@@ -56,3 +56,7 @@ main pre::-webkit-scrollbar{height:4px}main pre::-webkit-scrollbar-thumb{backgro
 .vp,[data-reel-fade]{transform:translate3d(var(--vp-px,0px),var(--vp-py,0px),0)}
 .vp :is(h1,h2),[data-reel-fade] > p:first-child{text-shadow:calc(var(--lx,0) * 1.2px) calc(var(--ly,0) * 1.2px) 1.5px rgba(233,240,248,calc(var(--li,0) * .7)),0 0 28px rgba(156,200,255,calc(var(--li,0) * .45)),0 0 22px rgba(4,8,14,.95),0 0 3px rgba(4,8,14,.9)}
 @media (prefers-reduced-motion: reduce){.vp,[data-reel-fade]{transform:none}}
+
+/* G8: on a phone nothing may widen the page (a block's parallax / depth transforms reached 393–401 px on a 390 viewport,
+   and mobile browsers zoomed out during each shot). clip, not hidden: no scroll container, so sticky blocks still work */
+@media (max-width:600px){html,body{overflow-x:clip}}

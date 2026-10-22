@@ -23,12 +23,12 @@
     + '.vd-ov{position:fixed;left:0;top:0;z-index:2;pointer-events:none;color:var(--fg,#E9F0F8);white-space:normal;margin:0}'
     + '.vd-w{display:inline-block;white-space:pre;text-align:left}';
   document.head.appendChild(css);
-  const state = new WeakMap(), seen = new WeakMap();
+  const state = new WeakMap(), seen = new WeakMap(), live = new Set(); // live: running overlays, re-placed by VegaDecode.sync()
   let armed = false;
 
   function reset(el) {
     if (RM.matches || !el || !armed) return;
-    const s = state.get(el); if (s) { cancelAnimationFrame(s.raf); s.ov.remove(); }
+    const s = state.get(el); if (s) { cancelAnimationFrame(s.raf); s.ov.remove(); live.delete(s); }
     state.delete(el); el.classList.add('vd-hold');
   }
   function run(el) {
@@ -44,10 +44,10 @@
     place(); document.body.appendChild(ov);
     spans.forEach(s => { s.style.width = s.getBoundingClientRect().width + 'px'; s.textContent = ''; });
     // timing after hubtown-study: ~25–35 ms per letter, words overlapping
-    const per = 28, scr = 220, t0 = performance.now(); let k = 0;
-    const plan = spans.map((s, i) => { const w = plain[i], start = k * per * 0.6; k += w.length; return { s, w, start }; });
+    const per = 12, scr = 110, t0 = performance.now(); let k = 0; /* G8: a headline settles in ~0.6 s (was 28 / 220: ~1.4 s) */
+    const plan = spans.map((s, i) => { const w = plain[i], start = k * per * 0.5; k += w.length; return { s, w, start }; });
     const end = Math.max(...plan.map(p => p.start + p.w.length * per + scr));
-    const st = { ov, raf: 0 }; state.set(el, st);
+    const st = { ov, raf: 0, place }; state.set(el, st); live.add(st);
     const tick = (now) => {
       const t = now - t0; place();
       for (const p of plan) {
@@ -56,7 +56,7 @@
         for (let i = 0; i < p.w.length; i++) { const on = p.start + i * per, fix = on + scr; if (t >= fix) out += p.w[i]; else if (t >= on) out += glyph(p.w[i]); else break; }
         p.s.textContent = out;
       }
-      if (t >= end) { ov.remove(); el.classList.remove('vd-hold'); state.delete(el); return; }
+      if (t >= end) { ov.remove(); el.classList.remove('vd-hold'); state.delete(el); live.delete(st); return; }
       st.raf = requestAnimationFrame(tick);
     };
     st.raf = requestAnimationFrame(tick);
@@ -88,5 +88,7 @@
   addEventListener('vegaarrive', (e) => inStop(e.detail.index).forEach(run));
   document.addEventListener('focusin', (e) => { const s = e.target.closest && e.target.closest('[data-stop]'); if (s) s.querySelectorAll('[data-decode]').forEach(run); });
   new MutationObserver(hold).observe(document.documentElement, { childList: true, subtree: true });
-  window.VegaDecode = { run, reset };
+  // sync(): re-place every running overlay on its heading now — a reel shot scrolls the page later in the same frame than
+  // the overlays' own tick, which left them one frame (20–35 px mid-shot) behind their headings (verifier G8)
+  window.VegaDecode = { run, reset, sync: () => live.forEach(s => s.place()) };
 })();

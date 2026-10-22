@@ -16,7 +16,7 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; // in-out cubic
   const fade = (t, a, b) => { const u = clamp((t - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); };
-  const LEG = 1500, PER = 260, MAXDUR = 2600; // ms for one chapter, each further chapter, the cap
+  const LEG = 900, PER = 160, MAXDUR = 1500; /* G8: was 1500 / 260 / 2600 — one notch committed the visitor to 1.5 s */ // ms for one chapter, each further chapter, the cap
   const GAP = 180;  // a wheel pause (ms) that ends a gesture: trackpad inertia after a play doesn't start another
   let cam = null, play = null, sm = null, lastWheel = 0, acc = 0, fired = false, queued = 0, touch = null;
 
@@ -74,14 +74,14 @@
     bs.forEach(b => {
       const o = +getComputedStyle(b.el).opacity;
       // G7 depth: going forward, the leaving text passes the lens (grows, blurs); going back it sinks into the scene
-      const so = dir > 0 ? 1.12 : 0.9, si = dir > 0 ? 0.88 : 1.1;
-      const kf = b.role === 'out' ? [{ opacity: o, translate: '0 0', scale: '1', filter: 'blur(0px)', easing: 'ease-in' }, { opacity: 0, translate: '0 ' + (-dir * D) + 'px', scale: String(so), filter: 'blur(5px)', offset: 0.32 }, { opacity: 0, translate: '0 ' + (-dir * D) + 'px', scale: String(so), filter: 'blur(5px)' }]
-        : b.role === 'in' ? [{ opacity: 0 }, { opacity: 0, offset: 0.6 }, { opacity: 1, offset: 0.64 }, { opacity: 1 }] // the block opens; its lines come in on their own (below)
+      const so = dir > 0 ? 1.04 : 0.97, si = dir > 0 ? 0.97 : 1.03; /* G8: depth kept, much less of it */
+      const kf = b.role === 'out' ? [{ opacity: o, translate: '0 0', scale: '1', filter: 'blur(0px)', easing: 'ease-in' }, { opacity: 0, translate: '0 ' + (-dir * D) + 'px', scale: String(so), filter: 'blur(2px)', offset: 0.3 }, { opacity: 0, translate: '0 ' + (-dir * D) + 'px', scale: String(so), filter: 'blur(2px)' }]
+        : b.role === 'in' ? [{ opacity: 0 }, { opacity: 0, offset: 0.45 }, { opacity: 1, offset: 0.48 }, { opacity: 1 }] // the block opens; its lines come in on their own (below)
         : [{ opacity: 0 }, { opacity: 0 }];
       b.anim = b.el.animate(kf, { duration: 1000, fill: 'both' }); b.anim.pause();
       // shader.se's reveal: the arriving block's lines rise in one after another out of a soft blur, on real time
-      if (b.role === 'in') b.lines = atoms(b.el).map((el, i) => el.animate([{ opacity: 0, translate: '0 ' + (dir * 26) + 'px', scale: String(si), filter: i < 6 ? 'blur(7px)' : 'none' }, { opacity: 1, translate: '0 0', scale: '1', filter: 'blur(0px)' }],
-        { duration: 760, delay: dur * 0.6 + Math.min(i, 10) * 75, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' }));
+      if (b.role === 'in') b.lines = atoms(b.el).map((el, i) => el.animate(el.matches('[data-decode]') || el.querySelector('[data-decode]') ? [{ opacity: 0 }, { opacity: 1 }] /* a decoding headline enters by its scramble: its overlay must sit on an unmoved box */ : [{ opacity: 0, translate: '0 ' + (dir * 14) + 'px', scale: String(si), filter: i < 6 ? 'blur(3px)' : 'none' }, { opacity: 1, translate: '0 0', scale: '1', filter: 'blur(0px)' }],
+        { duration: 420, delay: dur * 0.45 + Math.min(i, 10) * 35, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' }));
     });
     play = { from, to, y0, y1, t0: performance.now(), dur, bs };
     window.VegaReel.playing = true;
@@ -102,7 +102,7 @@
     window.VegaReel.t = t;
     // re-read the rest each frame: a layout change mid-play (fonts, resize) lands on the real stop
     const y1 = rests()[play.to]; play.y1 = y1;
-    scrollTo({ top: play.y0 + (y1 - play.y0) * ease(t), behavior: 'instant' });
+    scrollTo({ top: play.y0 + (y1 - play.y0) * ease(t), behavior: 'instant' }); if (window.VegaDecode && window.VegaDecode.sync) window.VegaDecode.sync(); // overlays follow this frame's scroll
     // the leaving text drifts out against the travel and fades in the first third; the arriving text comes in
     // over the last third, drifting the short way into place — a cut between shots, not a scroll. An arriving block
     // ends at the opacity the page gives it by then (chain's other steps stay dimmed)
@@ -110,7 +110,7 @@
     play.bs.forEach(b => { b.anim.currentTime = t * 1000; });
     // the arriving headline decodes as its block settles in (not after the camera settles: the number and arrow
     // would show alone for a beat; not earlier: the overlay lives in <body> and doesn't fade with the block)
-    if (t >= 0.88 && !play.dec) { play.dec = true; if (window.VegaDecode) play.bs.forEach(b => { if (b.role === 'in') b.el.querySelectorAll('[data-decode]').forEach(h => window.VegaDecode.run(h)); }); }
+    if (t >= 0.5 && !play.dec) { play.dec = true; if (window.VegaDecode) play.bs.forEach(b => { if (b.role === 'in') b.el.querySelectorAll('[data-decode]').forEach(h => window.VegaDecode.run(h)); }); }
     if (t < 1) requestAnimationFrame(step); else finish();
   };
 
@@ -133,7 +133,7 @@
     const dt = Math.min(0.05, (now - (sm.t || now)) / 1000 || 0.016); sm.t = now;
     sm.y += (sm.goal - sm.y) * (1 - Math.exp(-dt * 9));
     if (Math.abs(sm.goal - sm.y) < 0.5) sm.y = sm.goal;
-    scrollTo({ top: sm.y, behavior: 'instant' }); sm.w = scrollY;
+    scrollTo({ top: sm.y, behavior: 'instant' }); sm.w = scrollY; if (window.VegaDecode && window.VegaDecode.sync) window.VegaDecode.sync();
     if (sm.y !== sm.goal) requestAnimationFrame(glide); else sm = null;
   };
   const glideBy = (d, g) => {
@@ -237,7 +237,7 @@
     if (document.hidden) return;
     const root = document.documentElement;
     if (!RM.matches) { const k = 0.06; const nx = px + (tx - px) * k, ny = py + (ty - py) * k;
-      if (Math.abs(nx - px) + Math.abs(ny - py) > 0.0004) { px = nx; py = ny; root.style.setProperty('--vp-px', (-px * 14).toFixed(2) + 'px'); root.style.setProperty('--vp-py', (-py * 9).toFixed(2) + 'px'); } }
+      if (Math.abs(nx - px) + Math.abs(ny - py) > 0.0004) { px = nx; py = ny; root.style.setProperty('--vp-px', (-px * 6).toFixed(2) + 'px'); root.style.setProperty('--vp-py', (-py * 4).toFixed(2) + 'px'); } }
     if (now - lastLit < 50) return; lastLit = now; // 20 Hz is plenty for light that moves with the camera
     const g = document.querySelector('vega-galaxy'), st = g && !g.failed && g.star;
     const H = innerHeight, diag = Math.hypot(innerWidth, H);

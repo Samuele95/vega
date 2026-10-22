@@ -135,7 +135,7 @@ html.vfl-active vega-rail,html.vfl-active vega-readouts,html.vfl-active [data-fi
     ship = { pos, fwd, up, speed: 0, want: rm ? 0 : 4, av: [0, 0, 0], auto: null, near: null, mt: 0 };
     // leaving the page: from the page's camera (and its screen anchor) out to the ship, eased; reduced motion cuts
     const f = gal.frame; if (saved && f) saved.from = { eye: f.eye.slice(), fwd: nrm(f.fwd), up: [0, 1, 0], ax: f.ax || 0, ay: f.ay || 0 };
-    if (saved && saved.from && !rm) { ship.move = { t: 0, dur: 2.2, from: saved.from, to: { eye: pos, fwd, up, ax: 0, ay: 0 } }; gal.cam = Object.assign({}, saved.from); }
+    if (saved && saved.from && !rm) { ship.move = { t: 0, dur: 1.4, from: saved.from, to: { eye: pos, fwd, up, ax: 0, ay: 0 } }; gal.cam = Object.assign({}, saved.from); }
     else { gal.cam = { eye: pos, fwd, up }; root.classList.add('live'); }
     // labels: VEGA and the planets, pinned to their projections each frame
     const vega = el('div', 'vfl-lab vega vfl-c', { 'aria-hidden': 'true' }); vega.innerHTML = '<span>VEGA</span>'; root.appendChild(vega);
@@ -274,7 +274,10 @@ html.vfl-active vega-rail,html.vfl-active vega-readouts,html.vfl-active [data-fi
       }
       const g = Math.max(8, r2 + 8), C = [['r', q2[0] + g, q2[1] - 10], ['l', q2[0] - g - w, q2[1] - 10], ['r', q2[0] - w / 2, q2[1] - g - lh], ['r', q2[0] - w / 2, q2[1] + g]];
       let pick = C.find(([, x, y]) => x >= fr[0] && x + w <= fr[2] && y >= fr[1] && y + lh <= fr[3] && !hitR(x, y, w, lh) && !hitD(x, y, w, lh, it.i));
-      if (!pick && it.pri === 0) { const c = C.find(([, x, y]) => x >= fr[0] && x + w <= fr[2] && !hitR(x, y, w, lh)) || C[0]; pick = [c[0], Math.min(Math.max(fr[0], c[1]), fr[2] - w), Math.min(Math.max(fr[1], c[2]), fr[3] - lh)]; } // the target always keeps its label, inside the frame
+      if (!pick && it.pri === 0) { // the target always keeps its label: the nearest free spot around its candidates (clear of the cockpit's controls, so it stays clickable), else clamped inside the frame
+        const fit = (x, y) => x >= fr[0] && x + w <= fr[2] && y >= fr[1] && y + lh <= fr[3] && !hitR(x, y, w, lh);
+        for (let d = 16; d <= 240 && !pick; d += 16) for (const [sd, x0, y0] of C) { for (const [ox, oy] of [[0, -d], [0, d], [-d, 0], [d, 0]]) { const x = Math.min(Math.max(fr[0], x0 + ox), fr[2] - w), y = Math.min(Math.max(fr[1], y0 + oy), fr[3] - lh); if (fit(x, y)) { pick = [sd, x, y]; break; } } if (pick) break; }
+        if (!pick) { const c = C[0]; pick = [c[0], Math.min(Math.max(fr[0], c[1]), fr[2] - w), Math.min(Math.max(fr[1], c[2]), fr[3] - lh)]; } }
       if (!pick) { node.style.visibility = 'hidden'; return; }
       placed.push([pick[1], pick[2], pick[1] + w, pick[2] + lh]);
       node.classList.toggle('left', pick[0] === 'l'); node.style.visibility = 'visible';
@@ -315,7 +318,7 @@ html.vfl-active vega-rail,html.vfl-active vega-readouts,html.vfl-active [data-fi
       closing = true; root.classList.remove('live'); keys = {}; drag = null;
       document.documentElement.classList.remove('vfl-deep'); document.documentElement.classList.add('vfl-closing');
       const c = gal.cam || { eye: ship.pos, fwd: ship.fwd, up: ship.up };
-      ship.move = { t: 0, dur: 1.7, from: { eye: c.eye.slice(), fwd: nrm(c.fwd), up: c.up || [0, 1, 0], ax: c.ax || 0, ay: c.ay || 0 }, to: back2, done: finish };
+      ship.move = { t: 0, dur: 1.1, from: { eye: c.eye.slice(), fwd: nrm(c.fwd), up: c.up || [0, 1, 0], ax: c.ax || 0, ay: c.ay || 0 }, to: back2, done: finish };
       setTimeout(() => document.documentElement.classList.remove('vfl-active'), 1000); // (the text returns over the last of the move)
       if (window.VegaAudio && window.VegaAudio.motion) window.VegaAudio.motion(0);
       return; }

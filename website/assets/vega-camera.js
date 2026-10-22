@@ -36,7 +36,7 @@
   const smooth = (t) => t * t * (3 - 2 * t);
   const HOLD = 0.16; // share of each leg held at either end, so a stop settles before the next flight
   const hold = (f) => smooth(clamp((f - HOLD) / (1 - 2 * HOLD), 0, 1));
-  const DOLLY = 0.32; // share of zoom given up at mid-leg in a reel shot (vega-reel)
+  const DOLLY = 0.14; /* G8: was 0.32 */ // share of zoom given up at mid-leg in a reel shot (vega-reel)
   const SWAY = 0.1, SWAY_W = 0.13; // idle sway (rad, rad/s): the slow drift Hubtown's set pieces have, bounded so a stop's framing holds
 
   class VegaCamera extends HTMLElement {
@@ -237,7 +237,7 @@
       const prev = this.cur;
       if (!prev || rm) this.cur = target;
       else {
-        const k = 1 - Math.exp(-dt * 6.5), c = this.cur;
+        const k = 1 - Math.exp(-dt * 9), c = this.cur; /* G8: snappier (was 6.5) */
         c.yaw += (target.yaw - c.yaw) * k; c.pitch += (target.pitch - c.pitch) * k; c.zoom += (target.zoom - c.zoom) * k; c.opacity += (target.opacity - c.opacity) * k; c.nebula += (target.nebula - c.nebula) * k; c.cross += (target.cross - c.cross) * k; c.text += (target.text - c.text) * k;
         c.focus = c.focus.map((v, j) => v + (target.focus[j] - v) * k); c.at = c.at.map((v, j) => v + (target.at[j] - v) * k);
       }

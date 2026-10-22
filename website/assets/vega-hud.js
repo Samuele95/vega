@@ -60,6 +60,14 @@ vega-hud.vh-fold .vh-links,vega-hud.vh-fold .vh-sep{display:none}
 /* G7 one navigation: the page links are the menu; INDEX (the same pages as a dialog) only stands in for them when they fold */
 vega-hud:not(.vh-fold) .vh-index,vega-hud:not(.vh-fold) .vh-sep{display:none}
 [data-fighud].vh-clash{opacity:0!important;transition:opacity .25s ease!important}
+/* G8: a page's calm opening (html.vg-calm, index's hero): no frame, no chapter counter, the page links folded into INDEX */
+vega-hud .vh-frame{transition:opacity .4s ease}
+html.vg-calm vega-hud .vh-frame{opacity:0}
+html.vg-calm vega-hud .vh-links,html.vg-calm vega-hud .vh-sep{display:none}
+html.vg-calm vega-hud:not(.vh-fold) .vh-index{display:flex}
+vega-hud .vh-links{animation:vh-in .35s ease both}@keyframes vh-in{from{opacity:0}to{opacity:1}}
+html.vg-calm vega-rail{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:opacity .35s ease,visibility 0s linear .35s} /* hidden, not just transparent: out of the tab order */
+vega-rail{transition:opacity .35s ease,visibility 0s}
 @media (prefers-reduced-motion: reduce){vega-hud .vh-sound[aria-pressed="true"] .vh-eq i{animation:none;transform:scaleY(.7)}vega-hud *{transition:none!important}}
 `;
   const MARK = '<svg viewBox="0 0 64 64" aria-hidden="true"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"/><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"/><g stroke="var(--acc,#9CC8FF)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"/><line x1="36.2" y1="27.8" x2="46" y2="18"/><line x1="27.8" y1="36.2" x2="18" y2="46"/><line x1="36.2" y1="36.2" x2="46" y2="46"/></g><g fill="var(--acc,#9CC8FF)"><circle cx="18" cy="18" r="2.4"/><circle cx="46" cy="18" r="2.4"/><circle cx="18" cy="46" r="2.4"/><circle cx="46" cy="46" r="2.4"/></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"/><circle cx="32" cy="59" r="3.2"/><circle cx="9" cy="32" r="3.2"/><circle cx="55" cy="32" r="3.2"/></g><circle cx="32" cy="32" r="6" fill="currentColor"/></svg>';
@@ -145,11 +153,14 @@ vega-hud:not(.vh-fold) .vh-index,vega-hud:not(.vh-fold) .vh-sep{display:none}
         fx.forEach(el => { const r = el.getBoundingClientRect(); if (!r.width) return;
           el.classList.toggle('vh-clash', vps.some(b => b.left < r.right + 4 && b.right > r.left - 4 && b.top < r.bottom + 4 && b.bottom > r.top - 4)); }); }); };
       addEventListener('scroll', this.onClash, { passive: true }); addEventListener('resize', this.onClash); setTimeout(this.onClash, 800);
+      // a reel shot's scroll can end before its arriving text has faded in: check again when the shot ends and on arrival
+      this.onReelEnd = (e) => { if (e.detail && e.detail.state === 'end') { this.onClash(); setTimeout(this.onClash, 150); } };
+      addEventListener('vegareel', this.onReelEnd); addEventListener('vegaarrive', this.onClash);
       this.ro = new ResizeObserver(() => this.layout());
       this.ro.observe(this);
       this.layout();
     }
-    disconnectedCallback() { removeEventListener('scroll', this.onClash); removeEventListener('resize', this.onClash); this.ro && this.ro.disconnect(); removeEventListener('vegasound', this.onSound); removeEventListener('vegaflight', this.onFlight); removeEventListener('keydown', this.onKeyF); }
+    disconnectedCallback() { removeEventListener('vegareel', this.onReelEnd); removeEventListener('vegaarrive', this.onClash); removeEventListener('scroll', this.onClash); removeEventListener('resize', this.onClash); this.ro && this.ro.disconnect(); removeEventListener('vegasound', this.onSound); removeEventListener('vegaflight', this.onFlight); removeEventListener('keydown', this.onKeyF); }
 
     syncSound(animate) {
       const on = !!(window.VegaAudio && window.VegaAudio.on), text = on ? 'SOUND ON' : 'SOUND OFF';

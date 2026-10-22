@@ -380,7 +380,7 @@ void main() { gl_FragColor = vec4(v_col * v_a, v_a); }`;
       if (d) {
         const tgt = { dist: d.dist, yaw: d.yaw, pitch: d.pitch, ax: d.anchor ? d.anchor[0] / W * 2 - 1 : 0, ay: d.anchor ? 1 - d.anchor[1] / H * 2 : 0 };
         if (rm || !this._eased) { Object.assign(v, tgt); this._eased = true; }
-        else { const k = 1 - Math.exp(-dt * 5.5); v.yaw += (tgt.yaw - v.yaw) * k; v.pitch += (tgt.pitch - v.pitch) * k; v.ax += (tgt.ax - v.ax) * k; v.ay += (tgt.ay - v.ay) * k;
+        else { const k = 1 - Math.exp(-dt * 8); /* G8: was 5.5 */ v.yaw += (tgt.yaw - v.yaw) * k; v.pitch += (tgt.pitch - v.pitch) * k; v.ax += (tgt.ax - v.ax) * k; v.ay += (tgt.ay - v.ay) * k;
           v.dist = Math.exp(Math.log(v.dist) + (Math.log(tgt.dist) - Math.log(v.dist)) * k); } // distance eases in log space: the dive feels even
       }
       if (this.tick) this.tick(dt, now); // a pilot (vega-flight) moves el.cam inside this frame
@@ -407,7 +407,7 @@ void main() { gl_FragColor = vec4(v_col * v_a, v_a); }`;
         const hc = this._hc || (this._hc = { eye: eye.slice(), tg: tg.slice() }), kk = rm ? 1 : hold ? 0 : 1 - Math.exp(-dt * (this._arr && now - this._arr < 3200 ? 1.15 : 3));
         for (let j = 0; j < 3; j++) { hc.eye[j] += (eye[j] - hc.eye[j]) * kk; hc.tg[j] += (tg[j] - hc.tg[j]) * kk; }
         this.homeCam = { eye: hc.eye, fwd: [hc.tg[0] - hc.eye[0], hc.tg[1] - hc.eye[1], hc.tg[2] - hc.eye[2]], up: [0, 1, 0] };
-        const R = window.VegaReel; this.streak = R && R.playing ? Math.sin(Math.PI * (R.t || 0)) * 0.6 : 0;
+        const R = window.VegaReel; this.streak = R && R.playing ? Math.sin(Math.PI * (R.t || 0)) * 0.3 : 0;
       } else this.homeCam = null;
       const t = (now - this.t0) / 1000, spin = rm ? 0 : t * 0.006;
       const nrm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
@@ -429,7 +429,7 @@ void main() { gl_FragColor = vec4(v_col * v_a, v_a); }`;
       const ex = clamp(this.exposure == null ? 1 : this.exposure, 0, 1);
       gl.useProgram(this.ps);
       gl.uniformMatrix4fv(this.U.u_mvp, false, new Float32Array(MVP)); gl.uniform2f(this.U.u_anchor, ax, ay); gl.uniform1f(this.U.u_px, dpr);
-      gl.uniform1f(this.U.u_time, t); gl.uniform1f(this.U.u_tw, rm ? 0 : 1); gl.uniform1f(this.U.u_exp, ex * 0.85 * (1 - 0.55 * clamp(wp, 0, 1)));
+      gl.uniform1f(this.U.u_time, t); gl.uniform1f(this.U.u_tw, rm ? 0 : 1); gl.uniform1f(this.U.u_exp, ex * 0.85 * (1 - 0.55 * clamp(wp, 0, 1)) * (this.field == null ? 1 : clamp(this.field, 0, 1))); // el.field: the star field alone (not VEGA, its mark or the planets) — index's hero keeps it quiet
       this.attrs.forEach(a => { gl.bindBuffer(gl.ARRAY_BUFFER, a.b); gl.enableVertexAttribArray(a.loc); gl.vertexAttribPointer(a.loc, a.n, gl.FLOAT, false, 0, 0); });
       gl.drawArrays(gl.POINTS, 0, this.n);
       gl.blendFunc(gl.ZERO, gl.ONE_MINUS_SRC_ALPHA); gl.drawArrays(gl.POINTS, this.n, this.nd); gl.blendFunc(gl.ONE, gl.ONE); // dust absorbs

@@ -7,6 +7,7 @@
 <script src="./support.js"></script>
 </head>
 <body>
+<script src="../assets/vega-clock.js"></script>
 <script src="../assets/vega-scramble.js"></script>
 <script src="../assets/vega-audio.js"></script>
 <script src="../assets/vega-loader.js"></script>
@@ -124,6 +125,10 @@ class Component extends DCLogic {
   setClose = (el) => { this.closeRef.current = el; };
 
   componentDidMount() {
+    /* G8: the hero is calm, as the original — the HUD shows only V2.3.0, INDEX, SOUND and FLY until the first shot leaves it */
+    document.documentElement.classList.add('vg-calm');
+    this.onCalm = (e) => document.documentElement.classList.toggle('vg-calm', e.detail.index === 0);
+    addEventListener('vegastop', this.onCalm);
     this.onKey = (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (window.VegaLoader && window.VegaLoader.active) return;
@@ -289,7 +294,7 @@ class Component extends DCLogic {
       addEventListener('pointermove', this.onGalPtr, { passive: true });
       gal.drive = () => {
         const now = performance.now(), { lin } = cam.progress(), a = ease(Math.min(1, lin)), b = Math.max(0, lin - 1) / 5, q = sc.P && sc.P[0];
-        const crane = window.VegaReel && window.VegaReel.playing && lin >= 0.5 ? 1 + 0.45 * Math.sin(Math.PI * (window.VegaReel.t || 0)) : 1;
+        const crane = window.VegaReel && window.VegaReel.playing && lin >= 0.5 ? 1 + 0.18 * Math.sin(Math.PI * (window.VegaReel.t || 0)) : 1; /* G8: crane was 0.45 */
         const mr = mEl ? mEl.getBoundingClientRect() : null, heroL = mr ? 27 / 64 * mr.width : 0;
         const k = mr ? 1 - ease(Math.min(1, Math.max(0, (lin - 0.04) / 0.55))) : 0;
         let L = heroL, off = [0, 0], inP = rmq.matches ? 1 : (this.markInStart ? Math.min(1, Math.max(0, (now - this.markInStart) / this.markInDur)) : (this.gateUp ? 0 : 1));
@@ -298,9 +303,10 @@ class Component extends DCLogic {
           inP = 1; gal.exposure = 0.3 + 0.7 * ease(Math.min(1, (now - this.glide.t) / 1600)); if (u >= 1 && now - this.glide.t > 1600) this.glide = null; }
         else if (this.gateUp) gal.exposure = 0.3; else gal.exposure = 1;
         gal.mark = { L, k, in: inP };
+        gal.field = rmq.matches ? (lin < 0.5 ? 0.45 : 1) : 0.45 + 0.55 * ease(Math.min(1, Math.max(0, (lin - 0.05) / 0.6))); /* G8: the hero is the mark on a quiet sky (as the original); the galaxy comes up as the first shot leaves */
         gal.res = 1; // the mark is drawn crisp (one fixed size: a switch reallocates the canvas and the bloom mid-shot)
         gal.flare = 0.12 + 0.3 * (1 - k);
-        gal.streak = window.VegaReel && window.VegaReel.playing ? Math.sin(Math.PI * (window.VegaReel.t || 0)) * 0.9 : 0;
+        gal.streak = window.VegaReel && window.VegaReel.playing ? Math.sin(Math.PI * (window.VegaReel.t || 0)) * 0.4 : 0;
         const px = rmq.matches ? 0 : (this.gpx || 0), py = rmq.matches ? 0 : (this.gpy || 0);
         return { dist: 2600 * Math.pow(230 / 2600, a) * (1 - 0.35 * b) * crane, yaw: (sc.yaw || 0) * 0.6 + 0.5 + px * 0.09, pitch: 0.62 - 0.46 * a - 0.04 * b - py * 0.05, anchor: q ? [q[0] + off[0], q[1] + off[1]] : null };
       };
@@ -314,7 +320,8 @@ class Component extends DCLogic {
         // a film's key light: VEGA's side, with the light brought round toward the lens so a framed planet shows a
         // half / crescent instead of an eclipse (the stops look at each planet from outside the system)
         const lt = (x, y, z) => { const h = Math.hypot(x, y) || 1; return [x / h, y / h, Math.max(z / h, 0.55)]; };
-        const list = stars.map((i, k) => { const q = P[i]; return { x: q[0] + ox, y: q[1] + oy, r: 3.4 * q[3] * 3.6 * (i === sc.sel ? 1.2 : 1), L: lt(c[5] - q[5], c[6] - q[6], -(c[2] - q[2])), z: q[2], i: k, a: a * q[4] }; });
+        /* G8: no planets on the hero — they come in with the first shot */ const cm = document.querySelector('vega-camera'), hl = cm && cm.progress ? cm.progress().lin : 1, hk = Math.min(1, Math.max(0, (hl - 0.25) / 0.5)); if (hk <= 0.001) return null;
+        const list = stars.map((i, k) => { const q = P[i]; return { x: q[0] + ox, y: q[1] + oy, r: 3.4 * q[3] * 3.6 * (i === sc.sel ? 1.2 : 1), L: lt(c[5] - q[5], c[6] - q[6], -(c[2] - q[2])), z: q[2], i: k, a: a * q[4] * hk }; });
         list.coreZ = c[2]; return list; }; };
     this.tryGalaxy(); this.tryPlanets();
     // pinned readouts: each page star carries its INDEX number (spec §3, index), from the first page stop on
@@ -341,7 +348,7 @@ class Component extends DCLogic {
     if (this._gk !== undefined && this._gk !== key) this.g && this.g.rebuild();
     this._gk = key;
   }
-  componentWillUnmount() { if (this.onGalPtr) removeEventListener('pointermove', this.onGalPtr); clearTimeout(this.retry); clearTimeout(this.sceneRetry); const sc = document.querySelector('vega-constellation'); if (sc && this.onPick) sc.removeEventListener('pick', this.onPick); removeEventListener('keydown', this.onKey); this.onTilt && removeEventListener('pointermove', this.onTilt); clearTimeout(this.tEnd); clearTimeout(this.tPulse); removeEventListener('vegapulse', this.onPulse); removeEventListener('vegaindex', this.onIndex); this.onEnter && removeEventListener('vegaenter', this.onEnter); this.g && this.g.stop(); }
+  componentWillUnmount() { removeEventListener('vegastop', this.onCalm); document.documentElement.classList.remove('vg-calm'); if (this.onGalPtr) removeEventListener('pointermove', this.onGalPtr); clearTimeout(this.retry); clearTimeout(this.sceneRetry); const sc = document.querySelector('vega-constellation'); if (sc && this.onPick) sc.removeEventListener('pick', this.onPick); removeEventListener('keydown', this.onKey); this.onTilt && removeEventListener('pointermove', this.onTilt); clearTimeout(this.tEnd); clearTimeout(this.tPulse); removeEventListener('vegapulse', this.onPulse); removeEventListener('vegaindex', this.onIndex); this.onEnter && removeEventListener('vegaenter', this.onEnter); this.g && this.g.stop(); }
 
   ground() {
     const c = this.canvasRef.current; if (!c) return;
