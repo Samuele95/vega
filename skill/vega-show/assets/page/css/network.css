@@ -1,0 +1,11 @@
+/* The network area (js/net/**): the drawings' level switch when a graph has one level only, the
+   parts of the unit and stage card, and the weights read. Only the page's tokens (page.css). */
+.switch[hidden]{display:none}
+.net-card-title{margin:8px 0 4px}
+.net-card-members{font-size:13.5px}
+.net-card-note{margin:6px 0 0}
+.card .formula{margin:4px 0 2px}
+.net-map-lead{margin-top:10px}
+.net-map-scale{margin-left:18px}
+.net-matrix{margin:26px 0 0}
+.net-matrix-cap{margin-bottom:6px}

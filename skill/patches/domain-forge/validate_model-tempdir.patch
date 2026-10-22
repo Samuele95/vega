@@ -1,0 +1,29 @@
+--- a/scripts/validate_model.py
++++ b/scripts/validate_model.py
+@@ -757,7 +757,7 @@
+             return
+         instrumented = html_text[:idx] + probe + '\n  ' + html_text[idx:]
+ 
+-    with tempfile.TemporaryDirectory() as td:
++    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+         instr_path = os.path.join(td, 'instrumented.html')
+         with open(instr_path, 'w', encoding='utf-8') as fh:
+             fh.write(instrumented)
+@@ -943,7 +943,7 @@
+ """
+     idx = html_text.rfind('</body>')
+     instrumented = (html_text[:idx] + probe + html_text[idx:]) if idx >= 0 else (html_text + probe)
+-    with tempfile.TemporaryDirectory() as td:
++    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+         instr_path = os.path.join(td, 'instr.html')
+         with open(instr_path, 'w', encoding='utf-8') as fh:
+             fh.write(instrumented)
+@@ -1363,7 +1363,7 @@
+         warn("invariant 16: no headless browser found (google-chrome/chromium); "
+              "skipping per-layer isolation render")
+         return
+-    with tempfile.TemporaryDirectory() as td:
++    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
+         # Baseline: the page with every layer stripped. Errors already present
+         # here belong to the base model, not to a layer.
+         base = _l16_run(browser, _strip_layer_spans(doc, layers), "", td, "base")

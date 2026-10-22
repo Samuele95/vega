@@ -1,0 +1,20 @@
+{
+ "schema": "vega/verifier-run@1",
+ "skill": "vega-forge",
+ "verdict": "SHIP",
+ "blocking": 0,
+ "non_blocking": 0,
+ "inconclusive": 0,
+ "audited": {
+  "../vega/references/brief-contract.md": "sha256:b93e4be3aac9d7e34a5098537076a85c011a7ed2b02de61ad7a4be04232ea9a0",
+  "SKILL.md": "sha256:c7a1831dc13fb9f9e542e0976b84e78aea5601b6d410cba4a5049fb3f8e86bd3",
+  "references/backend-contract.md": "sha256:419152493c1bf563391625a6f5595c5969fa113b9590553351f366902c4b234a",
+  "references/code-contract.md": "sha256:e8010b665e88adc9c6b92ef5d3dc74d9cd2fcc7086b1f2c3909506dbcb9e2652",
+  "references/family-catalog.md": "sha256:e02bab695f5771710d17750b67fbfe50e451b60ed262561d5441e396d073d46d",
+  "references/netspec-contract.md": "sha256:5d65632e704e0222fe4e2d809857d518119d96bffb55dd6553d819d19190c803",
+  "references/notebook-contract.md": "sha256:6539523f3f7adeef64d952b1aa5e27ca9a34886597050a21c9fa53950c5fdebb",
+  "verifiers/static-verifier.md": "sha256:31fa572845ac6e0f51b1879fc820c8a99174123ef33b558f576d1dee559d195d"
+ },
+ "run_at": "2026-10-12T17:46:54Z",
+ "session": "498b3045-6db4-4c38-bd5f-a5d4413847a2"
+}

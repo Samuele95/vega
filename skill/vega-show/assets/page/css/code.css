@@ -1,0 +1,5 @@
+/* The code area (js/views/code.js): the parts of the code room today's page did not have — the line
+   saying the service did not check its files against the manifest. Only the page's tokens
+   (page.css); today's rules for the walk, the files, the source panel, its highlighting and its §
+   note lines stay in page.css. */
+.code-top .code-unverified{color:var(--alert)}

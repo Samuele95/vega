@@ -1,0 +1,3537 @@
+{
+  "schema": "vega/test-lanes@1",
+  "note": "The lane registry (BUILD-PLAN §4.8; D6 §3). A lane is declared here and proved by what its run observed (lanes/<id>/observed.json), never by this file. Budgets are 1.5 x the measured wall time rounded up to 30 s (D6 §16.5), and each stage share holds 1.5 x the slowest measured stage of its group (size_budgets.py, T12): measured on the release run of 2026-10-09 (every lane through page, -j 6, CPU, 2 threads per lane, machine load about 44 on 20 cores; runs/final/T12) and the final run's earlier lane runs; G00 keeps its estimate until it runs.",
+  "defaults": {
+    "threads": 2,
+    "n_boot": 200,
+    "max_epochs": 8,
+    "patience": 3,
+    "budget_s": {
+      "core": 150,
+      "full": 300
+    },
+    "allowed_skips": [
+      "non-finite values",
+      "digit-code column",
+      "monitor reference",
+      "no wheel could be built",
+      "code column with a pattern",
+      "packed with --no-inspect"
+    ],
+    "forbidden_skip_patterns": [
+      "cannot be shown",
+      "dense chain",
+      "view cannot",
+      "not available",
+      "no presets"
+    ],
+    "stage_shares": {
+      "fixture": 0.08,
+      "forge": 0.1,
+      "train": 0.2,
+      "eval": 0.12,
+      "pack": 0.1,
+      "bundle_api": 0.28,
+      "report": 0.01,
+      "show": 0.1,
+      "serve": 0.03,
+      "serve_check": 0.04,
+      "inspect": 0.05,
+      "page": 0.11
+    },
+    "acceptance_shares": {
+      "forge": 0.15,
+      "train": 0.22,
+      "eval": 0.15,
+      "pack": 0.23,
+      "bundle_api": 0.06,
+      "report": 0.01,
+      "show": 0.05,
+      "serve": 0.02,
+      "serve_check": 0.03,
+      "inspect": 0.03,
+      "page": 0.06
+    },
+    "golden_shares": {
+      "golden": 0.55,
+      "serve": 0.05,
+      "serve_check": 0.1,
+      "inspect": 0.1,
+      "page": 0.2
+    },
+    "stage_timeout_factor": 2,
+    "lane_kill_factor": 2,
+    "budget_warn_factor": 1.25,
+    "jobs": 6,
+    "adaptation_pairs": [
+      "L02:L01",
+      "L10:L02",
+      "L02:G00"
+    ]
+  },
+  "lanes": [
+    {
+      "id": "L01",
+      "title": "late orders, residual MLP (the acceptance chain)",
+      "driver": "acceptance",
+      "generator": "orders",
+      "variant": null,
+      "seed": 7,
+      "rows": 740,
+      "rows_unit": "row",
+      "entity": "Order",
+      "family": "mlp-residual",
+      "task": "binary",
+      "goal": "predict",
+      "shape": "row",
+      "target": {
+        "column": "late",
+        "classes": [
+          "0",
+          "1"
+        ],
+        "base": null,
+        "positive": "1",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null,
+        "source": "geometry:partitions/late",
+        "class_names": {
+          "0": "on time",
+          "1": "late"
+        }
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "embedding",
+          "params": {
+            "columns": [
+              "zip",
+              "region"
+            ],
+            "dims": {
+              "zip": 12,
+              "region": 4
+            }
+          }
+        },
+        {
+          "id": "B2",
+          "type": "concat",
+          "params": {}
+        },
+        {
+          "id": "B2b",
+          "type": "dense",
+          "params": {
+            "units": 64,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "residual",
+          "params": {
+            "repeat": 2,
+            "projection": "auto",
+            "inner": [
+              {
+                "type": "dense",
+                "params": {
+                  "units": 64,
+                  "activation": "none"
+                }
+              },
+              {
+                "type": "batchnorm",
+                "params": {}
+              },
+              {
+                "type": "activation",
+                "params": {
+                  "name": "gelu"
+                }
+              },
+              {
+                "type": "dropout",
+                "params": {
+                  "p": 0.2
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "B4",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "bce_with_logits",
+        "params": {
+          "pos_weight": 4.9
+        }
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "batch+serve",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1",
+          "R6"
+        ],
+        "hpo_trials": 5,
+        "expect_floor": "linear"
+      },
+      "report": "stub",
+      "roles": {
+        "0": "neutral",
+        "1": "alert"
+      },
+      "stances": [
+        "show: roles alert = 1 (user)"
+      ],
+      "lexicon": {
+        "target": {
+          "one": "delivery outcome",
+          "many": "delivery outcomes",
+          "article": "a"
+        },
+        "row": {
+          "one": "order",
+          "many": "orders",
+          "article": "an"
+        },
+        "feature": {
+          "one": "input",
+          "many": "inputs",
+          "article": "an"
+        },
+        "source": {
+          "one": "order system",
+          "many": "order systems",
+          "article": "the"
+        }
+      },
+      "service_title": "Late order detector",
+      "profile": "full",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": "reference",
+      "expect": {
+        "motif": "points"
+      },
+      "budget_s": 690
+    },
+    {
+      "id": "L02",
+      "title": "land cover from spectral bands, plain MLP",
+      "driver": "lanekit",
+      "generator": "landcover",
+      "variant": null,
+      "seed": 1,
+      "rows": 1800,
+      "rows_unit": "row",
+      "entity": "Parcel",
+      "family": "mlp-plain",
+      "task": "multiclass",
+      "goal": "predict",
+      "shape": "row",
+      "target": {
+        "column": "cover",
+        "classes": [
+          "water",
+          "forest",
+          "grassland",
+          "cropland",
+          "urban",
+          "bare"
+        ],
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "dense",
+          "params": {
+            "units": 64,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "gelu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B4",
+          "type": "dense",
+          "params": {
+            "units": 64,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B5",
+          "type": "activation",
+          "params": {
+            "name": "gelu"
+          }
+        },
+        {
+          "id": "B6",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B7",
+          "type": "head",
+          "params": {
+            "out": 6,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cross_entropy",
+        "params": {
+          "label_smoothing": 0.05
+        }
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 2,
+        "expect_floor": "linear"
+      },
+      "report": "stub",
+      "roles": {
+        "water": "plain",
+        "forest": "plain",
+        "grassland": "plain",
+        "cropland": "plain",
+        "urban": "plain",
+        "bare": "plain"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "parcel",
+          "many": "parcels",
+          "article": "a"
+        },
+        "feature": {
+          "one": "band",
+          "many": "bands",
+          "article": "a"
+        },
+        "source": {
+          "one": "satellite survey",
+          "many": "satellite surveys",
+          "article": "the"
+        }
+      },
+      "service_title": "Land cover classifier",
+      "profile": "full",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": "domain",
+      "expect": {
+        "motif": "points",
+        "real_subchain": true
+      },
+      "budget_s": 420
+    },
+    {
+      "id": "L03",
+      "title": "support tickets, FT-Transformer multilabel",
+      "driver": "lanekit",
+      "generator": "tickets",
+      "variant": null,
+      "seed": 1,
+      "rows": 1200,
+      "rows_unit": "row",
+      "entity": "Ticket",
+      "family": "ft-transformer",
+      "task": "multilabel",
+      "goal": "predict",
+      "shape": "row",
+      "target": {
+        "column": "tags",
+        "classes": [
+          "billing",
+          "bug",
+          "account",
+          "shipping"
+        ],
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": "delimited",
+        "sep": "|",
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "feature_tokenizer",
+          "params": {
+            "d": 32
+          }
+        },
+        {
+          "id": "B2",
+          "type": "transformer_encoder",
+          "params": {
+            "d": 32,
+            "heads": 4,
+            "layers": 2,
+            "ff": 64,
+            "dropout": 0.1
+          }
+        },
+        {
+          "id": "B3",
+          "type": "pool",
+          "params": {
+            "kind": "cls"
+          }
+        },
+        {
+          "id": "B4",
+          "type": "head",
+          "params": {
+            "out": 4,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "bce_with_logits",
+        "params": {}
+      },
+      "optimizer": {
+        "name": "adamw",
+        "params": {
+          "lr": 0.0001
+        }
+      },
+      "schedule": "cosine",
+      "init": "xavier_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": {
+        "billing": "plain",
+        "bug": "plain",
+        "account": "plain",
+        "shipping": "plain"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "ticket",
+          "many": "tickets",
+          "article": "a"
+        },
+        "feature": {
+          "one": "field",
+          "many": "fields",
+          "article": "a"
+        },
+        "source": {
+          "one": "help desk",
+          "many": "help desks",
+          "article": "the"
+        }
+      },
+      "service_title": "Ticket tagger",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "points"
+      },
+      "budget_s": 420
+    },
+    {
+      "id": "L04",
+      "title": "wine quality, linear ordinal (beaten by its baseline)",
+      "driver": "lanekit",
+      "generator": "wine",
+      "variant": null,
+      "seed": 1,
+      "rows": 1500,
+      "rows_unit": "row",
+      "entity": "Wine",
+      "family": "linear",
+      "task": "ordinal",
+      "goal": "predict",
+      "shape": "row",
+      "target": {
+        "column": "quality",
+        "classes": [
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "embedding",
+          "params": {
+            "columns": [
+              "color"
+            ],
+            "dims": {
+              "color": 2
+            }
+          }
+        },
+        {
+          "id": "B2",
+          "type": "concat",
+          "params": {}
+        },
+        {
+          "id": "B3",
+          "type": "head",
+          "params": {
+            "out": 5,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cumulative_link",
+        "params": {}
+      },
+      "optimizer": "sgd",
+      "schedule": "none",
+      "init": "xavier_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "dropped"
+      },
+      "report": "stub",
+      "roles": {
+        "3": "plain",
+        "4": "plain",
+        "5": "plain",
+        "6": "plain",
+        "7": "plain",
+        "8": "plain"
+      },
+      "stances": [
+        "show: motif grid (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "wine",
+          "many": "wines",
+          "article": "a"
+        },
+        "feature": {
+          "one": "measurement",
+          "many": "measurements",
+          "article": "a"
+        },
+        "source": {
+          "one": "wine laboratory",
+          "many": "wine laboratories",
+          "article": "the"
+        }
+      },
+      "service_title": "Wine quality grader",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "grid",
+        "verdict": "beaten_by_baseline"
+      },
+      "budget_s": 240
+    },
+    {
+      "id": "L05",
+      "title": "house prices, the blocks lane (parallel, reshape, custom)",
+      "driver": "lanekit",
+      "generator": "housing",
+      "variant": null,
+      "seed": 1,
+      "rows": 1600,
+      "rows_unit": "row",
+      "entity": "Sale",
+      "family": "mlp-plain",
+      "task": "regression",
+      "goal": "predict",
+      "shape": "row",
+      "target": {
+        "column": "price_keur",
+        "classes": null,
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "embedding",
+          "params": {
+            "columns": [
+              "district"
+            ],
+            "dims": {
+              "district": 4
+            }
+          }
+        },
+        {
+          "id": "B2",
+          "type": "concat",
+          "params": {}
+        },
+        {
+          "id": "B3",
+          "type": "parallel",
+          "params": {
+            "merge": "concat",
+            "inner": [
+              {
+                "type": "dense",
+                "params": {
+                  "units": 32,
+                  "activation": "sigmoid"
+                }
+              },
+              {
+                "type": "sequential",
+                "params": {
+                  "inner": [
+                    {
+                      "type": "dense",
+                      "params": {
+                        "units": 32,
+                        "activation": "none"
+                      }
+                    },
+                    {
+                      "type": "layernorm",
+                      "params": {}
+                    },
+                    {
+                      "type": "activation",
+                      "params": {
+                        "name": "silu"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "B4",
+          "type": "reshape",
+          "params": {
+            "shape": [
+              4,
+              16
+            ]
+          }
+        },
+        {
+          "id": "B5",
+          "type": "pool",
+          "params": {
+            "kind": "mean"
+          }
+        },
+        {
+          "id": "B6",
+          "type": "custom",
+          "params": {
+            "code_ref": "custom/custom_gain.py",
+            "out_shape": [
+              16
+            ]
+          },
+          "source": "user:stance/custom-gain"
+        },
+        {
+          "id": "B7",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B8",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "huber",
+        "params": {
+          "delta": 1.0
+        }
+      },
+      "optimizer": "adam",
+      "schedule": "plateau",
+      "init": "kaiming_normal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "linear"
+      },
+      "report": "stub",
+      "roles": null,
+      "stances": [
+        "network: custom block custom_gain (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "sale",
+          "many": "sales",
+          "article": "a"
+        },
+        "feature": {
+          "one": "attribute",
+          "many": "attributes",
+          "article": "an"
+        },
+        "source": {
+          "one": "land registry",
+          "many": "land registries",
+          "article": "the"
+        }
+      },
+      "service_title": "House price estimator",
+      "profile": "core",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "contours",
+        "spatial": true,
+        "markers": {
+          "forge": {
+            "warn_max": 1
+          }
+        }
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L06",
+      "title": "turbine faults, autoencoder anomaly (labelled)",
+      "driver": "lanekit",
+      "generator": "turbine",
+      "variant": "labelled",
+      "seed": 3,
+      "rows": 2000,
+      "rows_unit": "row",
+      "entity": "Reading",
+      "family": "autoencoder",
+      "task": "anomaly",
+      "goal": "anomaly",
+      "shape": "row",
+      "target": {
+        "column": "fault",
+        "classes": [
+          "ok",
+          "fault"
+        ],
+        "base": null,
+        "positive": "fault",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "sequential",
+          "params": {
+            "inner": [
+              {
+                "type": "dense",
+                "params": {
+                  "units": 16,
+                  "activation": "none"
+                }
+              },
+              {
+                "type": "activation",
+                "params": {
+                  "name": "relu"
+                }
+              },
+              {
+                "type": "dropout",
+                "params": {
+                  "p": 0.1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "B2",
+          "type": "dense",
+          "params": {
+            "units": 4,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "decoder",
+          "params": {
+            "widths": [
+              16
+            ],
+            "activation": "relu"
+          }
+        },
+        {
+          "id": "B4",
+          "type": "head",
+          "params": {
+            "out": "recon_dim",
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "reconstruction",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "pca-floor"
+      },
+      "report": "none",
+      "roles": {
+        "ok": "neutral",
+        "fault": "alert"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "feature": {
+          "one": "sensor",
+          "many": "sensors",
+          "article": "a"
+        },
+        "source": {
+          "one": "turbine controller",
+          "many": "turbine controllers",
+          "article": "the"
+        }
+      },
+      "service_title": "Turbine fault detector",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "points"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L07",
+      "title": "household meter profiles, PCA floor reconstruction",
+      "driver": "lanekit",
+      "generator": "meters",
+      "variant": null,
+      "seed": 2,
+      "rows": 1400,
+      "rows_unit": "row",
+      "entity": "MeterDay",
+      "family": "pca-floor",
+      "task": "unsupervised",
+      "goal": "reconstruct",
+      "shape": "row",
+      "target": {
+        "column": null,
+        "classes": null,
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "dense",
+          "params": {
+            "units": 3,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "head",
+          "params": {
+            "out": "recon_dim",
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "reconstruction",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "xavier_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": null,
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "household day",
+          "many": "household days",
+          "article": "a"
+        },
+        "feature": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "source": {
+          "one": "smart meter",
+          "many": "smart meters",
+          "article": "the"
+        }
+      },
+      "service_title": "Meter profile reconstructor",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "points"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L08",
+      "title": "turbine readings, VAE anomaly (unlabelled)",
+      "driver": "lanekit",
+      "generator": "turbine",
+      "variant": "unlabelled",
+      "seed": 1,
+      "rows": 2000,
+      "rows_unit": "row",
+      "entity": "Reading",
+      "family": "vae",
+      "task": "anomaly",
+      "goal": "anomaly",
+      "shape": "row",
+      "target": {
+        "column": null,
+        "classes": [
+          "normal",
+          "anomalous"
+        ],
+        "base": null,
+        "positive": "anomalous",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": 0.03
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "sequential",
+          "params": {
+            "inner": [
+              {
+                "type": "dense",
+                "params": {
+                  "units": 16,
+                  "activation": "none"
+                }
+              },
+              {
+                "type": "activation",
+                "params": {
+                  "name": "gelu"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "B2",
+          "type": "dense",
+          "params": {
+            "units": 8,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "reparameterize",
+          "params": {
+            "z": 4
+          }
+        },
+        {
+          "id": "B4",
+          "type": "decoder",
+          "params": {
+            "widths": [
+              16
+            ],
+            "activation": "gelu"
+          }
+        },
+        {
+          "id": "B5",
+          "type": "head",
+          "params": {
+            "out": "recon_dim",
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "vae",
+        "params": {
+          "beta": 1
+        }
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "xavier_normal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "pca-floor"
+      },
+      "report": "none",
+      "roles": {
+        "normal": "neutral",
+        "anomalous": "alert"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "feature": {
+          "one": "sensor",
+          "many": "sensors",
+          "article": "a"
+        },
+        "source": {
+          "one": "turbine controller",
+          "many": "turbine controllers",
+          "article": "the"
+        }
+      },
+      "service_title": "Turbine anomaly monitor",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "verdict": "not_assessable",
+        "motif": "points"
+      },
+      "budget_s": 300
+    },
+    {
+      "id": "L09",
+      "title": "turbine faults, deep SVDD (labelled)",
+      "driver": "lanekit",
+      "generator": "turbine",
+      "variant": "labelled",
+      "seed": 1,
+      "rows": 2000,
+      "rows_unit": "row",
+      "entity": "Reading",
+      "family": "deep-svdd",
+      "task": "anomaly",
+      "goal": "anomaly",
+      "shape": "row",
+      "target": {
+        "column": "fault",
+        "classes": [
+          "ok",
+          "fault"
+        ],
+        "base": null,
+        "positive": "fault",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "sequential",
+          "params": {
+            "inner": [
+              {
+                "type": "dense",
+                "params": {
+                  "units": 16,
+                  "activation": "none"
+                }
+              },
+              {
+                "type": "activation",
+                "params": {
+                  "name": "tanh"
+                }
+              },
+              {
+                "type": "dense",
+                "params": {
+                  "units": 8,
+                  "activation": "none"
+                }
+              },
+              {
+                "type": "activation",
+                "params": {
+                  "name": "leaky_relu"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "B2",
+          "type": "head",
+          "params": {
+            "out": 4,
+            "activation": "none",
+            "bias": false
+          }
+        }
+      ],
+      "loss": {
+        "name": "svdd",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "pca-floor"
+      },
+      "report": "none",
+      "roles": {
+        "ok": "neutral",
+        "fault": "alert"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "feature": {
+          "one": "sensor",
+          "many": "sensors",
+          "article": "a"
+        },
+        "source": {
+          "one": "turbine controller",
+          "many": "turbine controllers",
+          "article": "the"
+        }
+      },
+      "service_title": "Turbine one-class monitor",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "points"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L10",
+      "title": "bike-share demand, GRU forecast over three stations",
+      "driver": "lanekit",
+      "generator": "bikeshare",
+      "variant": null,
+      "seed": 1,
+      "rows": 2400,
+      "rows_unit": "row",
+      "entity": "Hour",
+      "family": "gru",
+      "task": "forecast",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "demand",
+        "classes": null,
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 24,
+        "stride": 1,
+        "horizon": 3,
+        "series_by": "station",
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": true,
+        "autoregressive_source": null,
+        "season": 24
+      },
+      "graph": null,
+      "recipe_options": {
+        "lag": {
+          "column": "demand",
+          "depth": 2
+        }
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "embedding",
+          "params": {
+            "columns": [
+              "weather"
+            ],
+            "dims": {
+              "weather": 3
+            }
+          }
+        },
+        {
+          "id": "B2",
+          "type": "concat",
+          "params": {}
+        },
+        {
+          "id": "B3",
+          "type": "gru",
+          "params": {
+            "hidden": 32,
+            "num_layers": 1,
+            "return": "last"
+          }
+        },
+        {
+          "id": "B4",
+          "type": "head",
+          "params": {
+            "out": 3,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "mse",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1",
+          "R1b"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "linear+flatten"
+      },
+      "report": "stub",
+      "roles": null,
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "hour",
+          "many": "hours",
+          "article": "an"
+        },
+        "feature": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "source": {
+          "one": "bike-share system",
+          "many": "bike-share systems",
+          "article": "the"
+        },
+        "step": {
+          "one": "hour",
+          "many": "hours",
+          "article": "an"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Bike-share demand forecast",
+      "profile": "full",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": "task",
+      "expect": {
+        "verdict": "not_earned",
+        "motif": "traces"
+      },
+      "budget_s": 450,
+      "budget": {
+        "max_epochs": 60,
+        "patience": 10,
+        "reason": "the gru forecaster reading its last state still improves at epoch 8 (valid mase 1.87 against the rnn floor's 1.70); at 60 epochs it wins beyond the valid noise (0.88 against the rnn floor's 0.99 and the linear floor's 1.00); a run takes seconds, well inside the stage time limits"
+      },
+      "changes": [
+        {
+          "amendment": "A38",
+          "what": "blocks: embedding, concat, gru(all), attention(pool), head(3) became embedding, concat, gru(return: last), head(3) — the catalog's standard gru forecaster reading its last state; the shape facts (three series, the nominal weather, the lag step, the autoregressive channel, horizon 3) and the bikeshare generator are unchanged",
+          "why": "attention(pool) is self-attention followed by a mean over the whole 24-step window: over a day-long window it averages away the hour of day, the data's main signal, so the rnn floor rightly won (runs/gen-landing, A37 stop); the last state carries the hour; A39 records it (BUILD-PLAN §4.8 superseded: embedding, concat, gru(return: last), head(3); budget 60/10)"
+        }
+      ]
+    },
+    {
+      "id": "L11",
+      "title": "bike-share demand, transformer quantile forecast",
+      "driver": "lanekit",
+      "generator": "bikeshare",
+      "variant": null,
+      "seed": 1,
+      "rows": 2400,
+      "rows_unit": "row",
+      "entity": "Hour",
+      "family": "transformer-seq",
+      "task": "forecast",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "demand",
+        "classes": null,
+        "base": null,
+        "positive": null,
+        "quantiles": [
+          0.1,
+          0.5,
+          0.9
+        ],
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 24,
+        "stride": 1,
+        "horizon": 3,
+        "series_by": "station",
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": false,
+        "autoregressive_source": "user:stance/exogenous-only",
+        "season": 24
+      },
+      "graph": null,
+      "recipe_options": {
+        "encode": {
+          "weather": "onehot"
+        }
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "dense",
+          "params": {
+            "units": 32,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "positional",
+          "params": {
+            "kind": "sinusoidal"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "transformer_encoder",
+          "params": {
+            "d": 32,
+            "heads": 4,
+            "layers": 1,
+            "ff": 64,
+            "dropout": 0.1
+          }
+        },
+        {
+          "id": "B4",
+          "type": "pool",
+          "params": {
+            "kind": "mean"
+          }
+        },
+        {
+          "id": "B5",
+          "type": "head",
+          "params": {
+            "out": 9,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "quantile",
+        "params": {
+          "quantiles": [
+            0.1,
+            0.5,
+            0.9
+          ]
+        }
+      },
+      "optimizer": "radam",
+      "schedule": "onecycle",
+      "init": "xavier_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": null,
+      "stances": [
+        "network: autoregressive false (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "hour",
+          "many": "hours",
+          "article": "an"
+        },
+        "feature": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "source": {
+          "one": "bike-share system",
+          "many": "bike-share systems",
+          "article": "the"
+        },
+        "step": {
+          "one": "hour",
+          "many": "hours",
+          "article": "an"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Bike-share demand quantiles",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 330
+    },
+    {
+      "id": "L12",
+      "title": "machine vibration states, 1-D CNN",
+      "driver": "lanekit",
+      "generator": "vibration",
+      "variant": null,
+      "seed": 1,
+      "rows": 2000,
+      "rows_unit": "row",
+      "entity": "Frame",
+      "family": "cnn1d",
+      "task": "sequence-classification",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "state",
+        "classes": [
+          "normal",
+          "imbalance",
+          "misalignment",
+          "bearing"
+        ],
+        "base": "multiclass",
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 32,
+        "stride": 1,
+        "horizon": null,
+        "series_by": null,
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "conv1d",
+          "params": {
+            "channels": 16,
+            "kernel": 5,
+            "padding": 2
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "silu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "pool1d",
+          "params": {
+            "kind": "max",
+            "size": 2
+          }
+        },
+        {
+          "id": "B4",
+          "type": "conv1d",
+          "params": {
+            "channels": 32,
+            "kernel": 5,
+            "padding": 2
+          }
+        },
+        {
+          "id": "B5",
+          "type": "activation",
+          "params": {
+            "name": "silu"
+          }
+        },
+        {
+          "id": "B6",
+          "type": "pool1d",
+          "params": {
+            "kind": "avg",
+            "size": 2
+          }
+        },
+        {
+          "id": "B7",
+          "type": "flatten",
+          "params": {}
+        },
+        {
+          "id": "B8",
+          "type": "dense",
+          "params": {
+            "units": 32,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B9",
+          "type": "activation",
+          "params": {
+            "name": "silu"
+          }
+        },
+        {
+          "id": "B10",
+          "type": "head",
+          "params": {
+            "out": 4,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cross_entropy",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "onecycle",
+      "init": "kaiming_normal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "linear+flatten"
+      },
+      "report": "none",
+      "roles": {
+        "normal": "neutral",
+        "imbalance": "alert",
+        "misalignment": "alert",
+        "bearing": "alert"
+      },
+      "stances": [
+        "show: roles alert = imbalance, misalignment, bearing (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "frame",
+          "many": "frames",
+          "article": "a"
+        },
+        "feature": {
+          "one": "statistic",
+          "many": "statistics",
+          "article": "a"
+        },
+        "source": {
+          "one": "vibration sensor",
+          "many": "vibration sensors",
+          "article": "the"
+        },
+        "step": {
+          "one": "second",
+          "many": "seconds",
+          "article": "a"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Machine state classifier",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L13",
+      "title": "machine vibration faults, bidirectional GRU multilabel",
+      "driver": "lanekit",
+      "generator": "vibration",
+      "variant": "multilabel",
+      "seed": 1,
+      "rows": 2000,
+      "rows_unit": "row",
+      "entity": "Frame",
+      "family": "bi-gru",
+      "task": "sequence-classification",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "faults",
+        "classes": [
+          "imbalance",
+          "misalignment",
+          "bearing"
+        ],
+        "base": "multilabel",
+        "positive": null,
+        "quantiles": null,
+        "label_format": "delimited",
+        "sep": "|",
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 32,
+        "stride": 1,
+        "horizon": null,
+        "series_by": null,
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "gru",
+          "params": {
+            "hidden": 32,
+            "bidirectional": true,
+            "return": "last"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B3",
+          "type": "head",
+          "params": {
+            "out": 3,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "bce_with_logits",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": {
+        "imbalance": "plain",
+        "misalignment": "plain",
+        "bearing": "plain"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "frame",
+          "many": "frames",
+          "article": "a"
+        },
+        "feature": {
+          "one": "statistic",
+          "many": "statistics",
+          "article": "a"
+        },
+        "source": {
+          "one": "vibration sensor",
+          "many": "vibration sensors",
+          "article": "the"
+        },
+        "step": {
+          "one": "second",
+          "many": "seconds",
+          "article": "a"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Machine fault tagger",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 540
+    },
+    {
+      "id": "L14",
+      "title": "tank alarm, RNN",
+      "driver": "lanekit",
+      "generator": "tank",
+      "variant": null,
+      "seed": 1,
+      "rows": 1800,
+      "rows_unit": "row",
+      "entity": "Minute",
+      "family": "rnn",
+      "task": "sequence-classification",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "alarm",
+        "classes": [
+          "0",
+          "1"
+        ],
+        "base": "binary",
+        "positive": "1",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 16,
+        "stride": 1,
+        "horizon": null,
+        "series_by": null,
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "rnn",
+          "params": {
+            "hidden": 32,
+            "nonlinearity": "tanh",
+            "return": "last"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B3",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "bce_with_logits",
+        "params": {}
+      },
+      "optimizer": "rmsprop",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": {
+        "0": "neutral",
+        "1": "alert"
+      },
+      "stances": [
+        "show: roles alert = 1 (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "feature": {
+          "one": "signal",
+          "many": "signals",
+          "article": "a"
+        },
+        "source": {
+          "one": "tank controller",
+          "many": "tank controllers",
+          "article": "the"
+        },
+        "step": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Tank alarm predictor",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "verdict": "not_earned",
+        "motif": "traces"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L15",
+      "title": "tank alarm, bidirectional LSTM with focal loss",
+      "driver": "lanekit",
+      "generator": "tank",
+      "variant": null,
+      "seed": 1,
+      "rows": 1800,
+      "rows_unit": "row",
+      "entity": "Minute",
+      "family": "bi-lstm",
+      "task": "sequence-classification",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "alarm",
+        "classes": [
+          "0",
+          "1"
+        ],
+        "base": "binary",
+        "positive": "1",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 16,
+        "stride": 1,
+        "horizon": null,
+        "series_by": null,
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "lstm",
+          "params": {
+            "hidden": 32,
+            "bidirectional": true,
+            "return": "last"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B3",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "focal",
+        "params": {
+          "gamma": 2
+        }
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": {
+        "0": "neutral",
+        "1": "alert"
+      },
+      "stances": [
+        "show: roles alert = 1 (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "feature": {
+          "one": "signal",
+          "many": "signals",
+          "article": "a"
+        },
+        "source": {
+          "one": "tank controller",
+          "many": "tank controllers",
+          "article": "the"
+        },
+        "step": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Tank alarm predictor",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 240
+    },
+    {
+      "id": "L16",
+      "title": "tank minutes to empty, LSTM regression",
+      "driver": "lanekit",
+      "generator": "tank",
+      "variant": null,
+      "seed": 1,
+      "rows": 1800,
+      "rows_unit": "row",
+      "entity": "Minute",
+      "family": "lstm",
+      "task": "sequence-regression",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "minutes_to_empty",
+        "classes": null,
+        "base": "regression",
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 16,
+        "stride": 1,
+        "horizon": null,
+        "series_by": null,
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "lstm",
+          "params": {
+            "hidden": 32,
+            "return": "all"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "attention",
+          "params": {
+            "heads": 2,
+            "dim": 32,
+            "pool": true
+          }
+        },
+        {
+          "id": "B3",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "mae",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "linear+flatten"
+      },
+      "report": "none",
+      "roles": null,
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "feature": {
+          "one": "signal",
+          "many": "signals",
+          "article": "a"
+        },
+        "source": {
+          "one": "tank controller",
+          "many": "tank controllers",
+          "article": "the"
+        },
+        "step": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Tank emptying estimator",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 270,
+      "budget": {
+        "max_epochs": 30,
+        "patience": 10,
+        "reason": "the lstm still improves at epoch 8 (valid rmse 9.9, level with the linear floor's 9.8, both at their last epoch); at 30 epochs it wins beyond the valid noise (4.3 against 8.2); a run takes seconds, well inside the stage time limits"
+      },
+      "changes": [
+        {
+          "amendment": "A38",
+          "what": "tank's minutes_to_empty became the trailing 15-minute mean of the per-minute clipped time to empty (the level over that minute's net drain rate, 0-120); alarm and grade, the tank's other labels, are unchanged",
+          "why": "the instantaneous ratio suits a linear model reading the window's last step better than an lstm pooling its steps; a mean of a non-linear per-minute quantity is what the lstm family's step-then-pool reading is for, and a linear model over the window cannot form the ratio"
+        },
+        {
+          "amendment": "A38",
+          "what": "blocks: lstm(all), pool(mean), head became lstm(all), attention(pool), head — the lstm family's first catalog reducer in place of its alternative",
+          "why": "A38's L10 change left the catalog's attention block with no lane, and every catalog block must be declared by one (test_lanekit.py); of the two families that hold it (gru, lstm) this lane's window-averaged label is the one a pooled attention reads, and it seals the lstm beyond noise (4.3 against the linear floor's 8.2); ratified by A39 (BUILD-PLAN §4.8 superseded: lstm(all), attention(pool), head; budget 30/10)"
+        }
+      ]
+    },
+    {
+      "id": "L17",
+      "title": "tank operating grade, LSTM with attention pooling (ordinal)",
+      "driver": "lanekit",
+      "generator": "tank",
+      "variant": null,
+      "seed": 1,
+      "rows": 1800,
+      "rows_unit": "row",
+      "entity": "Minute",
+      "family": "lstm-attention",
+      "task": "sequence-regression",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "grade",
+        "classes": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ],
+        "base": "ordinal",
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 16,
+        "stride": 1,
+        "horizon": null,
+        "series_by": null,
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "lstm",
+          "params": {
+            "hidden": 32,
+            "return": "all"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "attention_pool",
+          "params": {
+            "hidden": 32
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B4",
+          "type": "head",
+          "params": {
+            "out": 3,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cumulative_link",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": {
+        "0": "plain",
+        "1": "plain",
+        "2": "plain",
+        "3": "plain"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "feature": {
+          "one": "signal",
+          "many": "signals",
+          "article": "a"
+        },
+        "source": {
+          "one": "tank controller",
+          "many": "tank controllers",
+          "article": "the"
+        },
+        "step": {
+          "one": "minute",
+          "many": "minutes",
+          "article": "a"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Tank grade estimator",
+      "profile": "core",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 240
+    },
+    {
+      "id": "L18",
+      "title": "bike-share demand, GRU with attention pooling (quantiles)",
+      "driver": "lanekit",
+      "generator": "bikeshare",
+      "variant": null,
+      "seed": 1,
+      "rows": 2400,
+      "rows_unit": "row",
+      "entity": "Hour",
+      "family": "gru-attention",
+      "task": "sequence-regression",
+      "goal": "predict",
+      "shape": "window",
+      "target": {
+        "column": "demand",
+        "classes": null,
+        "base": "regression",
+        "positive": null,
+        "quantiles": [
+          0.1,
+          0.5,
+          0.9
+        ],
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": {
+        "length": 24,
+        "stride": 1,
+        "horizon": null,
+        "series_by": "station",
+        "order_by": "ts",
+        "context": "previous-part",
+        "autoregressive": null,
+        "autoregressive_source": null,
+        "season": null
+      },
+      "graph": null,
+      "recipe_options": {
+        "encode": {
+          "weather": "onehot"
+        }
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "gru",
+          "params": {
+            "hidden": 32,
+            "return": "all"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "attention_pool",
+          "params": {
+            "hidden": 32
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B4",
+          "type": "head",
+          "params": {
+            "out": 3,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "quantile",
+        "params": {
+          "quantiles": [
+            0.1,
+            0.5,
+            0.9
+          ]
+        }
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "orthogonal",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": null,
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "hour",
+          "many": "hours",
+          "article": "an"
+        },
+        "feature": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "source": {
+          "one": "bike-share system",
+          "many": "bike-share systems",
+          "article": "the"
+        },
+        "step": {
+          "one": "hour",
+          "many": "hours",
+          "article": "an"
+        },
+        "window": {
+          "one": "window",
+          "many": "windows",
+          "article": "a"
+        }
+      },
+      "service_title": "Bike-share demand range",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "traces"
+      },
+      "budget_s": 360
+    },
+    {
+      "id": "L19",
+      "title": "grid overload, GCN node classification",
+      "driver": "lanekit",
+      "generator": "grid",
+      "variant": null,
+      "seed": 1,
+      "rows": 1500,
+      "rows_unit": "row",
+      "entity": "Bus",
+      "family": "gcn",
+      "task": "binary",
+      "goal": "predict",
+      "shape": "graph",
+      "target": {
+        "column": "overloaded",
+        "classes": [
+          "ok",
+          "overloaded"
+        ],
+        "base": null,
+        "positive": "overloaded",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": {
+        "method": "key_pair",
+        "columns": [
+          "bus_key",
+          "feeder_to"
+        ],
+        "k": null,
+        "weight": null,
+        "level": "node",
+        "protocol": "inductive",
+        "protocol_source": null,
+        "graph_id": null,
+        "batching": "full",
+        "neighbours": null,
+        "symmetric": true
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "edge_dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B2",
+          "type": "gcn_conv",
+          "params": {
+            "out": 32
+          }
+        },
+        {
+          "id": "B3",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B4",
+          "type": "dropout",
+          "params": {
+            "p": 0.5
+          }
+        },
+        {
+          "id": "B5",
+          "type": "gcn_conv",
+          "params": {
+            "out": 32
+          }
+        },
+        {
+          "id": "B6",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B7",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "bce_with_logits",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "linear"
+      },
+      "report": "none",
+      "roles": {
+        "ok": "neutral",
+        "overloaded": "alert"
+      },
+      "stances": [
+        "show: roles alert = overloaded (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "bus",
+          "many": "buses",
+          "article": "a"
+        },
+        "feature": {
+          "one": "measurement",
+          "many": "measurements",
+          "article": "a"
+        },
+        "source": {
+          "one": "grid operator",
+          "many": "grid operators",
+          "article": "the"
+        },
+        "node": {
+          "one": "bus",
+          "many": "buses",
+          "article": "a"
+        },
+        "edge": {
+          "one": "feeder",
+          "many": "feeders",
+          "article": "a"
+        }
+      },
+      "service_title": "Grid overload detector",
+      "profile": "core",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "links"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L20",
+      "title": "paper topics, GAT node classification",
+      "driver": "lanekit",
+      "generator": "papers",
+      "variant": null,
+      "seed": 1,
+      "rows": 1400,
+      "rows_unit": "row",
+      "entity": "Paper",
+      "family": "gat",
+      "task": "multiclass",
+      "goal": "predict",
+      "shape": "graph",
+      "target": {
+        "column": "topic",
+        "classes": [
+          "theory",
+          "systems",
+          "learning",
+          "vision",
+          "language"
+        ],
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": {
+        "method": "key_pair",
+        "columns": [
+          "paper_key",
+          "cites"
+        ],
+        "k": null,
+        "weight": null,
+        "level": "node",
+        "protocol": "inductive",
+        "protocol_source": null,
+        "graph_id": null,
+        "batching": "full",
+        "neighbours": null,
+        "symmetric": true
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "gat_conv",
+          "params": {
+            "out": 16,
+            "heads": 4,
+            "concat": true
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "leaky_relu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.5
+          }
+        },
+        {
+          "id": "B4",
+          "type": "gat_conv",
+          "params": {
+            "out": 16,
+            "heads": 1,
+            "concat": false
+          }
+        },
+        {
+          "id": "B5",
+          "type": "head",
+          "params": {
+            "out": 5,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cross_entropy",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "xavier_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": "linear"
+      },
+      "report": "stub",
+      "roles": {
+        "theory": "plain",
+        "systems": "plain",
+        "learning": "plain",
+        "vision": "plain",
+        "language": "plain"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "paper",
+          "many": "papers",
+          "article": "a"
+        },
+        "feature": {
+          "one": "score",
+          "many": "scores",
+          "article": "a"
+        },
+        "source": {
+          "one": "citation index",
+          "many": "citation indexes",
+          "article": "the"
+        },
+        "node": {
+          "one": "paper",
+          "many": "papers",
+          "article": "a"
+        },
+        "edge": {
+          "one": "citation",
+          "many": "citations",
+          "article": "a"
+        }
+      },
+      "service_title": "Paper topic classifier",
+      "profile": "full",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "links"
+      },
+      "budget_s": 330
+    },
+    {
+      "id": "L21",
+      "title": "road speeds, GraphSAGE over a kNN graph (sampled)",
+      "driver": "lanekit",
+      "generator": "roads",
+      "variant": null,
+      "seed": 1,
+      "rows": 1600,
+      "rows_unit": "row",
+      "entity": "Sensor",
+      "family": "graphsage",
+      "task": "regression",
+      "goal": "predict",
+      "shape": "graph",
+      "target": {
+        "column": "mean_speed",
+        "classes": null,
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": {
+        "method": "knn",
+        "columns": [
+          "x_km",
+          "y_km"
+        ],
+        "k": 6,
+        "weight": "distance",
+        "level": "node",
+        "protocol": "inductive",
+        "protocol_source": null,
+        "graph_id": null,
+        "batching": "sampled",
+        "neighbours": [
+          6,
+          4
+        ],
+        "symmetric": true
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "sage_conv",
+          "params": {
+            "out": 32,
+            "aggregator": "mean"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.2
+          }
+        },
+        {
+          "id": "B4",
+          "type": "sage_conv",
+          "params": {
+            "out": 32,
+            "aggregator": "mean"
+          }
+        },
+        {
+          "id": "B5",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B6",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "mse",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": null,
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "sensor",
+          "many": "sensors",
+          "article": "a"
+        },
+        "feature": {
+          "one": "reading",
+          "many": "readings",
+          "article": "a"
+        },
+        "source": {
+          "one": "traffic network",
+          "many": "traffic networks",
+          "article": "the"
+        },
+        "node": {
+          "one": "sensor",
+          "many": "sensors",
+          "article": "a"
+        },
+        "edge": {
+          "one": "neighbour link",
+          "many": "neighbour links",
+          "article": "a"
+        }
+      },
+      "service_title": "Road speed estimator",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "links"
+      },
+      "budget_s": 270
+    },
+    {
+      "id": "L22",
+      "title": "molecule solubility, GIN graph classification",
+      "driver": "lanekit",
+      "generator": "molecules",
+      "variant": null,
+      "seed": 1,
+      "rows": 300,
+      "rows_unit": "graph",
+      "entity": "Atom",
+      "family": "gin",
+      "task": "binary",
+      "goal": "predict",
+      "shape": "graph",
+      "target": {
+        "column": "soluble",
+        "classes": [
+          "0",
+          "1"
+        ],
+        "base": null,
+        "positive": "1",
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": {
+        "method": "key_pair",
+        "columns": [
+          "atom_key",
+          "bonded_to"
+        ],
+        "k": null,
+        "weight": null,
+        "level": "graph",
+        "protocol": "inductive",
+        "protocol_source": null,
+        "graph_id": "molecule_id",
+        "batching": "graphs",
+        "neighbours": null,
+        "symmetric": true
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "gin_conv",
+          "params": {
+            "out": 32
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "gin_conv",
+          "params": {
+            "out": 32
+          }
+        },
+        {
+          "id": "B4",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B5",
+          "type": "graph_pool",
+          "params": {
+            "readout": "sum"
+          }
+        },
+        {
+          "id": "B6",
+          "type": "head",
+          "params": {
+            "out": 1,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "bce_with_logits",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "stub",
+      "roles": {
+        "0": "plain",
+        "1": "plain"
+      },
+      "stances": [],
+      "lexicon": {
+        "row": {
+          "one": "atom",
+          "many": "atoms",
+          "article": "an"
+        },
+        "feature": {
+          "one": "property",
+          "many": "properties",
+          "article": "a"
+        },
+        "source": {
+          "one": "compound library",
+          "many": "compound libraries",
+          "article": "the"
+        },
+        "node": {
+          "one": "atom",
+          "many": "atoms",
+          "article": "an"
+        },
+        "edge": {
+          "one": "bond",
+          "many": "bonds",
+          "article": "a"
+        },
+        "graph": {
+          "one": "molecule",
+          "many": "molecules",
+          "article": "a"
+        }
+      },
+      "service_title": "Molecule solubility screen",
+      "profile": "core",
+      "tiers": [
+        "pr",
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "motif": "links"
+      },
+      "budget_s": 240
+    },
+    {
+      "id": "L23",
+      "title": "paper topics, transductive GCN (stops at eval; pack refuses)",
+      "driver": "lanekit",
+      "generator": "papers",
+      "variant": null,
+      "seed": 2,
+      "rows": 1400,
+      "rows_unit": "row",
+      "entity": "Paper",
+      "family": "gcn",
+      "task": "multiclass",
+      "goal": "predict",
+      "shape": "graph",
+      "target": {
+        "column": "topic",
+        "classes": [
+          "theory",
+          "systems",
+          "learning",
+          "vision",
+          "language"
+        ],
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null
+      },
+      "window": null,
+      "graph": {
+        "method": "key_pair",
+        "columns": [
+          "paper_key",
+          "cites"
+        ],
+        "k": null,
+        "weight": null,
+        "level": "node",
+        "protocol": "transductive",
+        "protocol_source": "user:stance/transductive-papers",
+        "graph_id": null,
+        "batching": "full",
+        "neighbours": null,
+        "symmetric": true
+      },
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "gcn_conv",
+          "params": {
+            "out": 32
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "relu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.5
+          }
+        },
+        {
+          "id": "B4",
+          "type": "gcn_conv",
+          "params": {
+            "out": 32
+          }
+        },
+        {
+          "id": "B5",
+          "type": "head",
+          "params": {
+            "out": 5,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cross_entropy",
+        "params": {}
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0"
+        ],
+        "hpo_trials": 0,
+        "expect_floor": null
+      },
+      "report": "none",
+      "roles": null,
+      "stances": [
+        "network: graph protocol transductive (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "paper",
+          "many": "papers",
+          "article": "a"
+        },
+        "feature": {
+          "one": "score",
+          "many": "scores",
+          "article": "a"
+        },
+        "source": {
+          "one": "citation index",
+          "many": "citation indexes",
+          "article": "the"
+        },
+        "node": {
+          "one": "paper",
+          "many": "papers",
+          "article": "a"
+        },
+        "edge": {
+          "one": "citation",
+          "many": "citations",
+          "article": "a"
+        }
+      },
+      "service_title": "Paper topic classifier (transductive)",
+      "profile": "core",
+      "tiers": [
+        "release",
+        "nightly"
+      ],
+      "adaptation": null,
+      "expect": {
+        "last_stage": "eval",
+        "exposure": {
+          "kind": "features",
+          "rows": "test"
+        },
+        "pack_refusal": {
+          "exit": 2,
+          "needle": "inductive graphs only"
+        }
+      },
+      "budget_s": 120
+    },
+    {
+      "id": "G00",
+      "title": "CIC-IDS2017 R7, the golden lane",
+      "driver": "golden",
+      "generator": "cic",
+      "variant": null,
+      "seed": 7,
+      "rows": 2830743,
+      "rows_unit": "row",
+      "entity": "Flow",
+      "family": "mlp-plain",
+      "task": "multiclass",
+      "goal": "predict",
+      "shape": "row",
+      "target": {
+        "column": "Label",
+        "classes": [
+          "BENIGN",
+          "DoS Hulk",
+          "DDoS",
+          "PortScan",
+          "DoS GoldenEye",
+          "FTP-Patator",
+          "DoS slowloris",
+          "DoS Slowhttptest",
+          "SSH-Patator",
+          "Bot",
+          "Web Attack – Brute Force",
+          "Web Attack – XSS",
+          "Infiltration",
+          "Web Attack – Sql Injection",
+          "Heartbleed"
+        ],
+        "base": null,
+        "positive": null,
+        "quantiles": null,
+        "label_format": null,
+        "sep": null,
+        "anomaly_rate": null,
+        "source": "geometry:partitions/chosen"
+      },
+      "window": null,
+      "graph": null,
+      "blocks": [
+        {
+          "id": "B1",
+          "type": "dense",
+          "params": {
+            "units": 256,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B2",
+          "type": "activation",
+          "params": {
+            "name": "gelu"
+          }
+        },
+        {
+          "id": "B3",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B4",
+          "type": "dense",
+          "params": {
+            "units": 256,
+            "activation": "none"
+          }
+        },
+        {
+          "id": "B5",
+          "type": "activation",
+          "params": {
+            "name": "gelu"
+          }
+        },
+        {
+          "id": "B6",
+          "type": "dropout",
+          "params": {
+            "p": 0.1
+          }
+        },
+        {
+          "id": "B7",
+          "type": "head",
+          "params": {
+            "out": 15,
+            "activation": "none"
+          }
+        }
+      ],
+      "loss": {
+        "name": "cross_entropy",
+        "params": {
+          "label_smoothing": 0.05
+        }
+      },
+      "optimizer": "adamw",
+      "schedule": "cosine",
+      "init": "kaiming_uniform",
+      "serving_mode": "online",
+      "campaign": {
+        "rungs": [
+          "R0",
+          "R1"
+        ],
+        "hpo_trials": 8,
+        "expect_floor": "linear"
+      },
+      "report": "real",
+      "roles": {
+        "BENIGN": "neutral",
+        "DoS Hulk": "alert",
+        "DDoS": "alert",
+        "PortScan": "alert",
+        "DoS GoldenEye": "alert",
+        "FTP-Patator": "alert",
+        "DoS slowloris": "alert",
+        "DoS Slowhttptest": "alert",
+        "SSH-Patator": "alert",
+        "Bot": "alert",
+        "Web Attack – Brute Force": "alert",
+        "Web Attack – XSS": "alert",
+        "Infiltration": "alert",
+        "Web Attack – Sql Injection": "alert",
+        "Heartbleed": "alert"
+      },
+      "stances": [
+        "show: motif lanes (user)",
+        "show: roles alert = every class but BENIGN (user)"
+      ],
+      "lexicon": {
+        "row": {
+          "one": "flow",
+          "many": "flows",
+          "article": "a"
+        },
+        "feature": {
+          "one": "statistic",
+          "many": "statistics",
+          "article": "a"
+        },
+        "source": {
+          "one": "flow extractor",
+          "many": "flow extractors",
+          "article": "the"
+        }
+      },
+      "service_title": "Network flow classifier",
+      "profile": "golden",
+      "tiers": [
+        "nightly"
+      ],
+      "adaptation": "reference",
+      "expect": {
+        "motif": "lanes",
+        "verdict": "earned"
+      },
+      "budget_s": 720,
+      "requires": [
+        "CIDS_ROOT"
+      ],
+      "recorded": {
+        "campaign": "vega-runs/20260925T214854Z",
+        "run": "R7",
+        "shaped": "shaped-v2",
+        "bundle": "bundle/cicids2017-label-R7",
+        "story_plan": "vega-runs/20260925T214854Z/story-plan.json",
+        "aux": "docs/main.aux",
+        "pdf": "docs/main.pdf"
+      }
+    }
+  ]
+}

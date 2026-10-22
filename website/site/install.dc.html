@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — install</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.78);--code:#07111A;--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:3px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+</helmet>
+<link rel="stylesheet" href="../assets/vega-panel.css">
+<style>
+/* shell placement (template: notes/page-template.md) */
+[data-brand]{position:fixed;z-index:10;top:calc(24px + 12px);left:calc(24px + 18px + 6px)}
+[data-pagebar]{position:fixed;z-index:9;top:24px;left:50%;transform:translate(-50%,-50%);width:min(340px,42vw);max-width:none!important;margin:0!important;padding:0 10px!important;background:var(--bg)}
+/* the figure's HUD (STEP n / 5, the step, n / 5 DONE; the release and the stack): fixed HUD text, bottom-left above SOUND */
+[data-hudtext]{position:fixed;left:calc(24px + 18px);bottom:calc(24px + 74px);z-index:2;pointer-events:none;display:flex;flex-direction:column;gap:8px;max-width:min(320px,30vw);text-shadow:0 0 10px var(--bg),0 0 3px var(--bg)}
+[data-hudtext] > div{display:flex;flex-direction:column;gap:6px}
+[data-figfoot]{position:fixed;left:calc(24px + 18px);bottom:calc(24px + 50px);z-index:9;pointer-events:none;display:flex;gap:18px;text-shadow:0 0 10px var(--bg),0 0 3px var(--bg)}
+[data-stop-card]{min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;justify-content:flex-end;align-items:flex-start;padding:18vh calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-stop-card] > .vp{width:min(600px,42vw)}
+[data-stop-card] .vp h1{font-size:clamp(46px,5.4vw,78px)!important;line-height:1.02!important}
+[data-stop-card] .vp h2{font-size:clamp(34px,3.6vw,52px)!important;line-height:1.08!important}
+[data-stop-card] .vp p{font-size:16.5px!important}
+[data-then],[data-pagesnav],[data-foot]{display:flex;justify-content:flex-end!important;padding-right:calc(24px + 56px)!important}
+[data-then]{padding:10vh 0 6vh;pointer-events:none}
+[data-then] > .vp{width:min(600px,42vw)}
+[data-pagesnav]{border-top:0!important;max-width:none!important;gap:28px!important}
+[data-foot]{z-index:10;padding-bottom:calc(34px + 30px)!important;pointer-events:none}[data-foot] a{pointer-events:auto} /* the box lies over the HUD's bottom row: only its link takes the pointer */
+/* on a phone the fixed readouts sit in the scene's top band, where text scrolls past: a soft --bg dimming behind them (no box) */
+@media (max-width:600px){[data-hudtext]{z-index:2!important;isolation:isolate}[data-figfoot]{z-index:11!important;isolation:isolate} /* top band under the HUD (z 9); the bottom one above the footer (z 10) but clear of the SOUND row and inside the frame */[data-hudtext]::before{content:'';position:absolute;z-index:-1;top:-80px;bottom:-44px;left:calc(-30px / .88);width:calc(100vw / .88);pointer-events:none;background:linear-gradient(to bottom,var(--bg) 0,var(--bg) calc(100% - 30px),rgba(4,8,14,0))}[data-figfoot]::before{content:'';position:absolute;z-index:-1;top:-34px;bottom:-6px;left:-17px;width:calc(100vw - 26px);pointer-events:none;background:linear-gradient(to top,var(--bg) 0,var(--bg) 70%,rgba(4,8,14,0))}} /* full-width --bg fade bands (as the HUD's own), not boxes */ /* above the HUD's bottom band, the pager clear of it */
+@media (max-width:600px){[data-foot]{padding-bottom:calc(34px + 124px)!important}} /* the pager wraps to two lines on a phone: both clear the SOUND / CH row */
+@media (max-width:899px){[data-stop-card]{justify-content:center;padding:52vh 24px 8vh}[data-stop-card] > .vp,[data-then] > .vp{width:100%}[data-then],[data-pagesnav],[data-foot]{justify-content:center;padding-left:24px!important;padding-right:24px!important}[data-hudtext]{bottom:auto;top:calc(24px + 54px);max-width:60vw}}
+@media (max-width:600px){[data-brand]{top:calc(12px + 12px);left:calc(12px + 12px + 6px)}[data-pagebar]{top:12px;width:44vw}[data-hudtext]{left:calc(12px + 18px);top:calc(12px + 94px);transform:scale(.88);transform-origin:top left}[data-figfoot]{left:calc(12px + 18px);bottom:calc(12px + 50px);gap:4px 12px;flex-wrap:wrap;max-width:calc(100vw - 2 * (12px + 18px))}}
+</style>
+</helmet>
+<div style="position:relative;color:var(--fg)">
+  <div data-stage="1" style="position:fixed;inset:0;z-index:0;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)"></div>
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="71" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0;pointer-events:none"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:var(--bg);opacity:.38"></div>
+    <div data-fig="mark" style="position:absolute;inset:0">
+  <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="The Vega mark in 3D: four tips and a core. Each completed install step lights one of them; the fifth lights the core and the network around it." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <x-import component-from-global-scope="vega-readouts" from="../assets/vega-readouts.js"></x-import>
+  </div>
+
+  <header>
+    <a data-brand="1" href="index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg)">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span>INSTALL</span></span>
+    </a>
+  </header>
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="install" brand="page"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters" room="320"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+  <div data-pagebar="1" aria-label="Page 6 of 6" style="max-width:1200px;margin:0 auto;padding:4px clamp(20px,4vw,48px) 0;display:flex;align-items:center;gap:6px">
+    <a href="chain.dc.html" title="The chain" aria-label="The chain" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="data.dc.html" title="The data lane" aria-label="The data lane" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="promise.dc.html" title="The rules" aria-label="The rules" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="proof.dc.html" title="The proof" aria-label="The proof" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="coverage.dc.html" title="Coverage" aria-label="Coverage" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="install.dc.html" aria-current="page" title="Install" aria-label="Install" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--fg)"></span></a>
+    <span style="margin-left:14px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);white-space:nowrap">06 / 06</span>
+  </div>
+
+  <main style="position:relative;pointer-events:none">
+    <section aria-labelledby="h-inst" data-stop="0" data-rail="Five steps" data-rail-full="Five steps to the first run." data-stop-card="1">
+      <div class="vp">
+      <h1 id="h-inst" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(34px,5vw,58px);line-height:1.04;letter-spacing:-.01em;font-family:'Newsreader',Georgia,serif">Five steps to the first run.</h1>
+      <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">Each one lights a point of the star. The fifth lights its core.</p>
+      </div>
+    </section>
+    <div data-hudparts="1" aria-hidden="true">
+      <div data-hudtext="1" data-fighud-narrow="1">
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">{{ hudTop }}</span><span style="font:300 clamp(20px,2.4vw,28px)/1.15 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--fg)">{{ hudName }}</span></div>
+          <span style="white-space:nowrap;font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:{{ doneC }}">{{ doneText }}</span>
+      </div>
+      <div data-figfoot="1">
+          <span style="white-space:nowrap;font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">v2.3.0 · 915 files</span>
+          <span style="white-space:nowrap;font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim);text-align:right">PYTORCH · FASTAPI · ONNX</span>
+      </div>
+    </div>
+
+    <section aria-labelledby="h-steps" data-stop="1" data-rail="The steps" data-rail-full="The steps" data-stop-card="1" data-steps="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:22px">
+      <h2 id="h-steps" data-decode="1" style="margin:0;font-weight:300;font-family:'Newsreader',Georgia,serif">The steps</h2>
+      <ol aria-label="Install, step by step" onPointerLeave="{{ unhover }}" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+        <li data-step="{{ s.i }}" onPointerEnter="{{ s.hover }}" onFocus="{{ s.hover }}" style="display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:4px 14px;align-items:baseline;padding:14px 0;border-top:1px solid {{ s.bar }}">
+          <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.12em;color:{{ s.numc }}">{{ s.mark }}</span>
+          <p style="margin:0;font-size:16px;line-height:1.45;color:{{ s.textc }};text-wrap:pretty">{{ s.line }}</p>
+          <button type="button" onClick="{{ s.toggle }}" aria-pressed="{{ s.pressed }}" aria-label="{{ s.checkLabel }}" style="appearance:none;cursor:pointer;background:none;border:0;padding:4px 0;color:{{ s.numc }};font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;white-space:nowrap" style-hover="color:var(--fg)">{{ s.doneLbl }}</button>
+          <sc-if value="{{ s.hasCode }}" hint-placeholder-val="{{ false }}">
+          <div style="grid-column:2 / 4;display:flex;align-items:baseline;gap:14px;min-width:0">
+            <pre style="margin:0;flex:1;min-width:0;white-space:normal;font:13px/1.6 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)"><code><sc-for list="{{ s.parts }}" as="t" hint-placeholder-count="2"><span style="white-space:nowrap;margin-right:1.6em">{{ t }}</span> </sc-for></code></pre>
+            <button type="button" onClick="{{ s.copy }}" aria-label="{{ s.copyLabel }}" style="appearance:none;flex:0 0 auto;border:0;background:none;color:{{ s.copyc }};font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;padding:4px 0;cursor:pointer" style-hover="color:var(--fg)">{{ s.copyText }}</button>
+          </div>
+          </sc-if>
+        </li>
+        </sc-for>
+      </ol>
+      </div>
+    </section>
+
+    <section aria-label="Then" data-then="1"><div class="vp" style="display:flex;flex-direction:column;align-items:flex-start;gap:20px">
+      <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">THEN · READ A STAGE BEFORE YOU RUN IT</span>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px">
+        <a href="../docs/vega-eval.dc.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border:1px solid var(--line);border-radius:999px;font:14px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">vega-eval <span aria-hidden="true" style="color:var(--acc)">→</span></a>
+        <a href="../docs/vega-show.dc.html" style="display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border:1px solid var(--line);border-radius:999px;font:14px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">vega-show <span aria-hidden="true" style="color:var(--acc)">→</span></a>
+      </div>
+    </div></section>
+
+    <nav aria-label="Pages" data-pagesnav="1" style="pointer-events:auto;padding:40px 0 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line)">
+      <a href="coverage.dc.html" style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);padding:10px 0" style-hover="color:var(--fg)">← COVERAGE</a>
+      <a href="index.dc.html" style="display:inline-flex;align-items:center;gap:12px;padding:14px 22px;border:1px solid var(--line);border-radius:999px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">BACK TO THE THRESHOLD <span aria-hidden="true" style="color:var(--acc)">↺</span></a>
+    </nav>
+  </main>
+
+  <footer data-foot="1" style="position:relative;display:flex;justify-content:center;padding:24px 0 34px">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STEPS = [
+  { line: 'Replace the installed skill folders with the nine in the release.', code: 'vega/\ndataset-forge/\ndata-lens/\ndataset-shaper/\nvega-forge/\nvega-train/\nvega-eval/\nvega-pack/\nvega-show/' },
+  { line: 'Apply patches/ to blueprint, document-project and domain-forge.', code: 'patches/' },
+  { line: 'Install the external skills: domain-forge, spec-analysis, inferred-questions, model-chat, blueprint, document-project, architect, improve, effective-java.' },
+  { line: 'Check the environment.', code: 'python3 vega/scripts/env_check.py --env' },
+  { line: 'Point the orchestrator at your dataset.', code: '/vega <your dataset>' }
+];
+const PAGES = [
+  { num: '00', label: 'Threshold', href: 'index.dc.html', note: '' },
+  { num: '01', label: 'The chain', href: 'chain.dc.html', note: '' },
+  { num: '02', label: 'The data lane', href: 'data.dc.html', note: '' },
+  { num: '03', label: 'The rules', href: 'promise.dc.html', note: '' },
+  { num: '04', label: 'The proof', href: 'proof.dc.html', note: '' },
+  { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: '' },
+  { num: '06', label: 'Install', href: 'install.dc.html', note: 'HERE' },
+  { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+  { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+];
+
+class Component extends DCLogic {
+  state = { indexOpen: false, done: [false, false, false, false, false], copied: -1, sel: -1 };
+  closeRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  componentDidMount() {
+    const go = (u) => { if (window.VegaFly) window.VegaFly.go(u); else location.href = u; };
+    try { const d = JSON.parse(localStorage.getItem('vega-install-progress') || 'null'); if (Array.isArray(d) && d.length === 5) this.setState({ done: d.map(Boolean) }); } catch (e) {}
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 'p' || e.key === 'P') go('coverage.dc.html');
+      else if (/^[0-6]$/.test(e.key)) go(PAGES[+e.key].href);
+    };
+    addEventListener('keydown', this.onKey);
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    this.sync3d();
+    this.setupCamera();
+  }
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); removeEventListener('vegaindex', this.onIndex); clearTimeout(this.ct); clearTimeout(this.t3); clearTimeout(this.tcam); }
+  // the mark in 3D is the stage: the title frames it whole, each step flies to its tip, the fifth to the core
+  setupCamera() {
+    if (this.camOn) return;
+    const sc = document.querySelector('[data-fig="mark"] vega-constellation'), cam = document.querySelector('vega-camera'), ro = document.querySelector('vega-readouts');
+    const sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    if (!sc || !sc.d || !sc.d.nodes.length || !cam || !cam.configure || !ro || !ro.configure || sections.length !== 2) { this.tcam = setTimeout(() => this.setupCamera(), 150); return; }
+    this.camOn = true;
+    const small = () => innerWidth <= 600, wide = () => innerWidth >= 900;
+    const gapX = () => { const r = document.querySelector('vega-rail'), b = document.querySelector('[data-stop-card] .vp'); const l = r && !r.classList.contains('vr-compact') ? r.getBoundingClientRect().right : 24 + 40; const c = b ? b.getBoundingClientRect().left : innerWidth * 0.6; return (l + c) / 2; };
+    const anchor = (W, H) => wide() ? [gapX(), H * 0.5] : [W * 0.5, H * (small() ? 0.24 : 0.26)];
+    const S = 9, TIPS = [[0, 27 * S, 0], [23 * S, 0, 0], [0, -27 * S, 0], [-23 * S, 0, 0]];
+    const stops = [{ el: sections[0], focus: [0, 0, 0], yaw: 0.25, pitch: -0.12, select: -1, fit: true, get zoom() { return wide() ? 0.46 : 0.38; }, at: anchor }];
+    stops.push({ el: sections[1], focus: [0, 0, 0], select: -1, at: anchor, fit: true, yaw: 0.6, pitch: -0.2, get zoom() { return wide() ? 0.5 : 0.4; } });
+    cam.configure({ scene: sc, sky: document.querySelector('vega-sky-lab'), stops, free: true, home: 1 });
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters (G2)
+    ro.configure({ scene: sc, items: [] });
+  }
+  sync3d() {
+    const el = document.querySelector('[data-fig="mark"] vega-constellation');
+    if (!el || !el.setData) { clearTimeout(this.t3); this.t3 = setTimeout(() => this.sync3d(), 150); return; }
+    const st = this.state, key = st.done.join() + '|' + st.sel;
+    if (key === this._k && el === this._el) return;
+    // only the selection moved: relabel in place (setData would hand the camera a new scene object and a refit mid-flight)
+    if (el === this._el && this._k && this._k.split('|')[0] === st.done.join() && el.d && el.d.nodes) { el.d.nodes.forEach((n, i) => { n.label = i === 0 ? (st.sel === 4 ? 'core' : '') : i <= 4 ? (st.sel === i - 1 ? 'step ' + i : '') : n.label; }); this._k = key; return; }
+    this._k = key; this._el = el;
+    const d = st.done, all = d.every(Boolean), S = 9;
+    const TIPS = [[0, 27 * S, 0], [23 * S, 0, 0], [0, -27 * S, 0], [-23 * S, 0, 0]], DG = [[14, 14, 50], [-14, 14, -50], [14, -14, -50], [-14, -14, 50]];
+    const N = [{ x: 0, y: 0, z: 0, size: d[4] ? 7 : 4, kind: d[4] ? 'core' : undefined, color: d[4] ? 'fg' : 'mut', glow: d[4] ? 'acc' : 'dim', alpha: d[4] ? 1 : 0.85, label: st.sel === 4 ? 'core' : '', pick: false }];
+    TIPS.forEach((t, i) => N.push({ x: t[0], y: t[1], z: t[2], size: d[i] ? 5 : 3.4, color: d[i] ? 'fg' : 'mut', glow: d[i] ? 'acc' : 'dim', alpha: d[i] ? 1 : 0.8, label: st.sel === i ? 'step ' + (i + 1) : '', pick: false, lag: i * 0.05 }));
+    DG.forEach((g, i) => N.push({ x: g[0] * S, y: g[1] * S, z: g[2], size: all ? 3.4 : 2.2, color: all ? 'acc' : 'dim', glow: 'acc', alpha: all ? 1 : 0.55, pick: false, lag: 0.2 }));
+    const E = [];
+    TIPS.forEach((t, i) => E.push({ a: 0, b: 1 + i, alpha: d[i] ? 0.85 : 0.34, w: d[i] ? 2.2 : 1.2, color: d[i] ? 'fg' : 'acc', pulse: d[i] && d[4] }));
+    DG.forEach((g, i) => E.push({ a: 0, b: 5 + i, alpha: all ? 0.6 : 0.2, w: 1, pulse: all }));
+    if (all) for (let i = 0; i < 4; i++) E.push({ a: 1 + i, b: 5 + [0, 2, 3, 1][i], alpha: 0.25, dash: [2, 5], pulse: false });
+    el.setData({ nodes: N, edges: E, morph: this._m ? 900 : 0, radius: 260, zoom: 0.44, autoRotate: false, yaw: 0.25, pitch: -0.12, showLabels: true, pulse: d[4] ? { tokens: all ? 4 : 2, period: 0.55 } : null });
+    this._m = true;
+  }
+  componentDidUpdate() {
+    this.sync3d();
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+  }
+  // all five done: VEGA flares (the galaxy's star pulse) and the mark's network wakes (its pulse tokens)
+  burst() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const g = document.querySelector('vega-galaxy'); if (g) g.pulseAt = performance.now();
+    if (window.VegaAudio && window.VegaAudio.tick) window.VegaAudio.tick();
+  }
+  toggleStep = (i) => this.setState(s => {
+    const done = s.done.slice(); done[i] = !done[i];
+    if (done.every(Boolean) && !s.done.every(Boolean)) setTimeout(() => this.burst(), 80);
+    try { localStorage.setItem('vega-install-progress', JSON.stringify(done)); } catch (e) {}
+    return { done };
+  });
+  copy = (i, text) => {
+    const ok = () => { this.setState({ copied: i }); clearTimeout(this.ct); this.ct = setTimeout(() => this.setState({ copied: -1 }), 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, () => this.fallbackCopy(text, ok));
+    else this.fallbackCopy(text, ok);
+  };
+  fallbackCopy(text, ok) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); ok(); } catch (e) {} ta.remove();
+  }
+  renderVals() {
+    const st = this.state;
+    const n = st.done.filter(Boolean).length;
+    const hs = st.sel >= 0 ? st.sel : Math.max(0, st.done.indexOf(false));
+    const steps = STEPS.map((s, i) => {
+      const d = st.done[i]; const c = st.copied === i;
+      return {
+        i: String(i), line: s.line, hasCode: !!s.code, parts: (s.code || '').split('\n'),
+        doneLbl: d ? 'DONE' : 'MARK DONE', mark: d ? '✓' : String(i + 1).padStart(2, '0'),
+        pressed: d ? 'true' : 'false', checkLabel: (d ? 'Mark step ' + (i + 1) + ' as not done' : 'Mark step ' + (i + 1) + ' as done'),
+        numc: d ? 'var(--cy)' : 'var(--dim)', textc: d ? 'var(--mut)' : 'var(--fg)', bar: d ? 'rgba(111,224,220,.32)' : 'var(--line)',
+        hover: () => { if (this.state.sel !== i) this.setState({ sel: i }); },
+        toggle: () => this.toggleStep(i),
+        copy: () => this.copy(i, s.code), copyText: c ? 'COPIED' : 'COPY', copyc: c ? 'var(--cy)' : 'var(--acc)', copyLabel: 'Copy: ' + (s.code || '').split('\n')[0]
+      };
+    });
+    return {
+      /* the figure HUD: the hovered step (else the next one to do), number and line; READY and the lit star once all five are done */
+      hudTop: n === 5 ? 'READY' : 'STEP ' + (hs + 1) + ' / 5', hudName: n === 5 ? 'The star is lit.' : STEPS[hs].line,
+      steps, unhover: () => { if (this.state.sel !== -1) this.setState({ sel: -1 }); }, doneText: n === 5 ? 'ALL FIVE · RUN /vega' : n + ' / 5 DONE', doneC: n === 5 ? 'var(--cy)' : 'var(--dim)',
+      closeRef: this.setClose,
+      indexOpen: st.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vega/test-lanes@1",
+  "title": "vega/test-lanes@1 — the lane registry of the verification program",
+  "description": "The grammar of lanes.json (D6 §3.1 with BUILD-PLAN §4.8). The cross-checks a schema cannot hold (catalog membership, the family's sample shape or floor shapes, roles against classes, the lexicon per shape) live in lanekit/registry.py validate().",
+  "type": "object",
+  "required": ["schema", "defaults", "lanes"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "vega/test-lanes@1" },
+    "note": { "type": "string" },
+    "defaults": { "$ref": "#/$defs/defaults" },
+    "lanes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/lane" } }
+  },
+  "$defs": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_+-]*$" },
+    "share": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "shares": {
+      "type": "object",
+      "propertyNames": { "enum": ["fixture", "forge", "train", "eval", "pack", "bundle_api", "report", "show", "serve", "serve_check", "inspect", "page", "golden"] },
+      "additionalProperties": { "$ref": "#/$defs/share" }
+    },
+    "defaults": {
+      "type": "object",
+      "required": ["threads", "n_boot", "max_epochs", "patience", "budget_s", "allowed_skips",
+                   "forbidden_skip_patterns", "stage_shares", "acceptance_shares", "golden_shares",
+                   "stage_timeout_factor", "lane_kill_factor", "budget_warn_factor", "adaptation_pairs", "jobs"],
+      "additionalProperties": false,
+      "properties": {
+        "threads": { "type": "integer", "minimum": 1 },
+        "n_boot": { "type": "integer", "minimum": 50 },
+        "max_epochs": { "type": "integer", "minimum": 1 },
+        "patience": { "type": "integer", "minimum": 1 },
+        "budget_s": {
+          "type": "object", "required": ["core", "full"], "additionalProperties": false,
+          "properties": { "core": { "type": "integer", "minimum": 30 }, "full": { "type": "integer", "minimum": 30 } }
+        },
+        "allowed_skips": { "type": "array", "items": { "type": "string", "minLength": 3 } },
+        "forbidden_skip_patterns": { "type": "array", "items": { "type": "string", "minLength": 3 } },
+        "stage_shares": { "$ref": "#/$defs/shares" },
+        "acceptance_shares": { "$ref": "#/$defs/shares" },
+        "golden_shares": { "$ref": "#/$defs/shares" },
+        "stage_timeout_factor": { "type": "number", "minimum": 1 },
+        "lane_kill_factor": { "type": "number", "minimum": 1 },
+        "budget_warn_factor": { "type": "number", "minimum": 1 },
+        "jobs": { "type": "integer", "minimum": 1 },
+        "adaptation_pairs": { "type": "array", "items": { "type": "string", "pattern": "^(L\\d{2}|G\\d{2}):(L\\d{2}|G\\d{2})$" } }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["type", "params"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^B\\d+[a-z]?$" },
+        "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "params": {
+          "type": "object",
+          "properties": { "inner": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/inner_block" } } }
+        },
+        "source": { "type": "string" }
+      }
+    },
+    "top_block": {
+      "allOf": [ { "$ref": "#/$defs/block" }, { "required": ["id"] } ]
+    },
+    "inner_block": {
+      "allOf": [ { "$ref": "#/$defs/block" }, { "not": { "required": ["id"] } } ]
+    },
+    "choice": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "object", "required": ["name"], "additionalProperties": false,
+          "properties": { "name": { "type": "string" }, "params": { "type": "object" } } },
+        { "type": "null" }
+      ]
+    },
+    "lexicon_entry": {
+      "type": "object",
+      "required": ["one", "many", "article"],
+      "additionalProperties": false,
+      "properties": {
+        "one": { "type": "string" },
+        "many": { "type": "string" },
+        "article": { "enum": ["a", "an", "the"] }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["column", "classes"],
+      "additionalProperties": false,
+      "properties": {
+        "column": { "type": ["string", "null"] },
+        "base": { "enum": [null, "binary", "multiclass", "multilabel", "regression", "ordinal"] },
+        "classes": { "oneOf": [ { "type": "null" }, { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "type": "string" } } ] },
+        "positive": { "type": ["string", "null"] },
+        "quantiles": { "oneOf": [ { "type": "null" }, { "type": "array", "minItems": 1, "items": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 } } ] },
+        "label_format": { "enum": [null, "delimited"] },
+        "sep": { "type": ["string", "null"], "maxLength": 3 },
+        "anomaly_rate": { "type": ["number", "null"], "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "source": { "type": "string" },
+        "class_names": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 30 } }
+      }
+    },
+    "window": {
+      "type": "object",
+      "required": ["length", "stride", "horizon", "series_by", "order_by", "context", "autoregressive", "season"],
+      "additionalProperties": false,
+      "properties": {
+        "length": { "type": "integer", "minimum": 2 },
+        "stride": { "type": "integer", "minimum": 1 },
+        "horizon": { "type": ["integer", "null"], "minimum": 1 },
+        "series_by": { "type": ["string", "null"] },
+        "order_by": { "type": "string" },
+        "context": { "enum": ["previous-part", "none"] },
+        "autoregressive": { "type": ["boolean", "null"] },
+        "autoregressive_source": { "type": ["string", "null"] },
+        "season": { "type": ["integer", "null"], "minimum": 2 }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "required": ["method", "columns", "level", "protocol", "batching", "symmetric"],
+      "additionalProperties": false,
+      "properties": {
+        "method": { "enum": ["key_pair", "knn", "spatial"] },
+        "columns": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+        "k": { "type": ["integer", "null"], "minimum": 1 },
+        "weight": { "enum": [null, "distance", "unit"] },
+        "level": { "enum": ["node", "graph"] },
+        "protocol": { "enum": ["inductive", "transductive"] },
+        "protocol_source": { "type": ["string", "null"] },
+        "graph_id": { "type": ["string", "null"] },
+        "batching": { "enum": ["full", "sampled", "graphs"] },
+        "neighbours": { "oneOf": [ { "type": "null" }, { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } } ] },
+        "symmetric": { "type": "boolean" }
+      }
+    },
+    "markers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "warn_max": { "type": ["integer", "null"], "minimum": 0 },
+        "warn_require": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "expect": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "markers": {
+          "type": "object",
+          "propertyNames": { "enum": ["fixture", "forge", "train", "eval", "pack", "bundle_api", "report", "show", "serve", "serve_check", "inspect", "page", "golden"] },
+          "additionalProperties": { "$ref": "#/$defs/markers" }
+        },
+        "motif": { "enum": ["grid", "points", "traces", "lanes", "links", "contours"] },
+        "spatial": { "type": "boolean" },
+        "skips": { "type": "array", "items": { "type": "string" } },
+        "verdict": { "enum": ["earned", "not_earned", "beaten_by_baseline", "not_assessable"] },
+        "last_stage": { "enum": ["fixture", "forge", "train", "eval", "pack", "bundle_api", "report", "show", "serve", "serve_check", "inspect", "page"] },
+        "pack_refusal": {
+          "type": "object", "required": ["exit", "needle"], "additionalProperties": false,
+          "properties": { "exit": { "type": "integer", "minimum": 1 }, "needle": { "type": "string", "minLength": 3 } }
+        },
+        "real_subchain": { "type": "boolean" },
+        "exposure": {
+          "type": "object", "required": ["kind", "rows"], "additionalProperties": false,
+          "properties": { "kind": { "const": "features" }, "rows": { "const": "test" } }
+        }
+      }
+    },
+    "recorded": {
+      "type": "object",
+      "required": ["campaign", "run", "shaped", "bundle"],
+      "additionalProperties": false,
+      "properties": {
+        "campaign": { "type": "string" },
+        "run": { "type": "string" },
+        "shaped": { "type": "string" },
+        "bundle": { "type": "string" },
+        "story_plan": { "type": "string" },
+        "aux": { "type": "string" },
+        "pdf": { "type": "string" }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "required": ["id", "title", "driver", "generator", "seed", "rows", "entity", "family", "task", "goal",
+                   "shape", "target", "window", "graph", "blocks", "loss", "optimizer", "schedule", "init",
+                   "serving_mode", "campaign", "report", "roles", "lexicon", "profile", "tiers",
+                   "adaptation", "expect", "budget_s"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^(L\\d{2}|G\\d{2})$" },
+        "title": { "type": "string", "minLength": 3 },
+        "driver": { "enum": ["acceptance", "lanekit", "golden"] },
+        "generator": { "$ref": "#/$defs/name" },
+        "variant": { "type": ["string", "null"] },
+        "seed": { "type": "integer", "minimum": 0 },
+        "rows": { "type": "integer", "minimum": 1 },
+        "rows_unit": { "enum": ["row", "graph"] },
+        "entity": { "type": "string", "pattern": "^[A-Z][A-Za-z]*$" },
+        "family": { "type": "string" },
+        "task": { "type": "string" },
+        "goal": { "type": "string" },
+        "shape": { "enum": ["row", "window", "graph"] },
+        "target": { "$ref": "#/$defs/target" },
+        "window": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/window" } ] },
+        "graph": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/graph" } ] },
+        "recipe_options": { "type": "object" },
+        "blocks": { "oneOf": [ { "type": "null" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/top_block" } } ] },
+        "loss": {
+          "type": "object", "required": ["name", "params"], "additionalProperties": false,
+          "properties": { "name": { "type": "string" }, "params": { "type": "object" } }
+        },
+        "optimizer": { "$ref": "#/$defs/choice" },
+        "schedule": { "$ref": "#/$defs/choice" },
+        "init": { "$ref": "#/$defs/choice" },
+        "serving_mode": { "enum": ["online", "batch+serve"] },
+        "campaign": {
+          "type": "object", "required": ["rungs", "hpo_trials", "expect_floor"], "additionalProperties": false,
+          "properties": {
+            "rungs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^(R\\d+[a-z]?|H\\d+)$" } },
+            "hpo_trials": { "type": "integer", "minimum": 0 },
+            "expect_floor": { "enum": [null, "linear", "linear+flatten", "linear+graph_pool", "pca-floor", "dropped"] }
+          }
+        },
+        "report": { "enum": ["stub", "none", "real"] },
+        "roles": { "oneOf": [ { "type": "null" }, { "type": "object", "minProperties": 2, "additionalProperties": { "enum": ["neutral", "alert", "plain"] } } ] },
+        "stances": { "type": "array", "items": { "type": "string", "pattern": "^(show|network): " } },
+        "lexicon": {
+          "type": "object", "minProperties": 3,
+          "propertyNames": { "enum": ["row", "feature", "source", "step", "window", "node", "edge", "graph", "target"] },
+          "additionalProperties": { "$ref": "#/$defs/lexicon_entry" }
+        },
+        "service_title": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "profile": { "enum": ["core", "full", "golden"] },
+        "tiers": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["pr", "release", "nightly"] } },
+        "adaptation": { "enum": [null, "domain", "task", "reference"] },
+        "expect": { "$ref": "#/$defs/expect" },
+        "budget_s": { "type": "integer", "minimum": 30 },
+        "budget": {
+          "description": "The lane's own campaign budget, overriding defaults.max_epochs and defaults.patience for this lane only (A38); the stage time limits stay the lane's budget_s.",
+          "type": "object", "required": ["max_epochs", "patience", "reason"], "additionalProperties": false,
+          "properties": {
+            "max_epochs": { "type": "integer", "minimum": 1 },
+            "patience": { "type": "integer", "minimum": 1 },
+            "reason": { "type": "string", "minLength": 20 }
+          }
+        },
+        "changes": {
+          "description": "What an amendment changed in this lane's fixture or declaration, and why (A37, A38).",
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["amendment", "what", "why"], "additionalProperties": false,
+            "properties": {
+              "amendment": { "type": "string", "pattern": "^A[0-9]+$" },
+              "what": { "type": "string", "minLength": 10 },
+              "why": { "type": "string", "minLength": 20 }
+            }
+          }
+        },
+        "requires": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" } },
+        "recorded": { "$ref": "#/$defs/recorded" }
+      },
+      "allOf": [
+        { "if": { "properties": { "shape": { "const": "window" } } }, "then": { "properties": { "window": { "type": "object" } } } },
+        { "if": { "properties": { "shape": { "const": "graph" } } }, "then": { "properties": { "graph": { "type": "object" } } } },
+        { "if": { "properties": { "driver": { "const": "golden" } } }, "then": { "required": ["recorded", "requires"] } }
+      ]
+    }
+  }
+}

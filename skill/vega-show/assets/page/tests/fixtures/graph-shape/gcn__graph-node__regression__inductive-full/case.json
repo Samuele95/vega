@@ -1,0 +1,17 @@
+{
+  "effective": "regression",
+  "extra": null,
+  "family": "gcn",
+  "files": {
+    "explain": "gcn__graph-node__regression__inductive-full/explain.json",
+    "network": "gcn__graph-node__regression__inductive-full/network.json"
+  },
+  "id": "gcn/graph-node/regression/inductive-full",
+  "level": "node",
+  "reading": "regression",
+  "shape": "graph",
+  "slug": "gcn__graph-node__regression__inductive-full",
+  "target": "value",
+  "task": "regression",
+  "variant": "inductive-full"
+}

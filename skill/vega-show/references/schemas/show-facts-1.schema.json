@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:show-facts:1",
+  "title": "vega/show-facts@1 — showcase/plan/facts.json, the typed fact set",
+  "description": "Written by extract_facts.py (H03) from the bundle's pinned records (each verified against MANIFEST.files before it is read) and the report's labels through a role; read by draft_plan.py, plan_rules.py, resolve_story.py and the brief. Every number the page can show is a fact with the record ref it came from; the only derivation is count_of. names is the whitelist the digit rule uses. groups carries structured views whose numbers are fact keys (show-contract.md §2).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "extracted_at", "bundle", "model", "task", "facts", "names", "groups"],
+  "properties": {
+    "schema": { "const": "vega/show-facts@1" },
+    "extracted_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$" },
+    "bundle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["dir", "manifest_digest", "slug", "run", "model_version"],
+      "properties": { "dir": { "type": "string", "minLength": 1 },
+                      "manifest_digest": { "$ref": "#/$defs/digest" },
+                      "slug": { "type": "string", "minLength": 1 }, "run": { "type": "string", "minLength": 1 },
+                      "model_version": { "type": "string", "minLength": 1 } }
+    },
+    "model": {
+      "type": "object", "additionalProperties": false, "required": ["path", "turtle_digest", "layers"],
+      "properties": { "path": { "type": "string", "pattern": "\\.pack\\.html$" },
+                      "turtle_digest": { "$ref": "#/$defs/digest" },
+                      "layers": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" } } }
+    },
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "base", "goal", "sample_shape", "graph_level", "modality", "family", "view_key", "label", "classes",
+                   "outcomes", "primary", "direction"],
+      "properties": {
+        "kind": { "enum": ["binary", "multiclass", "multilabel", "regression", "ordinal", "unsupervised", "anomaly",
+                           "sequence-classification", "sequence-regression", "forecast"] },
+        "base": { "enum": ["binary", "multiclass", "multilabel", "regression", "ordinal", null] },
+        "goal": { "enum": ["predict", "reconstruct", "anomaly"] },
+        "sample_shape": { "enum": ["row", "window", "graph"] },
+        "graph_level": { "enum": ["node", "graph", null] },
+        "modality": { "enum": ["row", "spatial-row", "window", "graph"] },
+        "family": { "type": "string", "minLength": 1 },
+        "view_key": { "enum": ["classes", "binary", "labels", "value", "ordinal", "reconstruction", "anomaly", "horizon"] },
+        "label": { "type": ["string", "null"] },
+        "classes": { "type": ["array", "null"], "items": { "type": "string" } },
+        "outcomes": { "type": ["array", "null"], "items": { "type": "string" } },
+        "primary": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "direction": { "enum": ["max", "min"] }
+      }
+    },
+    "facts": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+      "additionalProperties": { "$ref": "#/$defs/fact" }
+    },
+    "names": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "groups": {
+      "type": "object",
+      "propertyNames": { "enum": ["sizes", "recipe", "split", "sample", "inputs", "class_balance", "network", "decisions", "runs",
+                                  "selection", "hpo", "models", "metrics", "diffs", "breakdown", "verdict", "limits", "identity",
+                                  "report", "briefs", "prose_sources"] },
+      "required": ["sizes", "inputs", "network", "decisions", "runs", "selection", "models", "metrics", "verdict", "limits", "identity"],
+      "properties": {
+        "inputs": {
+          "type": "object", "required": ["shaped"],
+          "properties": { "shaped": { "type": "array", "minItems": 1, "items": { "type": "string" } } }
+        },
+        "limits": {
+          "type": "array",
+          "items": { "type": "object", "required": ["id", "mandatory", "facts"],
+                     "properties": { "id": { "type": "string", "pattern": "^(split|exposures|one_seed|robustness_not_run|verdict_not_earned|verdict_beaten|verdict_not_assessable|ship_stance|roundtrip_boundary|examples_synthetic|calibration|slices_empty|drift_suspected|serving_forced|small_support|warn_[a-z-]+_\\d+)$" },
+                                     "mandatory": { "type": "boolean" },
+                                     "facts": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" } },
+                                     "prose_ref": { "type": ["string", "null"] },
+                                     "recorded": { "type": "string", "description": "the record's own words the limit stands for, verbatim: a WARN: marker, the MANIFEST stance, the classes with few test rows and their counts — what the page quotes beside the authored text" } } }
+        },
+        "breakdown": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "required": ["kind", "names", "values"],
+                       "properties": { "kind": { "enum": ["per_class", "per_label", "per_bin", "per_horizon", "per_feature", "at_k"] },
+                                       "names": { "type": "string" }, "values": { "type": "string" },
+                                       "trivial": { "type": ["string", "null"] } } } ]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "fact": {
+      "type": "object", "additionalProperties": false, "required": ["value", "ref", "kind", "format"],
+      "properties": {
+        "value": {},
+        "ref": { "type": "string",
+                 "pattern": "^((MANIFEST|netspec|schema)\\.json|records/(geometry|analysis|shape|architecture|training|evaluation)\\.json)#[^\\s#]+$|^report:[a-z][a-z0-9.-]*\\.(number|page|title)$" },
+        "kind": { "enum": ["count", "size", "metric", "ci_metric", "diff", "param", "epoch", "list", "labels", "count_of",
+                           "report_number", "report_page", "text"] },
+        "format": { "enum": ["count", "metric", "ci", "param", "epoch", "verbatim", "list"] },
+        "direction": { "enum": ["max", "min"] }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "vega/show-facts@1",
+      "extracted_at": "2026-09-29T12:00:00Z",
+      "bundle": { "dir": "bundle/cicids2017-label-R7", "manifest_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+                  "slug": "cicids2017-label", "run": "R7", "model_version": "sha256:2222222222222222222222222222222222222222222222222222222222222222" },
+      "model": { "path": "cicids2017.domain.analysis.shaped-v2.vega.train.eval.pack.html",
+                 "turtle_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+                 "layers": ["geometry", "analysis", "shape", "architecture", "training", "evaluation", "bundle"] },
+      "task": { "kind": "multiclass", "base": null, "goal": "predict", "sample_shape": "row", "graph_level": null, "modality": "row",
+                "family": "mlp-plain", "view_key": "classes", "label": "Label", "classes": ["BENIGN", "Bot", "DDoS"], "outcomes": null,
+                "primary": "f1_macro", "direction": "max" },
+      "facts": {
+        "source_rows": { "value": 2830743, "ref": "records/geometry.json#source.rows", "kind": "count", "format": "count" },
+        "step_s4_rows_after": { "value": 2522362, "ref": "records/shape.json#manifest.steps[id=S4].rows_after.all", "kind": "count", "format": "count" },
+        "block_b1_units": { "value": 256, "ref": "netspec.json#blocks[id=B1].params.units", "kind": "param", "format": "param" },
+        "run_r7_primary": { "value": 0.81775308593454, "ref": "records/training.json#experiments.runs[id=R7].primary", "kind": "metric",
+                            "format": "metric", "direction": "max" },
+        "eval_network_f1_macro": { "value": { "value": 0.8412, "ci": [0.83, 0.85], "n": 504473 },
+                                   "ref": "records/evaluation.json#metrics.models.network.f1_macro", "kind": "ci_metric", "format": "ci",
+                                   "direction": "max" },
+        "eval_ci_level": { "value": 0.95, "ref": "records/evaluation.json#metrics.ci_level", "kind": "param", "format": "param" },
+        "classes_n": { "value": 3, "ref": "netspec.json#task.classes", "kind": "count_of", "format": "count" },
+        "report_net_forward_number": { "value": "3", "ref": "report:net.forward.number", "kind": "report_number", "format": "verbatim" },
+        "report_net_forward_page": { "value": 14, "ref": "report:net.forward.page", "kind": "report_page", "format": "verbatim" }
+      },
+      "names": ["BENIGN", "Bot", "DDoS", "Destination Port", "IDS2017", "R7", "B1", "f1_macro", "mlp-plain"],
+      "groups": {
+        "sizes": { "source_rows": "source_rows", "classes_n": "classes_n" },
+        "inputs": { "shaped": ["Destination Port", "Flow Duration", "Flow IAT Mean"], "origin": {}, "typing": {},
+                    "created_by_recipe": [], "encoded": [], "relations": [] },
+        "network": { "family": "mlp-plain", "blocks": [ { "id": "B1", "type": "dense" } ], "params_total": null, "madds": null },
+        "decisions": [ { "id": "B1", "family": "architecture", "type": "dense", "params": { "units": "block_b1_units" } } ],
+        "runs": [ { "id": "R7", "kind": "ablation", "primary": "run_r7_primary", "selected": true, "reference": false } ],
+        "selection": { "run": "R7", "primary_name": "f1_macro", "direction": "max", "value": "run_r7_primary" },
+        "models": [ { "name": "network", "primary": "eval_network_f1_macro" } ],
+        "metrics": { "primary": "f1_macro", "direction": "max", "shown": ["balanced_accuracy", "accuracy"] },
+        "breakdown": null,
+        "verdict": { "earned": true, "beaten_by_baseline": false, "strongest_baseline": "tree", "diff": null },
+        "limits": [ { "id": "split", "mandatory": true, "facts": ["source_rows"], "prose_ref": "records/evaluation.json#readings.limits" },
+                    { "id": "warn_eval_1", "mandatory": false, "facts": [], "prose_ref": null } ],
+        "identity": { "cmd": "cids", "env": "CIDS", "noun": "flow", "nouns": "flows", "title": "cids flow classifier",
+                      "description": "Classifies each flow.", "port": 8765 }
+      }
+    }
+  ]
+}

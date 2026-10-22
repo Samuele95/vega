@@ -1,0 +1,409 @@
+{
+ "schema": "dataset-forge/geometry@1",
+ "source": {
+  "path": "data-lens/fixtures/sensors.csv",
+  "rows": 1440,
+  "columns": [
+   "reading_id",
+   "ts",
+   "station",
+   "lat",
+   "lon",
+   "reading_c",
+   "humidity_pct",
+   "calibration",
+   "battery_pct",
+   "alarm",
+   "split"
+  ],
+  "geometry_json": "data-lens/fixtures/sensors.geometry.json"
+ },
+ "markers": [
+  "OK: hand-written fixture layer — the numbers are the ones geometry.py reports on this file"
+ ],
+ "typing": [
+  {
+   "column": "reading_id",
+   "script_type": "id",
+   "final_type": "id",
+   "role": "identity",
+   "reason": "unique on every row: the identity",
+   "consequences": {
+    "decision": "reading_id enters as identity",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "ts",
+   "script_type": "datetime",
+   "final_type": "datetime",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "ts enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "station",
+   "script_type": "nominal",
+   "final_type": "nominal",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "station enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "lat",
+   "script_type": "numeric",
+   "final_type": "numeric",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "lat enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "lon",
+   "script_type": "numeric",
+   "final_type": "numeric",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "lon enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "reading_c",
+   "script_type": "numeric",
+   "final_type": "numeric",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "reading_c enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "humidity_pct",
+   "script_type": "numeric",
+   "final_type": "numeric",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "humidity_pct enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "calibration",
+   "script_type": "numeric",
+   "final_type": "numeric",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "calibration enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "battery_pct",
+   "script_type": "numeric",
+   "final_type": "numeric",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "battery_pct enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "alarm",
+   "script_type": "boolean",
+   "final_type": "boolean",
+   "role": "derived",
+   "reason": "head of a threshold rule",
+   "consequences": {
+    "decision": "alarm enters as derived",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  },
+  {
+   "column": "split",
+   "script_type": "nominal",
+   "final_type": "nominal",
+   "role": "dimension",
+   "reason": "primitive: nothing in this file defines it",
+   "consequences": {
+    "decision": "split enters as dimension",
+    "alternatives": [],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "none"
+    }
+   }
+  }
+ ],
+ "space": {
+  "ambient_dim": 6,
+  "exact_rank": 6,
+  "near_rank": 6,
+  "dims_95": 5,
+  "dims_99": 6,
+  "participation_ratio": 4.1,
+  "intrinsic_dim_twonn": 4.6,
+  "condition_number": 12.4,
+  "numeric_columns": [
+   "lat",
+   "lon",
+   "reading_c",
+   "humidity_pct",
+   "calibration",
+   "battery_pct"
+  ],
+  "reading": "Six numeric columns, full rank: nothing here is a linear combination of the rest. The 95 % variance sits in five directions and the two-nearest-neighbour estimate — the dimension of the surface the points actually lie on — is about 4.6, which is the signature of the two coordinates being tied to the station and of the reading carrying a daily cycle rather than free noise."
+ },
+ "basis": {
+  "members": [
+   "ts",
+   "station",
+   "lat",
+   "lon",
+   "reading_c",
+   "humidity_pct",
+   "calibration",
+   "battery_pct",
+   "split"
+  ],
+  "size": 9,
+  "intrinsic_dim": 4.6,
+  "reading": "Eight primitives against an intrinsic dimension near five: the surplus is the pair lat/lon, which the three stations pin to three neighbourhoods, and the timestamp, which no numeric measure sees as a dimension at all."
+ },
+ "derivations": [
+  {
+   "column": "alarm",
+   "rule_id": "swrl-alarm",
+   "layer": "swrl",
+   "formula": "alarm = 1 ⇔ reading_c > 24 ∧ humidity_pct < 62",
+   "body": [
+    "reading_c",
+    "humidity_pct"
+   ],
+   "provenance": {
+    "semantic": {
+     "status": "confirmed",
+     "note": "the alarm is defined by the two thresholds"
+    },
+    "symbolic": {
+     "status": "untested",
+     "verified_rows": 0,
+     "of_rows": 0
+    },
+    "empirical": {
+     "status": "confirmed",
+     "evidence": "the rule reproduces the column on every row"
+    }
+   },
+   "consequences": {
+    "decision": "alarm is a rule head, not a dimension",
+    "alternatives": [
+     "keep alarm as a primitive and let a model rediscover the thresholds"
+    ],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a tree recovers the conjunction; a linear model cannot",
+     "leakage": "reading_c and humidity_pct must leave the features when alarm is the label",
+     "dimensionality": "one fewer dimension",
+     "interpretability": "the alarm is a policy, not a measurement"
+    }
+   }
+  }
+ ],
+ "cycles": [],
+ "disagreements": [
+  {
+   "column": "humidity_pct",
+   "kind": "empirical-without-semantic",
+   "evidence": "pearson -0.44 with reading_c",
+   "reading": "Humidity falls as the reading rises, but neither defines the other: both answer to the weather, which this file does not carry. It is a hidden dimension, not a derivation."
+  }
+ ],
+ "orthogonality": {
+  "measures": "Spearman between numerics, eta² for numeric-by-nominal, NMI as the common scale",
+  "thresholds": {
+   "nmi": 0.5,
+   "pearson": 0.9,
+   "eta2": 0.8,
+   "cramers_v": 0.8
+  },
+  "pairs": [
+   {
+    "a": "reading_c",
+    "b": "humidity_pct",
+    "nmi": 0.31,
+    "pearson": -0.44,
+    "independence": "definitional, not statistical"
+   },
+   {
+    "a": "lat",
+    "b": "lon",
+    "nmi": 0.58,
+    "pearson": 0.72,
+    "independence": "neither: both are the station"
+   }
+  ],
+  "reading": "The basis is not statistically orthogonal and was never meant to be: the coordinates move together because there are three stations, and the reading and the humidity share a cause outside the file."
+ },
+ "partitions": {
+  "chosen": "station",
+  "provenance": "user-chosen",
+  "candidates": [
+   {
+    "label": "station",
+    "stance": "user: the fixture's analyst names station as the label to predict, though no rule or functional dependency derives it",
+    "task": "multiclass classification",
+    "rule_id": null,
+    "features": [
+     "ts",
+     "lat",
+     "lon",
+     "reading_c",
+     "humidity_pct",
+     "calibration",
+     "battery_pct",
+     "split"
+    ],
+    "dropped_for_leakage": [],
+    "input_dim": 8,
+    "consequences": {
+     "decision": "station is the label; nothing in the file derives it",
+     "alternatives": [
+      "alarm as the label"
+     ],
+     "downstream": {
+      "preprocessing": "the coordinates need no scaling for a tree",
+      "model_family": "any; the classes are separable by location",
+      "leakage": "none — no column defines the station",
+      "dimensionality": "8 inputs",
+      "interpretability": "the model recovers geography"
+     }
+    }
+   },
+   {
+    "label": "alarm",
+    "task": "binary classification",
+    "rule_id": "swrl-alarm",
+    "features": [
+     "ts",
+     "station",
+     "lat",
+     "lon",
+     "calibration",
+     "battery_pct",
+     "split"
+    ],
+    "dropped_for_leakage": [
+     "reading_c",
+     "humidity_pct"
+    ],
+    "input_dim": 7,
+    "consequences": {
+     "decision": "alarm as the label costs its two defining columns",
+     "alternatives": [
+      "keep them and learn the rule instead of the phenomenon"
+     ],
+     "downstream": {
+      "preprocessing": "none",
+      "model_family": "any",
+      "leakage": "reading_c and humidity_pct define the label and must leave",
+      "dimensionality": "7 inputs",
+      "interpretability": "what remains predicts the alarm only through the weather it cannot see"
+     }
+    }
+   }
+  ]
+ },
+ "functional_dependencies": [],
+ "stats": {},
+ "handoff": {
+  "nn_data_artifact": null,
+  "note": "no nn-* skill family installed; the partition is described, not materialized"
+ }
+}

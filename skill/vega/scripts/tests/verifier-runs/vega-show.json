@@ -1,0 +1,16 @@
+{
+ "schema": "vega/verifier-run@1",
+ "skill": "vega-show",
+ "verdict": "SHIP",
+ "blocking": 0,
+ "non_blocking": 0,
+ "inconclusive": 0,
+ "audited": {
+  "../vega/references/brief-contract.md": "sha256:b93e4be3aac9d7e34a5098537076a85c011a7ed2b02de61ad7a4be04232ea9a0",
+  "SKILL.md": "sha256:ddcee098f9f2a2f370e38e93b46da41da879ced7d789946129691bbf60c17d6a",
+  "references/show-contract.md": "sha256:662319bc55c0ddd93cc9d72620a7c857b085c856ef2f97c38c8249dc19f03718",
+  "verifiers/static-verifier.md": "sha256:c14bbb7fe218b6c24abb6ef465ae8fdb127b955eb76914010823f3a416c751a7"
+ },
+ "run_at": "2026-10-11T20:43:40Z",
+ "session": "90710f34-3587-4ca7-90fa-d67c29c10520"
+}

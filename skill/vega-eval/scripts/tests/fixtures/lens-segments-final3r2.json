@@ -1,0 +1,202 @@
+{
+ "_about": "modules.segments of a real data-lens analysis layer, as published before the assignment rule was recorded: rehearsal final3r2 (seed 3517), data/landcover.domain.analysis.html. vega-eval's test_lens_segments.py reads it to prove a segment slice that cannot be cut is said, not dropped.",
+ "segments": {
+  "ran": true,
+  "evidence": {
+   "chosen_k": 3,
+   "features": [
+    "b01",
+    "b02",
+    "b03",
+    "b04",
+    "b05",
+    "b06",
+    "b07",
+    "b08",
+    "b09",
+    "b10",
+    "elevation_m",
+    "slope_deg",
+    "aspect_deg"
+   ],
+   "profiles": [
+    {
+     "dominant": {
+      "cover": "water"
+     },
+     "label_rate": null,
+     "medians": {
+      "aspect_deg": 177.8,
+      "b01": 0.0804,
+      "b02": 0.0693,
+      "b03": 0.06,
+      "b04": 0.0427,
+      "b05": 0.0316,
+      "b06": 0.0264,
+      "b07": 0.0228,
+      "b08": 0.019,
+      "b09": 0.0108,
+      "b10": 0.0112,
+      "elevation_m": 149.1,
+      "slope_deg": 0.77
+     },
+     "n": 173,
+     "segment": 0,
+     "share": 0.0961111111,
+     "standardized_difference": {
+      "aspect_deg": -0.0251388598,
+      "b01": 0.5255643028,
+      "b02": -0.0054955007,
+      "b03": -0.7976338172,
+      "b04": -0.7412725945,
+      "b05": -1.6797128898,
+      "b06": -2.3698892871,
+      "b07": -2.344165447,
+      "b08": -2.3070970886,
+      "b09": -2.2330478655,
+      "b10": -1.6411280201,
+      "elevation_m": -0.9399719471,
+      "slope_deg": -0.7311572492
+     }
+    },
+    {
+     "dominant": {
+      "cover": "cropland"
+     },
+     "label_rate": null,
+     "medians": {
+      "aspect_deg": 179.7,
+      "b01": 0.0493,
+      "b02": 0.0584,
+      "b03": 0.0891,
+      "b04": 0.0713,
+      "b05": 0.133,
+      "b06": 0.2473,
+      "b07": 0.291,
+      "b08": 0.3098,
+      "b09": 0.2304,
+      "b10": 0.1417,
+      "elevation_m": 420.6,
+      "slope_deg": 5.07
+     },
+     "n": 1421,
+     "segment": 1,
+     "share": 0.7894444444,
+     "standardized_difference": {
+      "aspect_deg": 0.001310643,
+      "b01": -0.3049865755,
+      "b02": -0.2704743591,
+      "b03": -0.1841685206,
+      "b04": -0.2294095474,
+      "b05": -0.0612431921,
+      "b06": 0.2188228419,
+      "b07": 0.2644380546,
+      "b08": 0.2671436717,
+      "b09": 0.0796434008,
+      "b10": -0.0815329267,
+      "elevation_m": -0.1442072029,
+      "slope_deg": -0.0844348768
+     }
+    },
+    {
+     "dominant": {
+      "cover": "bare"
+     },
+     "label_rate": null,
+     "medians": {
+      "aspect_deg": 174.0,
+      "b01": 0.1195,
+      "b02": 0.13945,
+      "b03": 0.1775,
+      "b04": 0.21395,
+      "b05": 0.24905,
+      "b06": 0.27335,
+      "b07": 0.2794,
+      "b08": 0.28985,
+      "b09": 0.33525,
+      "b10": 0.2925,
+      "elevation_m": 1465.0,
+      "slope_deg": 21.41
+     },
+     "n": 206,
+     "segment": 2,
+     "share": 0.1144444444,
+     "standardized_difference": {
+      "aspect_deg": 0.012070869,
+      "b01": 1.6624432013,
+      "b02": 1.8703630381,
+      "b03": 1.9402627096,
+      "b04": 2.2050054646,
+      "b05": 1.8330917762,
+      "b06": 0.4807941177,
+      "b07": 0.1445346929,
+      "b08": 0.0947409653,
+      "b09": 1.3259417875,
+      "b10": 1.9406477494,
+      "elevation_m": 1.7841436029,
+      "slope_deg": 1.196466816
+     }
+    }
+   ],
+   "scans": [
+    {
+     "agglomerative_agreement_ari": 0.9188467494,
+     "inertia": 16729.7630660895,
+     "k": 2,
+     "silhouette": 0.4168664663,
+     "stability_ari_mean": 0.9970426974,
+     "stability_ari_sd": 0.0065404731
+    },
+    {
+     "agglomerative_agreement_ari": 0.9477686185,
+     "inertia": 11648.7082208839,
+     "k": 3,
+     "silhouette": 0.4278382791,
+     "stability_ari_mean": 1.0,
+     "stability_ari_sd": 0.0
+    },
+    {
+     "agglomerative_agreement_ari": 0.8578813848,
+     "inertia": 9294.6455826556,
+     "k": 4,
+     "silhouette": 0.3063417015,
+     "stability_ari_mean": 0.9833357952,
+     "stability_ari_sd": 0.0111953499
+    },
+    {
+     "agglomerative_agreement_ari": 0.5947504492,
+     "inertia": 8207.8073419348,
+     "k": 5,
+     "silhouette": 0.2544091678,
+     "stability_ari_mean": 0.9604396663,
+     "stability_ari_sd": 0.0278031356
+    },
+    {
+     "agglomerative_agreement_ari": 0.4873533383,
+     "inertia": 7606.7769631983,
+     "k": 6,
+     "silhouette": 0.2277965674,
+     "stability_ari_mean": 0.8972876023,
+     "stability_ari_sd": 0.1181600006
+    },
+    {
+     "agglomerative_agreement_ari": 0.542705328,
+     "inertia": 7093.5526046861,
+     "k": 7,
+     "silhouette": 0.2245426585,
+     "stability_ari_mean": 0.7197962173,
+     "stability_ari_sd": 0.1475225979
+    },
+    {
+     "agglomerative_agreement_ari": 0.4841383285,
+     "inertia": 6621.8141934685,
+     "k": 8,
+     "silhouette": 0.2158337094,
+     "stability_ari_mean": 0.7950901422,
+     "stability_ari_sd": 0.1440283943
+    }
+   ]
+  },
+  "reading": "Without the label, the standardized basis falls into three segments that are perfectly stable under resampling and agree with an agglomerative clustering. Their profiles name them as water, vegetated land and bright highland (F4). Higher k loses both silhouette and stability, so the six classes are not visible as unsupervised clusters, only as finer splits inside the vegetated segment."
+ }
+}

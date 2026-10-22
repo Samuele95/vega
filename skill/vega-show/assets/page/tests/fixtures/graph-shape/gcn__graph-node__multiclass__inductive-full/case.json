@@ -1,0 +1,17 @@
+{
+  "effective": "multiclass",
+  "extra": null,
+  "family": "gcn",
+  "files": {
+    "explain": "gcn__graph-node__multiclass__inductive-full/explain.json",
+    "network": "gcn__graph-node__multiclass__inductive-full/network.json"
+  },
+  "id": "gcn/graph-node/multiclass/inductive-full",
+  "level": "node",
+  "reading": "multiclass",
+  "shape": "graph",
+  "slug": "gcn__graph-node__multiclass__inductive-full",
+  "target": "logit",
+  "task": "multiclass",
+  "variant": "inductive-full"
+}

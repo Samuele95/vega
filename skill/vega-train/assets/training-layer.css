@@ -1,0 +1,153 @@
+/* /vega-train `training` layer — scoped styles. Every rule is prefixed .layer-training so nothing
+   bleeds into the host or another layer. Tokens fall back to the domain-forge template variables,
+   so the layer takes the host page's palette wherever the host defines one. */
+.layer-training { --t-ink: var(--ink, #1a1814); --t-muted: var(--muted, #6d685b);
+  --t-border: var(--border, #e6e1d5); --t-surface: var(--surface, #fff); --t-panel: var(--panel, #f8f6f1);
+  --t-accent: var(--accent, #1b3a73); --t-soft: var(--accent-soft, #eaeef6);
+  --t-ok: #2e6b3f; --t-bad: #9a3a2c; --t-warn: #8a6420; --t-spec: #2c6570; --t-ana: #7a3c77;
+  --t-vega: #35634a; --t-hpo: #1b3a73; --t-user: #8a6420; --t-diag: #9a3a2c;
+  --t-c0: #1b3a73; --t-c1: #9a3a2c; --t-c2: #2e6b3f; --t-c3: #7a3c77; --t-c4: #8a6420;
+  --t-c5: #2c6570;
+  padding: 1.25rem; color: var(--t-ink); font: 14px/1.55 var(--sans, system-ui, sans-serif); }
+@media (prefers-color-scheme: dark) {
+  .layer-training { --t-ink: var(--ink, #e8e4da); --t-muted: var(--muted, #a39d8e);
+    --t-border: var(--border, #3a362d); --t-surface: var(--surface, #1e1c18); --t-panel: var(--panel, #26231e);
+    --t-accent: var(--accent, #8fb0ea); --t-soft: var(--accent-soft, #2b3550);
+    --t-ok: #7fc98f; --t-bad: #e07a66; --t-warn: #d8b26a; --t-spec: #7fc0c9; --t-ana: #c99ad0;
+    --t-vega: #86c9a2; --t-hpo: #8fb0ea; --t-user: #d8b26a; --t-diag: #e07a66;
+    --t-c0: #8fb0ea; --t-c1: #e07a66; --t-c2: #7fc98f; --t-c3: #c99ad0; --t-c4: #d8b26a;
+    --t-c5: #7fc0c9; }
+}
+.layer-training h2 { margin: 0 0 .2rem; font-size: 1.35rem; }
+.layer-training h3 { margin: 1.1rem 0 .5rem; font-size: 1rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--t-border); }
+.layer-training h4 { margin: .8rem 0 .35rem; font-size: .84rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--t-muted); }
+.layer-training .t-prose { margin: .4rem 0; max-width: 62em; }
+.layer-training .t-muted { color: var(--t-muted); font-size: .85rem; margin: .2rem 0;
+  max-width: 62em; }
+.layer-training .t-warntext { color: var(--t-warn); font-size: .88rem; margin: .35rem 0;
+  max-width: 62em; }
+.layer-training .t-empty { padding: .8rem 1rem; border: 1px dashed var(--t-border);
+  border-radius: 6px; color: var(--t-muted); background: var(--t-panel); max-width: 62em; }
+.layer-training .t-mono { font-family: var(--mono, ui-monospace, monospace); font-size: .8rem; }
+.layer-training .t-abstract { margin: .3rem 0 .6rem; }
+.layer-training .t-marker { font-family: var(--mono, ui-monospace, monospace); font-size: .78rem;
+  color: var(--t-muted); margin: .1rem 0; }
+
+.layer-training .t-chip { display: inline-block; padding: .05rem .55rem; margin: 0 .25rem .2rem 0;
+  border: 1px solid var(--t-border); border-radius: 999px; font-size: .74rem; color: var(--t-muted);
+  background: var(--t-surface); }
+.layer-training .t-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: .3rem 0 .6rem;
+  align-items: center; }
+.layer-training .t-id { font-family: var(--mono, ui-monospace, monospace);
+  border-color: var(--t-accent); color: var(--t-accent); }
+.layer-training .t-tag { background: var(--t-panel); }
+.layer-training .t-ok { border-color: var(--t-ok); color: var(--t-ok); }
+.layer-training .t-bad { border-color: var(--t-bad); color: var(--t-bad); }
+.layer-training .t-warn { border-color: var(--t-warn); color: var(--t-warn);
+  background: var(--t-panel); }
+.layer-training .t-na { border-style: dashed; }
+.layer-training .t-cat { font-family: var(--mono, ui-monospace, monospace); font-size: .7rem;
+  border-style: dotted; }
+.layer-training .t-diagchip { font-family: var(--mono, ui-monospace, monospace);
+  border-color: var(--t-diag); color: var(--t-diag); }
+.layer-training .t-src-spec { border-color: var(--t-spec); color: var(--t-spec); }
+.layer-training .t-src-vega { border-color: var(--t-vega); color: var(--t-vega); }
+.layer-training .t-src-diag { border-color: var(--t-diag); color: var(--t-diag); }
+.layer-training .t-src-hpo { border-color: var(--t-hpo); color: var(--t-hpo);
+  background: var(--t-soft); }
+.layer-training .t-src-analysis { border-color: var(--t-ana); color: var(--t-ana); }
+.layer-training .t-src-user { border-color: var(--t-user); color: var(--t-user); }
+.layer-training .t-src-default { border-style: dashed; }
+
+.layer-training .t-stats { display: flex; flex-wrap: wrap; gap: .8rem; margin: .5rem 0 .8rem; }
+.layer-training .t-stat { border: 1px solid var(--t-border); border-radius: 6px;
+  padding: .45rem .8rem; background: var(--t-panel); min-width: 7rem; }
+.layer-training .t-statv { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.layer-training .t-statl { font-size: .74rem; color: var(--t-muted); text-transform: uppercase;
+  letter-spacing: .04em; }
+.layer-training .t-statn { font-size: .74rem; color: var(--t-muted); max-width: 16rem; }
+
+.layer-training .t-table { border-collapse: collapse; font-size: .8rem; margin: .4rem 0;
+  width: 100%; }
+.layer-training .t-table th { text-align: left; font-weight: 600; padding: .12rem .6rem .12rem 0;
+  border-bottom: 1px solid var(--t-border); white-space: nowrap; }
+.layer-training .t-table td { padding: .18rem .6rem .18rem 0;
+  border-bottom: 1px solid var(--t-border); vertical-align: top;
+  font-variant-numeric: tabular-nums; }
+.layer-training .t-numcell { white-space: nowrap; }
+.layer-training .t-hyp { max-width: 26em; }
+.layer-training .t-evidence { max-width: 26em; color: var(--t-ink); }
+/* the selected run and every run the rule may not pick are marked on the row itself: a reader
+   scanning the ledger must not have to cross-reference the selection panel to see either */
+.layer-training .t-selected td { background: var(--t-soft); }
+.layer-training .t-selected td:first-child { box-shadow: inset 3px 0 0 var(--t-ok); }
+.layer-training .t-ineligible td { background: var(--t-panel); color: var(--t-muted); }
+.layer-training .t-ineligible td:first-child { box-shadow: inset 3px 0 0 var(--t-warn); }
+.layer-training .t-unattended td { background: var(--t-panel); }
+.layer-training .t-ortext { font-size: .78rem; color: var(--t-muted); margin-left: .3rem; }
+
+.layer-training .t-gotorun, .layer-training .t-runbtn {
+  font: inherit; font-family: var(--mono, ui-monospace, monospace); font-size: .78rem;
+  color: var(--t-accent); background: var(--t-surface); border: 1px solid var(--t-border);
+  border-radius: 4px; padding: .05rem .45rem; cursor: pointer; }
+.layer-training .t-gotorun { border-color: transparent; padding-left: 0; }
+.layer-training .t-gotorun:hover, .layer-training .t-runbtn:hover { border-color: var(--t-accent); }
+.layer-training .t-gotorun:focus-visible, .layer-training .t-runbtn:focus-visible,
+.layer-training .t-runlink:focus-visible { outline: 2px solid var(--t-accent); outline-offset: 1px; }
+.layer-training .t-runsel { display: flex; flex-wrap: wrap; gap: .3rem; margin: .4rem 0 .6rem; }
+.layer-training .t-runbtn.active { background: var(--t-soft); border-color: var(--t-accent);
+  font-weight: 600; }
+.layer-training .t-runlink { color: var(--t-accent); text-decoration: none;
+  font-family: var(--mono, ui-monospace, monospace); font-size: .8rem;
+  border-bottom: 1px dotted var(--t-accent); }
+.layer-training .t-perread { margin: .2rem 0 .6rem; }
+
+.layer-training .t-det { border: 1px solid var(--t-border); border-radius: 5px;
+  padding: .3rem .6rem; margin: .35rem 0; background: var(--t-panel); }
+.layer-training .t-det > summary { cursor: pointer; font-size: .82rem; color: var(--t-accent); }
+.layer-training .t-formula { font-family: var(--mono, ui-monospace, monospace); font-size: .82rem;
+  background: var(--t-panel); border: 1px solid var(--t-border); border-radius: 4px;
+  padding: .45rem .6rem; margin: .25rem 0; white-space: pre-wrap; overflow-x: auto; }
+.layer-training .t-rule { border-left: 3px solid var(--t-accent); padding: .1rem 0 .1rem .7rem;
+  margin: .5rem 0; }
+.layer-training .t-rulel { font-size: .74rem; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--t-muted); }
+/* an override is a human overruling a mechanical rule; it never shares a box with the rule */
+.layer-training .t-override { margin: .5rem 0; }
+.layer-training .t-override-on { border: 1px solid var(--t-bad); border-radius: 6px;
+  padding: .5rem .8rem; background: var(--t-panel); }
+.layer-training .t-ovhead { display: flex; flex-wrap: wrap; gap: .3rem; }
+.layer-training .t-study { margin: .6rem 0 1rem; }
+
+.layer-training .t-fig { margin: .5rem 0 1rem; }
+.layer-training .t-figt { font-size: .8rem; font-weight: 600; margin-bottom: .15rem; }
+.layer-training .t-legend { margin: .1rem 0 .2rem; }
+.layer-training .t-leg { border-left-width: 6px; }
+.layer-training .t-leg.t-s0 { border-left-color: var(--t-c0); }
+.layer-training .t-leg.t-s1 { border-left-color: var(--t-c1); }
+.layer-training .t-leg.t-s2 { border-left-color: var(--t-c2); }
+.layer-training .t-leg.t-s3 { border-left-color: var(--t-c3); }
+.layer-training .t-leg.t-s4 { border-left-color: var(--t-c4); }
+.layer-training .t-leg.t-s5 { border-left-color: var(--t-c5); }
+.layer-training .t-svg { max-width: 100%; height: auto; border: 1px solid var(--t-border);
+  border-radius: 6px; background: var(--t-surface); margin: .2rem 0; display: block; }
+.layer-training .t-axis { stroke: var(--t-border); stroke-width: 1; }
+.layer-training .t-line { fill: none; stroke-width: 1.6; stroke-linejoin: round;
+  stroke-linecap: round; }
+.layer-training .t-line.t-s0 { stroke: var(--t-c0); }
+.layer-training .t-line.t-s1 { stroke: var(--t-c1); }
+.layer-training .t-line.t-s2 { stroke: var(--t-c2); }
+.layer-training .t-line.t-s3 { stroke: var(--t-c3); }
+.layer-training .t-line.t-s4 { stroke: var(--t-c4); }
+.layer-training .t-line.t-s5 { stroke: var(--t-c5); }
+.layer-training .t-tick { font: 10px var(--sans, system-ui, sans-serif); fill: var(--t-muted); }
+.layer-training .t-baseline { stroke: var(--t-muted); stroke-width: 1; stroke-dasharray: 4 3; }
+.layer-training .t-pt { fill: var(--t-accent); stroke: var(--t-surface); stroke-width: 1; }
+.layer-training .t-pt-best { fill: var(--t-ok); }
+/* a pruned trial is a cross, not a dot: its value came off a partial history */
+.layer-training .t-cross { stroke: var(--t-warn); stroke-width: 1.8; fill: none; }
+.layer-training .t-bar { fill: var(--t-accent); }
+.layer-training .t-barlabel { font: 10px var(--mono, ui-monospace, monospace); fill: var(--t-ink); }
+.layer-training-noscript { padding: 1rem; }

@@ -1,0 +1,1303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:network-view:2",
+  "title": "vega/network-view@2",
+  "description": "The body of GET /v1/network: the stage graph, weights and task readout of the served network. Normative text: vega-forge/references/inspect-contract.md §3 and §5.3; the closed sets mirror scripts/catalog.json `inspection`.",
+  "type": "object",
+  "required": [
+    "schema",
+    "available",
+    "model_version",
+    "spec_digest",
+    "network_digest",
+    "weights",
+    "family",
+    "task",
+    "sample",
+    "inputs",
+    "params",
+    "nodes",
+    "edges",
+    "chain",
+    "tensors",
+    "limits",
+    "inspection"
+  ],
+  "properties": {
+    "schema": {
+      "const": "vega/network-view@2"
+    },
+    "available": {
+      "const": true
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "spec_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "network_digest": {
+      "$ref": "#/$defs/digest"
+    },
+    "weights": {
+      "enum": [
+        "full",
+        "summary"
+      ]
+    },
+    "family": {
+      "type": "object",
+      "required": [
+        "name",
+        "source"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "$ref": "#/$defs/task"
+    },
+    "sample": {
+      "$ref": "#/$defs/sample"
+    },
+    "inputs": {
+      "$ref": "#/$defs/inputs"
+    },
+    "params": {
+      "type": "object",
+      "required": [
+        "total",
+        "trainable"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trainable": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "chain": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/chain"
+        }
+      ]
+    },
+    "tensors": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/tensor"
+      }
+    },
+    "limits": {
+      "$ref": "#/$defs/limits"
+    },
+    "inspection": {
+      "type": "object",
+      "required": [
+        "schema",
+        "readers"
+      ],
+      "properties": {
+        "schema": {
+          "const": "vega/inspection@1"
+        },
+        "readers": {
+          "$ref": "#/$defs/digest"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.@:-]{1,128}$"
+    },
+    "link": {
+      "enum": [
+        "softmax",
+        "sigmoid",
+        "sigmoid_each",
+        "identity",
+        "cumulative",
+        "reconstruction",
+        "distance",
+        "horizon"
+      ]
+    },
+    "target_kind": {
+      "enum": [
+        "logit",
+        "binary_logit",
+        "label_logit",
+        "value",
+        "quantile",
+        "expected_rank",
+        "threshold_logit",
+        "reconstruction_error",
+        "feature_error",
+        "svdd_distance",
+        "forecast_step"
+      ]
+    },
+    "output_kind": {
+      "enum": [
+        "classes",
+        "score",
+        "labels",
+        "value",
+        "quantiles",
+        "thresholds",
+        "reconstruction",
+        "embedding",
+        "horizon"
+      ]
+    },
+    "heat": {
+      "type": "object",
+      "required": [
+        "rows",
+        "cols",
+        "row_edges",
+        "col_edges",
+        "values"
+      ],
+      "properties": {
+        "rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cols": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "row_edges": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "col_edges": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "l2",
+        "abs_q",
+        "hist"
+      ],
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mean": {
+          "type": "number"
+        },
+        "std": {
+          "type": "number"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "l2": {
+          "type": "number"
+        },
+        "abs_q": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "hist": {
+          "type": "object",
+          "required": [
+            "lo",
+            "hi",
+            "counts"
+          ],
+          "properties": {
+            "lo": {
+              "type": "number"
+            },
+            "hi": {
+              "type": "number"
+            },
+            "counts": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "minItems": 32,
+              "maxItems": 32
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "kind",
+        "names"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/output_kind"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "kind",
+        "base",
+        "link",
+        "outputs",
+        "positive",
+        "threshold",
+        "quantiles",
+        "decision_rule",
+        "targets",
+        "default_target"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "binary",
+            "multiclass",
+            "multilabel",
+            "regression",
+            "ordinal",
+            "unsupervised",
+            "anomaly",
+            "sequence-classification",
+            "sequence-regression",
+            "forecast"
+          ]
+        },
+        "base": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "binary",
+                "multiclass",
+                "multilabel",
+                "regression",
+                "ordinal"
+              ]
+            }
+          ]
+        },
+        "link": {
+          "$ref": "#/$defs/link"
+        },
+        "outputs": {
+          "$ref": "#/$defs/outputs"
+        },
+        "positive": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "threshold": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "threshold_scale": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "probability",
+                "score"
+              ]
+            }
+          ]
+        },
+        "quantiles": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "exclusiveMaximum": 1
+              },
+              "minItems": 1
+            }
+          ]
+        },
+        "decision_rule": {
+          "enum": [
+            "argmax",
+            "threshold",
+            "per_label_threshold",
+            "cumulative_count",
+            "none"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/target_kind"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "default_target": {
+          "$ref": "#/$defs/target_kind"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sample": {
+      "type": "object",
+      "required": [
+        "shape",
+        "length",
+        "stride",
+        "horizon",
+        "autoregressive",
+        "level",
+        "directed",
+        "self_loops",
+        "protocol",
+        "batching"
+      ],
+      "properties": {
+        "shape": {
+          "enum": [
+            "row",
+            "window",
+            "graph"
+          ]
+        },
+        "length": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 2
+            }
+          ]
+        },
+        "stride": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ]
+        },
+        "horizon": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ]
+        },
+        "autoregressive": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "level": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "node",
+                "graph"
+              ]
+            }
+          ]
+        },
+        "directed": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "self_loops": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        },
+        "protocol": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "inductive",
+                "transductive"
+              ]
+            }
+          ]
+        },
+        "batching": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "full",
+                "sampled",
+                "graphs"
+              ]
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "feature_label": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "past"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "past": {
+              "const": true
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "numeric",
+        "nominal",
+        "past_target",
+        "order",
+        "width",
+        "edges",
+        "axis_labels"
+      ],
+      "properties": {
+        "numeric": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "nominal": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "cardinality",
+              "dim"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "cardinality": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "dim": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "past_target": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "edges": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "weighted"
+              ],
+              "properties": {
+                "weighted": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "axis_labels": {
+          "type": "object",
+          "required": [
+            "feature",
+            "step",
+            "token"
+          ],
+          "properties": {
+            "feature": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/feature_label"
+              }
+            },
+            "step": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            },
+            "token": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "code": {
+      "type": "object",
+      "required": [
+        "file",
+        "class",
+        "anchor"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string"
+        },
+        "anchor": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "block",
+        "type",
+        "view",
+        "parent",
+        "children",
+        "role",
+        "call",
+        "path",
+        "in_shape",
+        "out_shape",
+        "axes",
+        "per",
+        "config",
+        "params",
+        "formula",
+        "code"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "block": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "dense",
+            "embedding",
+            "concat",
+            "batchnorm",
+            "layernorm",
+            "dropout",
+            "activation",
+            "residual",
+            "sequential",
+            "parallel",
+            "conv1d",
+            "pool1d",
+            "rnn",
+            "gru",
+            "lstm",
+            "attention",
+            "attention_pool",
+            "transformer_encoder",
+            "feature_tokenizer",
+            "positional",
+            "flatten",
+            "reshape",
+            "pool",
+            "head",
+            "decoder",
+            "reparameterize",
+            "gcn_conv",
+            "sage_conv",
+            "gat_conv",
+            "gin_conv",
+            "graph_pool",
+            "edge_dropout",
+            "custom",
+            "input",
+            "output",
+            "residual_add",
+            "parallel_merge",
+            "encoder_layer"
+          ]
+        },
+        "view": {
+          "enum": [
+            "units",
+            "table",
+            "join",
+            "affine",
+            "pointwise",
+            "group",
+            "conv",
+            "pool",
+            "recurrent",
+            "attention",
+            "tokens",
+            "reshape",
+            "latent",
+            "graph",
+            "edges",
+            "opaque",
+            "io",
+            "merge"
+          ]
+        },
+        "parent": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/id"
+            }
+          ]
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "role": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "enum": [
+                "projection",
+                "decoder_layer"
+              ]
+            }
+          ]
+        },
+        "call": {
+          "enum": [
+            "emb",
+            "concat",
+            "tokens",
+            "tensor",
+            "graph",
+            "gdrop",
+            "gpool",
+            "inner",
+            "io"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "in_shape": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          ]
+        },
+        "out_shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "axes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "unit",
+              "feature",
+              "step",
+              "channel",
+              "token",
+              "output"
+            ]
+          }
+        },
+        "per": {
+          "enum": [
+            "sample",
+            "node",
+            "graph"
+          ]
+        },
+        "config": {
+          "type": "object"
+        },
+        "params": {
+          "type": "object",
+          "required": [
+            "count",
+            "trainable"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "trainable": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "formula": {
+          "type": "string"
+        },
+        "code": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/code"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "edge": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "kind"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/id"
+        },
+        "to": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "data",
+            "skip",
+            "embed",
+            "branch",
+            "merge",
+            "edges",
+            "readout"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "chain": {
+      "type": "object",
+      "required": [
+        "eligible",
+        "linear_reading",
+        "inputs",
+        "layers"
+      ],
+      "properties": {
+        "eligible": {
+          "const": true
+        },
+        "linear_reading": {
+          "type": "boolean"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "node",
+              "in",
+              "out",
+              "activation",
+              "dropout",
+              "weight",
+              "bias",
+              "params"
+            ],
+            "properties": {
+              "node": {
+                "$ref": "#/$defs/id"
+              },
+              "in": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "out": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "activation": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "dropout": {
+                "type": "number",
+                "minimum": 0
+              },
+              "weight": {
+                "$ref": "#/$defs/id"
+              },
+              "bias": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/$defs/id"
+                  }
+                ]
+              },
+              "params": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tensor": {
+      "type": "object",
+      "required": [
+        "id",
+        "node",
+        "role",
+        "shape",
+        "axes",
+        "dtype",
+        "encoding",
+        "data",
+        "summary"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "node": {
+          "$ref": "#/$defs/id"
+        },
+        "role": {
+          "enum": [
+            "weight",
+            "bias",
+            "table",
+            "buffer"
+          ]
+        },
+        "shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "axes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dtype": {
+          "const": "float32"
+        },
+        "encoding": {
+          "enum": [
+            "json",
+            "base64-le",
+            "deferred",
+            "withheld"
+          ]
+        },
+        "data": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "encoding": {
+                "const": "json"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "encoding": {
+                "const": "base64-le"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "encoding": {
+                "enum": [
+                  "deferred",
+                  "withheld"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "data": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "limits": {
+      "type": "object",
+      "required": [
+        "inline_tensor_max",
+        "inline_total_max",
+        "json_list_max",
+        "vector_max",
+        "heat_max",
+        "graph_nodes_max",
+        "explain_float_budget",
+        "explain_exact_float_budget",
+        "explain_rows_max",
+        "explain_edges_max",
+        "ig_steps_default",
+        "ig_steps_max",
+        "ig_batch_max"
+      ],
+      "properties": {
+        "inline_tensor_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "inline_total_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "json_list_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "vector_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "heat_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "graph_nodes_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "explain_float_budget": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "explain_exact_float_budget": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "explain_rows_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "explain_edges_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ig_steps_default": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ig_steps_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ig_batch_max": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,133 @@
+/* evaluation-layer.css — /vega-eval's `evaluation` tab.
+   Scoped entirely under .layer-evaluation so the layer cannot restyle the document it is
+   written into. Colours come from the platform's custom properties where they exist and fall
+   back to their own values, so the layer reads correctly in a model that defines none. */
+
+.layer-evaluation {
+  --ev-fg: var(--fg, #16181d);
+  --ev-dim: var(--fg-dim, #5d6470);
+  --ev-line: var(--line, #dfe3ea);
+  --ev-panel: var(--panel, #f7f8fa);
+  --ev-accent: var(--accent, #2f6fdb);
+  --ev-good: #1c7a4a;
+  --ev-bad: #b03030;
+  --ev-warn: #8a6100;
+  --ev-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--ev-fg);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .layer-evaluation {
+    --ev-fg: var(--fg, #e6e8ec);
+    --ev-dim: var(--fg-dim, #99a0ac);
+    --ev-line: var(--line, #333842);
+    --ev-panel: var(--panel, #1b1e24);
+    --ev-accent: var(--accent, #7aa7f0);
+    --ev-good: #4fbe86;
+    --ev-bad: #ec7a7a;
+    --ev-warn: #d6a740;
+  }
+}
+
+.layer-evaluation :where(h3, h4, p, table, ul, ol) { margin: 0 0 .6rem; }
+.layer-evaluation h3 { font-size: 1.05rem; }
+.layer-evaluation h4 { font-size: .9rem; letter-spacing: .02em; text-transform: uppercase;
+                       color: var(--ev-dim); }
+
+/* ---- the seal strip: the first thing read, because it qualifies everything below it */
+.layer-evaluation .ev-seal {
+  display: flex; flex-wrap: wrap; gap: .35rem 1.25rem; align-items: baseline;
+  padding: .6rem .8rem; margin-bottom: 1rem;
+  border: 1px solid var(--ev-line); border-left: 3px solid var(--ev-accent);
+  border-radius: 4px; background: var(--ev-panel);
+}
+.layer-evaluation .ev-seal.ev-reopened { border-left-color: var(--ev-warn); }
+.layer-evaluation .ev-seal dt { font-size: .72rem; text-transform: uppercase;
+                                letter-spacing: .04em; color: var(--ev-dim); }
+.layer-evaluation .ev-seal dd { margin: 0; font-family: var(--ev-mono); }
+.layer-evaluation .ev-seal .ev-pair { display: flex; flex-direction: column; gap: .1rem; }
+
+/* ---- the verdict */
+.layer-evaluation .ev-verdict {
+  padding: .8rem 1rem; margin-bottom: 1rem; border-radius: 4px;
+  border: 1px solid var(--ev-line);
+  border-left: 3px solid var(--ev-bad);
+}
+.layer-evaluation .ev-verdict.ev-earned { border-left-color: var(--ev-good); }
+.layer-evaluation .ev-verdict .ev-flag {
+  font-weight: 650; letter-spacing: .01em; color: var(--ev-bad);
+}
+.layer-evaluation .ev-verdict.ev-earned .ev-flag { color: var(--ev-good); }
+.layer-evaluation .ev-verdict.ev-not-assessable { border-left-color: var(--ev-dim); }
+.layer-evaluation .ev-verdict.ev-not-assessable .ev-flag { color: var(--ev-dim); }
+.layer-evaluation .ev-verdict p { margin: .4rem 0 0; }
+
+/* ---- tables */
+.layer-evaluation table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.layer-evaluation caption { text-align: left; padding-bottom: .3rem; color: var(--ev-dim);
+                            font-size: .78rem; text-transform: uppercase;
+                            letter-spacing: .04em; }
+.layer-evaluation th, .layer-evaluation td {
+  text-align: left; padding: .3rem .55rem; border-bottom: 1px solid var(--ev-line);
+  vertical-align: baseline;
+}
+.layer-evaluation td.ev-num, .layer-evaluation th.ev-num {
+  text-align: right; font-family: var(--ev-mono); font-variant-numeric: tabular-nums;
+}
+.layer-evaluation .ev-ci { color: var(--ev-dim); font-size: .82em; white-space: nowrap; }
+.layer-evaluation tr.ev-network th { font-weight: 650; }
+.layer-evaluation tr.ev-network td { background: color-mix(in srgb, var(--ev-accent) 7%,
+                                                            transparent); }
+.layer-evaluation .ev-excludes-zero { font-weight: 650; }
+.layer-evaluation .ev-excludes-zero.ev-up { color: var(--ev-good); }
+.layer-evaluation .ev-excludes-zero.ev-down { color: var(--ev-bad); }
+.layer-evaluation .ev-upstream { color: var(--ev-dim); font-style: italic; }
+.layer-evaluation .ev-none { color: var(--ev-dim); }
+
+.layer-evaluation th[aria-sort] { cursor: pointer; user-select: none; }
+.layer-evaluation th[aria-sort]:focus-visible { outline: 2px solid var(--ev-accent);
+                                                outline-offset: -2px; }
+.layer-evaluation th[aria-sort="ascending"]::after { content: " ▲"; color: var(--ev-dim); }
+.layer-evaluation th[aria-sort="descending"]::after { content: " ▼"; color: var(--ev-dim); }
+
+/* ---- the curves */
+.layer-evaluation .ev-curves {
+  display: grid; gap: .8rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.layer-evaluation .ev-curve {
+  border: 1px solid var(--ev-line); border-radius: 4px; padding: .5rem; background: var(--ev-panel);
+}
+.layer-evaluation .ev-curve svg { display: block; width: 100%; height: auto; }
+.layer-evaluation .ev-curve figcaption { font-size: .78rem; color: var(--ev-dim);
+                                         padding-top: .3rem; }
+
+/* ---- panels and skips */
+.layer-evaluation .ev-panel {
+  border: 1px solid var(--ev-line); border-radius: 4px; padding: .6rem .8rem;
+  margin-bottom: 1rem; background: var(--ev-panel);
+}
+.layer-evaluation .ev-skip { color: var(--ev-dim); }
+.layer-evaluation .ev-skip code { font-family: var(--ev-mono); }
+.layer-evaluation .ev-degenerate td { color: var(--ev-dim); }
+
+/* ---- readings and markers */
+.layer-evaluation .ev-reading { margin-bottom: .9rem; }
+.layer-evaluation .ev-reading p { white-space: pre-wrap; }
+.layer-evaluation .ev-markers { list-style: none; padding: 0; font-family: var(--ev-mono);
+                                font-size: .8rem; }
+.layer-evaluation .ev-markers li { padding: .12rem 0; }
+.layer-evaluation .ev-markers li.ev-m-warn { color: var(--ev-warn); }
+
+.layer-evaluation details > summary { cursor: pointer; color: var(--ev-dim);
+                                      font-size: .82rem; }
+.layer-evaluation details > summary:focus-visible { outline: 2px solid var(--ev-accent);
+                                                    outline-offset: 2px; }
+
+.layer-evaluation .ev-empty { color: var(--ev-dim); font-style: italic; padding: 1rem 0; }
+
+@media print {
+  .layer-evaluation details { display: block; }
+  .layer-evaluation details > *:not(summary) { display: block !important; }
+}

@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:explain-catalog:1",
+  "title": "vega/explain-catalog@1",
+  "description": "A backend's explain catalog, backends/<name>/explain-catalog.json: the backend-owned text the showcase page's stepper and code walk read for this backend's blocks (normative text: vega-forge/references/backend-contract.md §2.2). One entry per block type of the backend's coverage.json (blocks and planned blocks alike, the inspection.blocks list), per activation of coverage.json activations and per link of the vega-forge catalog's inspection.links, plus the nine fixed walk steps in the page's order. vega-show copies the subset a lane uses into page.json explain (verbatim) and page.json walk. Prose fields (label, label_many, step, prose, unit_how, walk.title, walk.text, an activation's name and bend, a link's prose and answer) follow the digit rule: no decimal digit outside a placeholder. Formula fields are notation and may carry numerals. A placeholder is {name} or {lexicon_key.path}, optionally with :int|num|pct|signed|count; a bare name must be a key of placeholders. Code anchors are regular expressions in the subset JavaScript and Python share, resolved as the page's code walk resolves them (resolveWalk, vega-show/assets/page/js/views/code.js): the served files whose path matches file are tried in turn, and the step lands in the first of them in which after and at resolve: searching from the first line matching after (or from the top), the alternatives of at are tried in order and the step lands on the first line that the first matching alternative matches; a matching file in which after or at finds nothing is passed over for the next one. to extends the step to a definition that starts fewer than 12 lines below the step's own. This backend's anchors are written so that the first matching file already resolves: a block's file pattern finds its one segment file, and the sync test holds the block anchors to that, which is stricter than the page. tests/test_explain_catalog_sync.py checks every cross-reference this schema cannot express.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "backend", "language", "placeholders", "recompute", "blocks", "activations", "links", "walk_fixed"],
+  "properties": {
+    "schema": { "const": "vega/explain-catalog@1" },
+    "backend": { "$ref": "#/$defs/name" },
+    "language": { "type": "string", "pattern": "^[a-z][a-z0-9+-]*$" },
+    "source": { "type": "string" },
+    "note": { "type": "string" },
+    "placeholders": {
+      "description": "The bare placeholders prose and formulas may use, each with what the explainer fills it with from the stage record: the stage parameters and the subscript helpers v and n_sub of backend-contract §2.2.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/name" },
+      "additionalProperties": { "$ref": "#/$defs/text" }
+    },
+    "recompute": {
+      "description": "The recompute methods the blocks name, each with the page explainer (js/how/explainers/<explainer>.js) that performs it and what it recomputes. none means formula and shapes only.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/recompute" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["explainer", "what"],
+        "properties": {
+          "explainer": { "$ref": "#/$defs/explainer" },
+          "what": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "blocks": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/name" },
+      "additionalProperties": { "$ref": "#/$defs/block" }
+    },
+    "activations": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/activation_name" },
+      "additionalProperties": { "$ref": "#/$defs/activation" }
+    },
+    "links": {
+      "type": "object",
+      "required": ["softmax", "sigmoid", "sigmoid_each", "identity", "cumulative", "reconstruction", "distance", "horizon"],
+      "propertyNames": { "$ref": "#/$defs/link" },
+      "additionalProperties": { "$ref": "#/$defs/link_entry" }
+    },
+    "walk_fixed": {
+      "description": "The walk steps every lane has, in the page's order: root, store, build before the block steps, then forward, link, shape, run, explain, route (BUILD-PLAN R-E8; page_config.build_walk inserts one step per distinct block type after build).",
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "prefixItems": [
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "root" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "store" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "build" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "forward" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "link" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "shape" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "run" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "explain" } } },
+        { "$ref": "#/$defs/walk_step", "properties": { "id": { "const": "route" } } }
+      ],
+      "items": false
+    }
+  },
+  "$defs": {
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "text": { "type": "string", "minLength": 1 },
+    "stage_kind": {
+      "description": "The page's stage kinds (the renderer registry), input excepted: every block type maps to one.",
+      "enum": ["embedding", "concat", "dense", "activation", "dropout", "norm", "residual", "sequential", "parallel", "conv", "pool1d", "recurrent", "attention", "attention_pool", "transformer", "tokenizer", "positional", "reshape", "pool", "head", "decoder", "latent", "graph_conv", "graph_pool", "edge_dropout", "custom"]
+    },
+    "recompute": {
+      "enum": ["weighted_sum", "cumulative_score", "elementwise", "lookup", "batchnorm", "layernorm", "residual_sum", "branch_merge", "conv1d", "pool1d", "rnn_step", "gru_step", "lstm_step", "attention_row", "attention_pool", "transformer_layer", "token_affine", "pool_reduce", "latent_mean", "gcn_message", "sage_message", "gat_message", "gin_message", "graph_readout", "none"]
+    },
+    "explainer": {
+      "description": "The block explainers of the page's stepper (js/how/explainers/); input and link explain the first and last steps, not a block.",
+      "enum": ["dense", "embedding", "norm", "residual", "conv", "recurrent", "attention", "graph", "latent", "pool", "generic"]
+    },
+    "link": {
+      "description": "The one link vocabulary of the chain (the vega-forge catalog's inspection.links).",
+      "enum": ["softmax", "sigmoid", "sigmoid_each", "identity", "cumulative", "reconstruction", "distance", "horizon"]
+    },
+    "activation_name": {
+      "enum": ["none", "relu", "gelu", "silu", "tanh", "sigmoid", "leaky_relu"]
+    },
+    "regex": { "type": "string", "minLength": 1 },
+    "code": {
+      "description": "A code anchor, resolved as the top-level description says: file picks the served files tried in turn, after (or null: the top) the line the search starts from, at the alternatives tried in order for the step's line, to (or null) a definition just below that the step runs on to.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "at", "after", "to"],
+      "properties": {
+        "file": { "$ref": "#/$defs/regex" },
+        "at": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/regex" } },
+        "after": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/regex" }] },
+        "to": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/regex" }] }
+      }
+    },
+    "walk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "text"],
+      "properties": { "title": { "$ref": "#/$defs/text" }, "text": { "$ref": "#/$defs/text" } }
+    },
+    "reads": {
+      "description": "The inspection-surface attributes the recompute and the prose read, the list the tensors to fetch for the block are taken from: attributes of the block type's coverage.json inspection.surface (in a variant, also of its inspection.surface_variants entry), plus every attribute of its inspection.surface_optional, which is fetched only when the rendered module carries it.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/name" }
+    },
+    "variant": {
+      "description": "A class variant of the block type (coverage.json inspection.surface_variants, blocks.CLASS_VARIANTS): its own formula, prose, recompute, surface, anchor and walk text.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "prose", "unit_how", "recompute", "reads", "code", "walk"],
+      "properties": {
+        "formula": { "$ref": "#/$defs/text" },
+        "prose": { "$ref": "#/$defs/text" },
+        "unit_how": { "$ref": "#/$defs/text" },
+        "recompute": { "$ref": "#/$defs/recompute" },
+        "reads": { "$ref": "#/$defs/reads" },
+        "code": { "$ref": "#/$defs/code" },
+        "walk": { "$ref": "#/$defs/walk" }
+      }
+    },
+    "block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage_kind", "label", "label_many", "step", "formula", "prose", "unit_how", "recompute", "reads", "code", "walk"],
+      "properties": {
+        "stage_kind": { "$ref": "#/$defs/stage_kind" },
+        "label": { "$ref": "#/$defs/text" },
+        "label_many": { "$ref": "#/$defs/text" },
+        "step": { "$ref": "#/$defs/text" },
+        "formula": { "$ref": "#/$defs/text" },
+        "prose": { "$ref": "#/$defs/text" },
+        "unit_how": { "$ref": "#/$defs/text" },
+        "recompute": { "$ref": "#/$defs/recompute" },
+        "reads": { "$ref": "#/$defs/reads" },
+        "code": { "$ref": "#/$defs/code" },
+        "walk": { "$ref": "#/$defs/walk" },
+        "variants": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/$defs/name" },
+          "additionalProperties": { "$ref": "#/$defs/variant" }
+        }
+      }
+    },
+    "activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "curve", "silences_negative", "formula", "bend"],
+      "properties": {
+        "name": { "$ref": "#/$defs/text" },
+        "curve": { "$ref": "#/$defs/activation_name" },
+        "silences_negative": { "type": "boolean" },
+        "formula": { "$ref": "#/$defs/text" },
+        "bend": { "$ref": "#/$defs/text" },
+        "params": {
+          "description": "The function's fixed parameters as this backend instantiates it (for example the negative slope of a LeakyReLU), for the page's curve.",
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/$defs/name" },
+          "additionalProperties": { "type": ["number", "string", "boolean"] }
+        }
+      }
+    },
+    "link_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "prose", "answer", "walk"],
+      "properties": {
+        "formula": { "$ref": "#/$defs/text" },
+        "prose": { "$ref": "#/$defs/text" },
+        "answer": { "$ref": "#/$defs/text" },
+        "walk": {
+          "description": "Replaces the fixed link step's title and text in a lane with this link.",
+          "$ref": "#/$defs/walk"
+        }
+      }
+    },
+    "walk_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "code", "title", "text"],
+      "properties": {
+        "id": { "enum": ["root", "store", "build", "forward", "link", "shape", "run", "explain", "route"] },
+        "code": { "$ref": "#/$defs/code" },
+        "title": { "$ref": "#/$defs/text" },
+        "text": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

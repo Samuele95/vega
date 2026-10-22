@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vega/lane-observed@1",
+  "title": "vega/lane-observed@1 — what one lane actually exercised",
+  "description": "Written by run_matrix.py for every lane it ran (lanes/<id>/observed.json). Every value under `observed` is read from the lane's artifacts (the packed or selected netspec, the evaluation records, the bundle MANIFEST, the check results); nothing is copied from lanes.json (D6 §6.13). A lane that stopped early leaves the fields it never reached null.",
+  "type": "object",
+  "required": ["schema", "lane", "git", "started_at", "finished_at", "verdict", "stages", "observed", "flakes", "artifacts"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "vega/lane-observed@1" },
+    "lane": { "type": "string", "pattern": "^(L\\d{2}|G\\d{2})$" },
+    "tier": { "type": ["string", "null"] },
+    "git": {
+      "type": "object", "required": ["commit", "dirty"], "additionalProperties": false,
+      "properties": { "commit": { "type": ["string", "null"] }, "dirty": { "type": "boolean" } }
+    },
+    "started_at": { "$ref": "#/$defs/time" },
+    "finished_at": { "$ref": "#/$defs/time" },
+    "verdict": { "enum": ["pass", "partial", "fail", "skip", "refused"] },
+    "reason": { "type": ["string", "null"] },
+    "stages": { "type": "array", "items": { "$ref": "#/$defs/stage" } },
+    "observed": { "$ref": "#/$defs/observed" },
+    "flakes": { "type": "array", "items": { "$ref": "#/$defs/flake" } },
+    "flake_calls": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "artifacts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["work", "bundle", "showcase", "model_html", "shots"],
+      "properties": {
+        "work": { "type": "string" },
+        "bundle": { "type": ["string", "null"] },
+        "showcase": { "type": ["string", "null"] },
+        "model_html": { "type": ["string", "null"] },
+        "shots": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "time": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+    "markers": {
+      "type": "object", "required": ["ok", "warn", "error"], "additionalProperties": false,
+      "properties": {
+        "ok": { "type": "integer", "minimum": 0 }, "warn": { "type": "integer", "minimum": 0 },
+        "error": { "type": "integer", "minimum": 0 }, "fork": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "required": ["id", "status", "seconds", "log", "markers", "detail"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "enum": ["fixture", "forge", "train", "eval", "pack", "bundle_api", "report", "show", "serve", "serve_check", "inspect", "page", "golden"] },
+        "status": { "enum": ["pass", "fail", "timeout", "blocked", "absent", "skip", "not-requested", "stamped"] },
+        "seconds": { "type": "number", "minimum": 0 },
+        "cpu_s": { "type": "number", "minimum": 0 },
+        "timeout_s": { "type": ["number", "null"] },
+        "log": { "type": ["string", "null"] },
+        "markers": { "$ref": "#/$defs/markers" },
+        "detail": { "type": "string" },
+        "provider": { "type": ["string", "null"] },
+        "not_run": {
+          "description": "Checks the stage announced it did not run (`WARN: check not run: <what> — <why>`): a gate whose provider has not landed, or a wrapper that is not installed. Coverage reads it; an empty list means every check of the stage ran.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "flake": {
+      "type": "object",
+      "required": ["id", "stage", "command", "retried", "second_attempt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" }, "stage": { "type": "string" }, "command": { "type": "string" },
+        "retried": { "type": "boolean" }, "second_attempt": { "enum": ["pass", "fail"] },
+        "via": { "enum": ["runner", "known_flake.py"] }
+      }
+    },
+    "nullable_string": { "type": ["string", "null"] },
+    "observed": {
+      "type": "object",
+      "required": ["spec_source", "family", "task", "goal", "shape", "window", "graph", "blocks", "activations",
+                   "loss", "optimizer", "schedule", "init", "protocol", "metrics_finite", "baselines", "runs",
+                   "selected_run", "endpoints", "inspection", "showcase", "page"],
+      "additionalProperties": false,
+      "properties": {
+        "spec_source": { "enum": [null, "bundle", "selected-run", "forge"] },
+        "family": { "$ref": "#/$defs/nullable_string" },
+        "task": { "$ref": "#/$defs/nullable_string" },
+        "base": { "$ref": "#/$defs/nullable_string" },
+        "goal": { "$ref": "#/$defs/nullable_string" },
+        "shape": { "$ref": "#/$defs/nullable_string" },
+        "window": {
+          "oneOf": [ { "type": "null" }, { "type": "object", "required": ["length", "stride", "horizon"],
+                     "properties": { "length": { "type": "integer" }, "stride": { "type": "integer" }, "horizon": { "type": ["integer", "null"] } } } ]
+        },
+        "graph": {
+          "oneOf": [ { "type": "null" }, { "type": "object", "required": ["level", "protocol"],
+                     "properties": { "level": { "type": ["string", "null"] }, "protocol": { "type": ["string", "null"] } } } ]
+        },
+        "blocks": { "type": ["array", "null"], "items": { "type": "string" } },
+        "activations": { "type": ["array", "null"], "items": { "type": "string" } },
+        "loss": { "$ref": "#/$defs/nullable_string" },
+        "optimizer": { "$ref": "#/$defs/nullable_string" },
+        "schedule": { "$ref": "#/$defs/nullable_string" },
+        "init": { "$ref": "#/$defs/nullable_string" },
+        "protocol": { "$ref": "#/$defs/nullable_string" },
+        "metrics_finite": { "type": ["array", "null"], "items": { "type": "string" } },
+        "baselines": { "type": ["array", "null"], "items": { "type": "string" } },
+        "runs": { "type": ["integer", "null"], "minimum": 0 },
+        "selected_run": { "$ref": "#/$defs/nullable_string" },
+        "verdict": { "$ref": "#/$defs/nullable_string" },
+        "endpoints": { "type": ["array", "null"], "items": { "type": "string" } },
+        "inspection": { "type": ["object", "null"] },
+        "showcase": { "type": ["object", "null"] },
+        "page": { "type": ["object", "null"] }
+      }
+    }
+  }
+}

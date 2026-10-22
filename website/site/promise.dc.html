@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — the rules</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.72);--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:4px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/vega-panel.css">
+<style>
+/* shell placement (template: notes/page-template.md) */
+[data-brand]{position:fixed;z-index:10;top:calc(24px + 12px);left:calc(24px + 18px + 6px)}
+[data-pagebar]{position:fixed;z-index:9;top:24px;left:50%;transform:translate(-50%,-50%);width:min(340px,42vw);max-width:none!important;margin:0!important;padding:0 10px!important;background:var(--bg)}
+/* the legend: fixed HUD text, bottom-left above SOUND */
+[data-figfoot]{position:fixed;left:calc(24px + 18px);bottom:calc(24px + 50px);z-index:9;pointer-events:none;text-shadow:0 0 10px var(--bg),0 0 3px var(--bg)}
+html.vl-holding [data-rfig]{opacity:0} /* the sky (and its names) waits behind the loader gate, as the other pages' scenes do */
+[data-rfig]{transition:opacity .6s ease}
+[data-stop-card]{min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;justify-content:flex-end;align-items:flex-start;padding:18vh calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-stop-card] > .vp{width:min(600px,42vw)}
+[data-stop-card] .vp h1{font-size:clamp(46px,5.4vw,78px)!important;line-height:1.02!important}
+[data-stop-card] .vp p{font-size:16.5px!important}
+[data-stop-card] .vp h2{font-size:clamp(34px,3.6vw,52px)!important;line-height:1.08!important}
+@media (min-width:900px){[data-rules]{padding-top:13vh!important}}
+@media (max-width:600px){.pr-row{grid-template-columns:minmax(0,1fr)!important}.pr-g{grid-column:1!important}}
+[data-tail],[data-pagesnav],[data-foot]{display:flex;justify-content:flex-end!important;padding-right:calc(24px + 56px)!important}
+[data-tail]{padding:4vh 0 6vh;pointer-events:none}
+[data-tail] > .vp{width:min(600px,42vw)}
+[data-pagesnav]{border-top:0!important;max-width:none!important;gap:28px!important}
+[data-foot]{z-index:10;padding-bottom:calc(34px + 30px)!important;pointer-events:none}[data-foot] a{pointer-events:auto} /* the box lies over the HUD's bottom row: only its link takes the pointer */
+/* on a phone the fixed readouts sit in the scene's top band, where text scrolls past: a soft --bg dimming behind them (no box) */
+@media (max-width:600px){[data-hudtext],[data-figfoot]{z-index:2!important;isolation:isolate} /* the legend's band sits under the HUD (z 9) */[data-figfoot]::before{content:'';position:absolute;z-index:-1;top:-80px;bottom:-44px;left:-30px;width:100vw;pointer-events:none;background:linear-gradient(to bottom,var(--bg) 0,var(--bg) calc(100% - 30px),rgba(4,8,14,0))}} /* full-width --bg fade bands (as the HUD's own), not boxes */ /* above the HUD's bottom band, the pager clear of it */
+@media (max-width:600px){[data-foot]{padding-bottom:calc(34px + 124px)!important}} /* the pager wraps to two lines on a phone: both clear the SOUND / CH row */
+@media (max-width:899px){[data-stop-card]{justify-content:center;padding:52vh 24px 8vh}[data-stop-card] > .vp,[data-tail] > .vp{width:100%}[data-tail],[data-pagesnav],[data-foot]{justify-content:center;padding-left:24px!important;padding-right:24px!important}[data-hudtext]{bottom:auto;top:calc(24px + 54px);max-width:60vw}}
+@media (max-width:600px){[data-brand]{top:calc(12px + 12px);left:calc(12px + 12px + 6px)}[data-pagebar]{top:12px;width:44vw}[data-hudtext]{left:calc(12px + 18px);top:calc(12px + 54px);transform:scale(.88);transform-origin:top left}[data-figfoot]{left:calc(12px + 18px);bottom:calc(12px + 50px)}[data-hudtext]{display:none}[data-figfoot]{bottom:auto;top:calc(12px + 94px);left:calc(12px + 18px);right:calc(12px + 18px);font-size:9px!important}[data-figfoot] span{font-size:9px!important}} /* on a phone the rule's own block names and counts it; the legend stays (§1), compact under the breadcrumb */
+</style>
+</helmet>
+<div style="position:relative;color:var(--fg)">
+  <div data-stage="1" style="position:fixed;inset:0;z-index:0;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)"></div>
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="47" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0;pointer-events:none"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:var(--bg);opacity:.38"></div>
+    <div data-rfig="1" style="position:absolute;inset:0">
+          <canvas data-sky="1" role="img" aria-label="The rules as a night sky: six bright stars along the horizon are the stages that carry a rule. Picking one sends its light up to link scattered stars into named constellations — the guarantees that rule produces." style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+    </div>
+  </div>
+
+  <header>
+    <a data-brand="1" href="index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg)">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span>THE RULES</span></span>
+    </a>
+  </header>
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="promise" brand="page"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters" room="320"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+  <div data-pagebar="1" aria-label="Page 3 of 6" style="max-width:1200px;margin:0 auto;padding:4px clamp(20px,4vw,48px) 0;display:flex;align-items:center;gap:6px">
+    <a href="chain.dc.html" title="The chain" aria-label="The chain" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="data.dc.html" title="The data lane" aria-label="The data lane" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="promise.dc.html" aria-current="page" title="The rules" aria-label="The rules" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--fg)"></span></a>
+    <a href="proof.dc.html" title="The proof" aria-label="The proof" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="coverage.dc.html" title="Coverage" aria-label="Coverage" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="install.dc.html" title="Install" aria-label="Install" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <span style="margin-left:14px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);white-space:nowrap">03 / 06</span>
+  </div>
+
+  <main style="position:relative;pointer-events:none">
+    <section aria-labelledby="h-rules" data-stop="0" data-rail="Six rules" data-rail-full="Six rules it never bends." data-stop-card="1">
+      <div class="vp">
+      <h1 id="h-rules" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(32px,4.6vw,52px);line-height:1.08;letter-spacing:-.01em;font-family:'Newsreader',Georgia,serif">Six rules it never bends.</h1>
+      <p style="margin:20px 0 0;max-width:40em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">Vega was the star every other was measured against. Every number here is measured, recorded and traceable.</p>
+      </div>
+    </section>
+    <div data-hudparts="1">
+      <div data-figfoot="1">
+          <span aria-hidden="true" style="font:500 10.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--dim);pointer-events:none">BRIGHT STARS · RULES &nbsp;·&nbsp; <span style="color:var(--cy)">CONSTELLATIONS · GUARANTEES</span></span>
+      </div>
+    </div>
+    <section aria-labelledby="h-list" data-stop="1" data-rail="The rules" data-rail-full="The rules" data-stop-card="1" data-rules="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:18px">
+      <h2 id="h-list" data-decode="1" style="margin:0;font-weight:300;font-family:'Newsreader',Georgia,serif">The rules</h2>
+      <ol aria-label="Six rules" onPointerLeave="{{ unhover }}" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
+        <sc-for list="{{ rules }}" as="r" hint-placeholder-count="6">
+        <li><button type="button" class="pr-row" onPointerEnter="{{ r.hover }}" onFocus="{{ r.hover }}" onClick="{{ r.pick }}" aria-pressed="{{ r.on }}" style="appearance:none;width:100%;text-align:left;cursor:pointer;border:0;border-top:1px solid {{ r.bar }};background:none;color:inherit;font:inherit;padding:13px 0;margin:0;display:grid;grid-template-columns:150px minmax(0,1fr);gap:5px 18px;align-items:baseline">
+          <span style="display:flex;align-items:center;gap:9px;font:12px/1.2 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:{{ r.mk }}"><span aria-hidden="true" style="font-size:10px">✦</span>{{ r.stage }}</span>
+          <span style="font:300 clamp(19px,1.75vw,24px)/1.25 'Newsreader',Georgia,serif;color:{{ r.tc }};text-wrap:pretty">{{ r.rule }}</span>
+          <sc-if value="{{ r.hasG }}" hint-placeholder-val="{{ false }}"><span class="pr-g" style="grid-column:2;font-size:13px;line-height:1.45;color:{{ r.gc }}">{{ r.gt }}</span></sc-if>
+        </button></li>
+        </sc-for>
+      </ol>
+      </div>
+    </section>
+    <nav aria-label="Pages" data-pagesnav="1" style="pointer-events:auto;padding:40px 0 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line)">
+      <a href="data.dc.html" style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);padding:10px 0" style-hover="color:var(--fg)">← THE DATA LANE</a>
+      <a href="proof.dc.html" style="display:inline-flex;align-items:center;gap:12px;padding:14px 22px;border:1px solid var(--line);border-radius:999px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">NEXT · THE PROOF <span aria-hidden="true" style="color:var(--acc)">→</span></a>
+    </nav>
+  </main>
+
+  <footer data-foot="1" style="position:relative;display:flex;justify-content:center;padding:24px 0 34px">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const RULES = [
+  { id: 'dataset-shaper', rule: 'No step without a traced decision.' },
+  { id: 'vega-forge', rule: 'No choice without a traced source.' },
+  { id: 'vega-train', rule: 'No run without a hypothesis, no number without a record.' },
+  { id: 'vega-eval', rule: 'The test is opened once, under a seal.' },
+  { id: 'vega-pack', rule: 'What ships is what was evaluated.' },
+  { id: 'vega-show', rule: 'The page says nothing the chain did not measure.' }
+];
+const GUAR = [
+  { stage: 'vega-eval', title: 'Sealed test, opened once.' },
+  { stage: 'vega-eval', title: 'Intervals and baselines beside every number.' },
+  { stage: 'vega-eval', title: 'Verdicts stated as they are.' },
+  { stage: 'vega-pack', title: 'What ships is what was measured.' },
+  { stage: 'vega-forge', title: 'Every choice cites its evidence.' },
+  { stage: 'vega-forge', title: 'Code inside an architecture.' },
+  { stage: 'vega-show', title: 'A showcase that cannot lie.' }
+];
+const MONO = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
+const SKY_SLOTS = [[0.17, 0.27], [0.5, 0.24], [0.83, 0.28], [0.7, 0.58], [0.2, 0.57], [0.45, 0.6], [0.66, 0.36]];
+const SKY_SHAPES = [
+  { v: [[-26, -2], [-26, 30], [26, 30], [26, -2], [-14, -2], [-14, -22], [0, -32], [14, -22], [14, -2]], e: [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 8]] },
+  { v: [[-44, 0], [-44, -16], [-44, 16], [0, 0], [44, 0], [44, -16], [44, 16]], e: [[1, 2], [0, 3], [3, 4], [5, 6]] },
+  { v: [[0, -30], [0, 24], [-44, -14], [44, -14], [-54, 10], [-34, 10], [34, 10], [54, 10]], e: [[0, 1], [2, 3], [2, 4], [2, 5], [4, 5], [3, 6], [3, 7], [6, 7]] },
+  { v: [[0, -34], [0, 14], [26, 8], [-40, 14], [40, 14], [28, 30], [-28, 30]], e: [[0, 1], [0, 2], [2, 1], [3, 4], [4, 5], [5, 6], [6, 3]] },
+  { v: [[-46, 18], [-18, -12], [12, 10], [44, -20], [44, -20]], e: [[0, 1], [1, 2], [2, 3]] },
+  { v: [[32, 0], [16, 27], [-16, 27], [-32, 0], [-16, -27], [16, -27], [0, 0]], e: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [6, 0], [6, 3]] },
+  { v: [[-46, 0], [-22, -18], [22, -18], [46, 0], [22, 18], [-22, 18], [0, 0]], e: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [6, 1], [6, 4]] }
+];
+const PAGES = [
+  { num: '00', label: 'Threshold', href: 'index.dc.html', note: '' },
+  { num: '01', label: 'The chain', href: 'chain.dc.html', note: '' },
+  { num: '02', label: 'The data lane', href: 'data.dc.html', note: '' },
+  { num: '03', label: 'The rules', href: 'promise.dc.html', note: 'HERE' },
+  { num: '04', label: 'The proof', href: 'proof.dc.html', note: '' },
+  { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: '' },
+  { num: '06', label: 'Install', href: 'install.dc.html', note: '' },
+  { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+  { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+];
+
+class Component extends DCLogic {
+  state = { indexOpen: false, sel: 'vega-eval', narrow: false, layer: 0 };
+  closeRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  componentDidMount() {
+    const go = (u) => { if (window.VegaFly) window.VegaFly.go(u); else location.href = u; };
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 'n' || e.key === 'N') go('proof.dc.html');
+      else if (e.key === 'p' || e.key === 'P') go('data.dc.html');
+      else if (/^[0-6]$/.test(e.key)) go(PAGES[+e.key].href);
+    };
+    addEventListener('keydown', this.onKey);
+    // stop 0 the title over the whole sky, stop 1 the list; there the sky tours the rules on its own until the visitor picks one (not under reduced motion)
+    this.onStop = (e) => { this.active = e.detail.index; this._held = 0; };
+    this.tour = setInterval(() => { if (this.active !== 1 || document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches || performance.now() - (this._held || 0) < 9000) return; const i = RULES.findIndex(r => r.id === this.state.sel); this.setState({ sel: RULES[(i + 1) % RULES.length].id }); }, 5200);
+    addEventListener('vegastop', this.onStop);
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    this.setupCamera();
+    this.sync3d();
+    this.onResize = () => { const n = innerWidth < 900; if (n !== this.state.narrow) this.setState({ narrow: n }); };
+    this.onResize(); addEventListener('resize', this.onResize);
+    this.sky = { act: {}, field: [], neb: [] }; let s = 17; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    for (let i = 0; i < 300; i++) this.sky.field.push({ x: r(), y: r() * 0.96, b: Math.pow(r(), 3), d: 0.2 + r(), s: 0.6 + r() * 1.6, p: r() * 6.283 });
+    this.sky.neb = [{ x: 0.25, y: 0.3, r: 0.38, c: 'acc', a: 0.07, p: 1 }, { x: 0.78, y: 0.42, r: 0.42, c: 'cy', a: 0.05, p: 2 }, { x: 0.5, y: 0.95, r: 0.5, c: 'acc', a: 0.06, p: 3 }];
+    this.onSkyMove = (e) => { const f = document.querySelector('[data-rfig]'); if (!f) return; const b = f.getBoundingClientRect(); this._mx = (e.clientX - b.left) / b.width - 0.5; this._my = (e.clientY - b.top) / b.height - 0.5;
+      if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-sky')) e.target.style.cursor = this.skyHit(e.clientX - b.left - this.vw.ox, e.clientY - b.top - this.vw.oy) ? 'pointer' : 'default'; };
+    this.onSkyClick = (e) => { if (!e.target || !e.target.hasAttribute || !e.target.hasAttribute('data-sky')) return; const b = e.target.getBoundingClientRect(), h = this.skyHit(e.clientX - b.left - this.vw.ox, e.clientY - b.top - this.vw.oy); if (h) this.goRule(RULES.findIndex(r => r.id === h), true); };
+    addEventListener('pointermove', this.onSkyMove); addEventListener('click', this.onSkyClick);
+    this.vw = { ox: 0, oy: 0, z: 0.6, init: false }; window.VegaSkyView = this.vw; /* read-only, for the reduced-motion probe (the view must cut, not fly) */ this.tickCards = this.tickCards.bind(this); this.raf = requestAnimationFrame(this.tickCards);
+  }
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); this.io && this.io.disconnect(); clearTimeout(this.t3); cancelAnimationFrame(this.raf); removeEventListener('pointermove', this.onSkyMove); removeEventListener('click', this.onSkyClick); removeEventListener('vegastop', this.onStop); clearInterval(this.tour); removeEventListener('vegaindex', this.onIndex); clearTimeout(this.tcam); removeEventListener('resize', this.onResize); }
+  sync3d() {}
+  setupCamera() {
+    const cam = document.querySelector('vega-camera'), sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    if (!cam || !cam.configure || sections.length !== 2) { this.tcam = setTimeout(() => this.setupCamera(), 150); return; }
+    cam.configure({ scene: null, stops: sections.map(el => ({ el })), free: true, home: 1, mask: [document.querySelector('[data-sky]')] }); // the sky keeps out from under the text at any scroll
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters (G2)
+    this.cam = cam;
+  }
+  // a picked rule lights its constellations (the sky's view follows it); off the list's chapter, the list's shot plays first
+  goRule(i, hold) {
+    if (i < 0) return;
+    if (hold) this._held = performance.now();
+    if (RULES[i].id !== this.state.sel) this.setState({ sel: RULES[i].id });
+    if (this.active !== 1 && hold && window.VegaReel) window.VegaReel.go(1);
+  }
+  // the camera for this sky: a virtual sky (Wv × Hv) seen through { ox, oy, z }. Stop 0 frames the whole sky in the stage
+  // area the text leaves free; a rule stop frames its star, its constellations and their arcs (a rule with none: the
+  // rule stars it lights downstream). Scroll interpolates between stops (log zoom); reduced motion cuts.
+  viewFor(i, W, H) {
+    const cam = this.cam, VW = 1000, VH = 640;
+    let R = null; if (cam && cam.fitBoxes) { const bs = cam.fitBoxes(i) || []; bs.forEach(b => { const a = (b.R - b.L) * (b.B - b.T); if (!R || a > R.a) R = { L: b.L, R: b.R, T: b.T, B: b.B, a }; }); }
+    if (!R || R.R - R.L < 120 || R.B - R.T < 120) R = W >= 900 ? { L: 300, R: W * 0.52, T: 90, B: H - 110 } : { L: 16, R: W - 16, T: 80, B: H * 0.48 };
+    // at ≥900px the sky always takes the column beside the text (rail edge → text edge): a stop with tall text and pinned
+    // guarantees otherwise picked a box under them and its rule flew out of sight (verifier G4 r2)
+    if (W >= 900) { const rl = document.querySelector('vega-rail'), vp = document.querySelector('[data-stop-card] > .vp'), l = rl && !rl.classList.contains('vr-compact') ? rl.getBoundingClientRect().right + 24 : 24 + 56, r = vp ? vp.getBoundingClientRect().left - 48 : W * 0.52; const hb = document.querySelector('[data-hudtext]'), ht = hb && hb.offsetParent !== null ? hb.getBoundingClientRect().top - 24 : H - 140; R = { L: l, R: Math.max(l + 200, r), T: 96, B: Math.min(H - 140, ht) }; }
+    // the sky's HUD and legend sit beside it, not over it (they are not text blocks for the camera's mask: a fixed block on
+    // the left would move the mask's text column to the screen's edge — verifier G4 r2 saw the whole sky cut away)
+    else { const lg = document.querySelector('[data-figfoot]'), lb = lg && lg.offsetParent !== null ? lg.getBoundingClientRect().bottom + 14 : 0; if (R.T < lb + 48) R.T = lb + 48; } // clear of the legend's band too
+    const RSf = (r) => [0.08 + r * 0.168, 0.84 - Math.sin(r / 5 * Math.PI) * 0.03];
+    let x0 = -0.06, x1 = 1.06, y0 = 0.12, y1 = 0.95; // room for the constellation names, which run wider than their shapes
+    if (i >= 1) { const r = Math.max(0, RULES.findIndex(q => q.id === this.state.sel)), P = [RSf(r)]; GUAR.forEach((g, j) => { if (g.stage === RULES[r].id) { const sl = SKY_SLOTS[j]; P.push([sl[0] - 0.07, sl[1] - 0.09], [sl[0] + 0.07, sl[1] + 0.09]); } });
+      if (P.length === 1) for (let d = r + 1; d < 6; d++) P.push(RSf(d));
+      x0 = Math.min.apply(null, P.map(p => p[0])) - 0.1; x1 = Math.max.apply(null, P.map(p => p[0])) + 0.1; y0 = Math.min.apply(null, P.map(p => p[1])) - 0.12; y1 = Math.max.apply(null, P.map(p => p[1])) + 0.08; }
+    const z = Math.max(0.25, Math.min(2.4, Math.min((R.R - R.L) / ((x1 - x0) * VW), (R.B - R.T) / ((y1 - y0) * VH))));
+    return { z, ox: (R.L + R.R) / 2 - (x0 + x1) / 2 * VW * z, oy: (R.T + R.B) / 2 - (y0 + y1) / 2 * VH * z };
+  }
+  tickCards(now) {
+    this.raf = requestAnimationFrame(this.tickCards);
+    now = performance.now();
+    const fig = document.querySelector('[data-rfig]'), cv = fig && fig.querySelector('[data-sky]'); if (!cv) return;
+    const W0 = fig.clientWidth, H0 = fig.clientHeight, dpr = Math.min(2, devicePixelRatio || 1); if (!W0 || !H0) return; let W = W0, H = H0;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    const rm = matchMedia('(prefers-reduced-motion: reduce)').matches, t = now / 1000, sky = this.sky; let S = Math.min(1.15, W / 640, H / 600);
+    if (!this._colAt || now - this._colAt > 500) { this._colAt = now; const cs = getComputedStyle(document.documentElement), g = (n) => { const v = cs.getPropertyValue(n).trim(); const h = parseInt(v.slice(1), 16); return v[0] === '#' ? [(h >> 16) & 255, (h >> 8) & 255, h & 255] : [230, 240, 250]; }; this._C = { fg: g('--fg'), mut: g('--mut'), dim: g('--dim'), acc: g('--acc'), cy: g('--cy'), day: false }; }
+    const C = this._C, cl = (v, a, b) => Math.max(a, Math.min(b, v)), ease = (u) => 1 - Math.pow(1 - cl(u, 0, 1), 3), A = (c, a) => 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + cl(a, 0, 1).toFixed(3) + ')';
+    const glow = (x, y, r, c, a) => { if (a <= 0.004) return; const gr = ctx.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, A(c, a)); gr.addColorStop(0.22, A(c, a * 0.35)); gr.addColorStop(1, A(c, 0)); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); };
+    const ga = C.day ? 0.45 : 1;
+    // selection bookkeeping
+    const sel = this.state.sel, ri = RULES.findIndex(r => r.id === sel);
+    if (this._lastSel !== sel) {
+      const keys = GUAR.map((g, j) => g.stage === sel ? 'g' + j : null).filter(Boolean); if (!keys.length && ri >= 0) keys.push('r' + ri);
+      for (const k in sky.act) if (!sky.act[k].end && keys.indexOf(k) < 0) sky.act[k].end = now;
+      keys.forEach((k, n) => { sky.act[k] = { start: now + (this._lastSel === undefined ? 700 : 150) + n * 240, n }; });
+      this._lastSel = sel;
+    }
+    for (const k in sky.act) if (sky.act[k].end && (rm || now - sky.act[k].end > 1400)) delete sky.act[k]; // reduced motion: a deselected rule's light goes at once
+    const mx = (this._mx || 0), my = (this._my || 0);
+    // nebula + field
+    sky.neb.forEach(b => { const x = (b.x + Math.sin(t * 0.03 + b.p) * 0.03) * W + mx * 6, y = (b.y + Math.cos(t * 0.025 + b.p) * 0.03) * H + my * 4; glow(x, y, b.r * Math.max(W, H), C[b.c], b.a * ga); });
+    sky.field.forEach(f => { const x = f.x * W + mx * f.d * 16, y = f.y * H + my * f.d * 10, a = (0.12 + f.b * 0.6) * (rm ? 1 : 0.78 + 0.22 * Math.sin(t * f.s + f.p)); ctx.fillStyle = A(C.day ? C.mut : C.fg, a); const z = 0.5 + f.b * 1.4; ctx.fillRect(x - z / 2, y - z / 2, z, z); if (f.b > 0.85) glow(x, y, 6, C.acc, 0.25 * a * ga); });
+    // the view: interpolated between the stops the scroll sits between, eased (cut under reduced motion)
+    if (this.cam && this.cam.progress) {
+      if (!this._vc || (!rm && now - this._vcAt > 400) || this._vcW !== W0 || this._vcH !== H0 || this._vcS !== this.state.sel) { this._vcAt = now; this._vcW = W0; this._vcH = H0; this._vcS = this.state.sel; this._vc = [0, 1].map(i => this.viewFor(i, W0, H0)); }
+      const pr = this.cam.progress(), p = rm ? Math.max(0, this.cam.active) : window.VegaReel && window.VegaReel.playing ? pr.lin : pr.p, /* reduced motion: the active stop's view, a cut */ i0 = 0, f = Math.max(0, Math.min(1, p)), A0 = this._vc[0], B0 = this._vc[1];
+      const tz = Math.exp(Math.log(A0.z) + (Math.log(B0.z) - Math.log(A0.z)) * f), tx = A0.ox + (B0.ox - A0.ox) * f, ty = A0.oy + (B0.oy - A0.oy) * f, vw = this.vw;
+      const dt = Math.min(0.05, this._lt ? (now - this._lt) / 1000 : 0.016), kk = rm || !vw.init ? 1 : 1 - Math.exp(-dt * 5); this._lt = now; vw.init = true;
+      vw.z += (tz - vw.z) * kk; vw.ox += (tx - vw.ox) * kk; vw.oy += (ty - vw.oy) * kk;
+    }
+    ctx.save(); ctx.translate(this.vw.ox, this.vw.oy); W = 1000 * this.vw.z; H = 640 * this.vw.z; S = Math.min(1.15, W / 640, H / 600);
+    const RS = RULES.map((r, i) => [(0.08 + i * 0.168) * W + mx * 3, (0.84 - Math.sin(i / 5 * Math.PI) * 0.03) * H + my * 2]);
+    const V = (j) => { const s = SKY_SHAPES[j], sl = SKY_SLOTS[j]; return s.v.map(v => [sl[0] * W + v[0] * S + mx * 6, sl[1] * H + v[1] * S + my * 4]); };
+    const bez = (a, b, c, u) => { const w = 1 - u; return [w * w * a[0] + 2 * w * u * c[0] + u * u * b[0], w * w * a[1] + 2 * w * u * c[1] + u * u * b[1]]; };
+    const filament = (from, to, age, dur, fade, seed) => {
+      const ctrl = [(from[0] + to[0]) / 2 + (seed % 2 ? 40 : -40) * S, Math.min(from[1], to[1]) - 70 * S], u = rm ? 1 : ease(age / dur);
+      if (u <= 0) return u;
+      ctx.lineCap = 'round';
+      const N = 40, k = Math.max(1, Math.round(N * u));
+      for (let i = 0; i < k; i++) { const a = bez(from, to, ctrl, i / N * 1), b = bez(from, to, ctrl, Math.min(u, (i + 1) / N)); const tail = u < 1 ? Math.pow(i / k, 2.2) : 0.25; ctx.strokeStyle = A(C.cy, (0.12 + 0.85 * tail) * fade); ctx.lineWidth = (0.8 + tail * 1.4); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); }
+      if (u < 1) { const h = bez(from, to, ctrl, u); glow(h[0], h[1], 22, C.cy, 0.9 * fade * ga + 0.1); glow(h[0], h[1], 7, C.fg, 0.9 * fade); }
+      else if (!rm) { const v = (t * 0.32 + seed * 0.27) % 1, h = bez(from, to, ctrl, v); glow(h[0], h[1], 9, C.cy, 0.55 * fade * ga + 0.05); }
+      return u;
+    };
+    // faint hints of every constellation
+    GUAR.forEach((g, j) => { const P = V(j), on = sky.act['g' + j]; const hint = on ? 0 : 1; if (hint) { ctx.setLineDash([1.5, 5]); ctx.lineWidth = 1; ctx.strokeStyle = A(C.acc, 0.1); SKY_SHAPES[j].e.forEach(e => { ctx.beginPath(); ctx.moveTo(P[e[0]][0], P[e[0]][1]); ctx.lineTo(P[e[1]][0], P[e[1]][1]); ctx.stroke(); }); ctx.setLineDash([]); } P.forEach(q => { ctx.fillStyle = A(C.day ? C.mut : C.fg, 0.35); ctx.beginPath(); ctx.arc(q[0], q[1], 1.1, 0, 6.283); ctx.fill(); }); });
+    const lay = {}, NR = []; // NR: the constellation names drawn this frame
+    // active
+    for (const key in sky.act) {
+      const st = sky.act[key], age = now - st.start, fade = st.end ? (rm ? 0 : 1 - ease((now - st.end) / 900)) : 1; if (age < 0 && !st.end) continue;
+      if (key[0] === 'g') {
+        const j = +key.slice(1), P = V(j), sh = SKY_SHAPES[j], owner = RULES.findIndex(r => r.id === GUAR[j].stage), FIL = 620, ED = 170;
+        filament(RS[owner], P[0], age, FIL, fade, j);
+        const reach = P.map(() => Infinity); reach[0] = FIL;
+        sh.e.forEach((e, k) => { const s0 = FIL + k * ED; if (reach[e[0]] === Infinity) reach[e[0]] = s0; reach[e[1]] = Math.min(reach[e[1]], s0 + ED); });
+        const done = FIL + sh.e.length * ED;
+        sh.e.forEach((e, k) => {
+          const u = rm ? 1 : ease((age - FIL - k * ED) / ED); if (u <= 0) return; const a = P[e[0]], b = P[e[1]], x = a[0] + (b[0] - a[0]) * u, y = a[1] + (b[1] - a[1]) * u;
+          ctx.strokeStyle = A(C.cy, 0.14 * fade * ga); ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(x, y); ctx.stroke();
+          ctx.strokeStyle = A(C.cy, 0.9 * fade); ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(x, y); ctx.stroke();
+          if (!rm && u >= 1 && age > done) { const ph = ((t * 0.9 - k * 0.22) % (sh.e.length * 0.22 + 1.2) + 99) % (sh.e.length * 0.22 + 1.2); const w = ph / 0.22 - 0; if (w >= 0 && w <= 1) glow(a[0] + (b[0] - a[0]) * w, a[1] + (b[1] - a[1]) * w, 8, C.fg, 0.7 * fade); }
+        });
+        P.forEach((q, v) => {
+          const since = age - reach[v]; if (since < 0 && !rm) return;
+          const fl = rm ? 0 : Math.max(0, 1 - since / 650);
+          glow(q[0], q[1], (7 + fl * 24) * (1 + 0.08 * Math.sin(t * 2 + v)), C.acc, (0.38 + fl * 0.55) * fade * ga); /* a steady halo small enough that a small figure keeps its lines */
+          if (fl > 0) { ctx.strokeStyle = A(C.cy, fl * 0.8 * fade); ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(q[0], q[1], 3 + (1 - fl) * 22, 0, 6.283); ctx.stroke(); }
+          ctx.fillStyle = A(C.fg, fade); ctx.beginPath(); ctx.arc(q[0], q[1], 2 + fl * 1.5, 0, 6.283); ctx.fill();
+          if (st.end && !rm) for (let e2 = 0; e2 < 3; e2++) { const d = (now - st.end) / 900, ang = v * 2.1 + e2 * 2.09; ctx.fillStyle = A(C.cy, (1 - d) * 0.8); ctx.fillRect(q[0] + Math.cos(ang) * d * 18 - 0.8, q[1] - d * 26 + Math.sin(ang) * d * 8 - 0.8, 1.6, 1.6); }
+        });
+        const na = (rm ? 1 : ease((age - FIL - 150) / 500)) * fade, /* the name comes in once the filament lands, while the figure draws */ top = Math.min.apply(null, P.map(q => q[1])), cx = P.reduce((s, q) => s + q[0], 0) / P.length;
+        if (na > 0 && this.vw.z >= 0.42) { const nm = GUAR[j].title.replace(/\.$/, '').toUpperCase(), sp = 1.5 + (1 - na) * 5; ctx.font = '500 10.5px ' + MONO; ctx.fillStyle = A(C.cy, na); ctx.textAlign = 'left'; const words = nm.split(' '), lines = []; let l = ''; words.forEach(w => { const tt = l ? l + ' ' + w : w; if (tt.length > 22 && l) { lines.push(l); l = w; } else l = tt; }); lines.push(l); (this._nl = this._nl || {})[j] = lines.length;
+          // a name that would overprint one already drawn this frame is left out (zoomed out, the constellations crowd)
+          const lw = (ln) => { let w = 0; for (const ch of ln) w += ctx.measureText(ch).width + sp; return w; }, bw = Math.max.apply(null, lines.map(lw)), bx = cl(cx - bw / 2, 30 - this.vw.ox, W0 - bw - 30 - this.vw.ox), by1 = top - 16 * S + 4, by0 = by1 - lines.length * 14 - 6;
+          const hit = NR.some(r => bx < r[2] + 6 && bx + bw + 6 > r[0] && by0 < r[3] && by1 > r[1]); if (!hit) { NR.push([bx, by0, bx + bw, by1]); lines.forEach((ln, q) => { let wdt = 0; for (const ch of ln) wdt += ctx.measureText(ch).width + sp; let x = cl(cx - wdt / 2, 8, W - wdt - 8); const y = top - 16 * S - (lines.length - 1 - q) * 14; for (const ch of ln) { ctx.fillText(ch, x, y); x += ctx.measureText(ch).width + sp; } }); } }
+        const bot = Math.max.apply(null, P.map(q => q[1])), rgt = Math.max.apply(null, P.map(q => q[0])), lft = Math.min.apply(null, P.map(q => q[0])), cyy = P.reduce((s, q) => s + q[1], 0) / P.length;
+        const nl = this._nl && this._nl[j] || 1;
+        lay[key] = SKY_SLOTS[j][1] > 0.45 ? { x: cl(cx, 0, W), bottom: top - 16 * S - (nl - 1) * 14 - 22, a: na } : { x: cl(cx, 0, W), top: bot + 16 * S, a: na, ax: cx, ay: bot + 4 };
+      } else {
+        const r = +key.slice(1); let maxu = 0;
+        for (let d = r + 1, n = 0; d < 6; d++, n++) { const u = filament(RS[r], RS[d], age - n * 260, 900, fade, d); maxu = Math.max(maxu, u); if (u >= 1 || rm) { const since = age - n * 260 - 900, fl = rm ? 0 : Math.max(0, 1 - since / 650); glow(RS[d][0], RS[d][1], 18 + fl * 20, C.cy, (0.4 + fl * 0.5) * fade * ga); if (fl > 0) { ctx.strokeStyle = A(C.cy, fl * 0.8 * fade); ctx.beginPath(); ctx.arc(RS[d][0], RS[d][1], 4 + (1 - fl) * 24, 0, 6.283); ctx.stroke(); } } }
+        lay[key] = { x: RS[r][0], bottom: RS[r][1] - 110 * S, a: (rm ? 1 : ease((age - 300) / 600)) * fade };
+      }
+    }
+    // rule stars
+    RS.forEach((q, i) => {
+      const on = i === ri, br = rm ? 1 : 0.85 + 0.15 * Math.sin(t * 1.6 + i);
+      glow(q[0], q[1], (on ? 40 : 22) * br, C.acc, (on ? 0.75 : 0.45) * ga);
+      const L = (on ? 30 : 14) * br; ctx.lineWidth = 1;
+      [[0, 1], [1, 0]].forEach(([dx, dy]) => { const gr = ctx.createLinearGradient(q[0] - dx * L, q[1] - dy * L, q[0] + dx * L, q[1] + dy * L); gr.addColorStop(0, A(C.fg, 0)); gr.addColorStop(0.5, A(C.fg, on ? 0.95 : 0.6)); gr.addColorStop(1, A(C.fg, 0)); ctx.strokeStyle = gr; ctx.beginPath(); ctx.moveTo(q[0] - dx * L, q[1] - dy * L); ctx.lineTo(q[0] + dx * L, q[1] + dy * L); ctx.stroke(); });
+      ctx.fillStyle = A(C.fg, 1); ctx.beginPath(); ctx.arc(q[0], q[1], on ? 4.2 : 3, 0, 6.283); ctx.fill();
+      if (on) { ctx.strokeStyle = A(C.acc, 0.7); ctx.setLineDash([3, 5]); ctx.lineDashOffset = rm ? 0 : -t * 10; ctx.beginPath(); ctx.arc(q[0], q[1], 16, 0, 6.283); ctx.stroke(); ctx.setLineDash([]); }
+      /* a rule star off screen draws no name (clamping piled them at the edge) */ const sx = q[0] + this.vw.ox; if ((sx > 6 && sx < W0 - 6) && (on || 0.168 * W >= 104 || (Math.abs(i - ri) > 1 && 0.168 * W * Math.abs(i - ri) >= 104 && i % 2 === ri % 2))) { ctx.font = (on ? '500 ' : '400 ') + '11.5px ' + MONO; ctx.textAlign = 'center'; ctx.fillStyle = A(on ? C.fg : C.mut, 1); ctx.fillText(RULES[i].id, cl(q[0], 44 - this.vw.ox, W0 - 44 - this.vw.ox) /* inside the screen, not the virtual sky */, q[1] + 30); } // zoomed out, only the names that have room
+    });
+    this._RS = RS; this._V = V;
+    ctx.restore();
+  }
+  componentDidUpdate(pp, ps) {
+    
+    this.sync3d();
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+  }
+  skyHit(x, y) {
+    if (!this._RS) return null; let best = null, bd = 30;
+    this._RS.forEach((q, i) => { const d = Math.hypot(q[0] - x, q[1] - y); if (d < bd) { bd = d; best = RULES[i].id; } });
+    if (best) return best;
+    GUAR.forEach((g, j) => { const P = this._V(j), cx = P.reduce((s, q) => s + q[0], 0) / P.length, cy = P.reduce((s, q) => s + q[1], 0) / P.length; const d = Math.hypot(cx - x, cy - y); if (d < 60 && d < bd + 40) { bd = d - 40; best = g.stage; } });
+    return best;
+  }
+
+  renderVals() {
+    const sel = this.state.sel;
+    const rules = RULES.map((r, i) => {
+      const on = sel === r.id, gs = GUAR.filter(x => x.stage === r.id);
+      return { stage: r.id, rule: r.rule, on: on ? 'true' : 'false', mk: on ? 'var(--cy)' : 'var(--acc)', tc: on ? 'var(--fg)' : 'var(--mut)', bar: on ? 'rgba(111,224,220,.45)' : 'var(--line)',
+        hasG: gs.length > 0, gt: gs.map(g => g.title).join(' · '), gc: on ? 'var(--cy)' : 'var(--dim)',
+        hover: () => this.goRule(i, true), pick: () => this.goRule(i, true) };
+    });
+    return {
+      rules, unhover: () => { this._held = performance.now(); }, closeRef: this.setClose,
+      indexOpen: this.state.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES
+    };
+  }
+}
+</script>
+</body>
+</html>

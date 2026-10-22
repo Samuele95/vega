@@ -1,0 +1,388 @@
+{
+ "schema": "vega/story-plan@1",
+ "values": {
+  "rows": "geometry:source.rows",
+  "columns": "geometry:source.columns",
+  "deduped": "shape:manifest.steps[id=S4].rows_after.all",
+  "train": "shape:manifest.outputs.files.train.rows",
+  "valid": "shape:manifest.outputs.files.valid.rows",
+  "test": "shape:manifest.outputs.files.test.rows",
+  "classes": "netspec:task.classes",
+  "inputs": "netspec:data_contract.input_dim",
+  "width": "netspec:blocks[id=B1].params.units",
+  "dropout": "netspec:blocks[id=B3].params.p",
+  "smoothing": "netspec:loss.params.label_smoothing",
+  "lr": "netspec:optimizer.params.lr",
+  "batch": "netspec:training.batch_size",
+  "max_epochs": "netspec:training.max_epochs",
+  "patience": "netspec:early_stopping.patience",
+  "params": "architecture:smoke.params_total",
+  "r0": "training:experiments.runs[id=R0].primary",
+  "r1": "training:experiments.runs[id=R1].primary",
+  "r2": "training:experiments.runs[id=R2].primary",
+  "r3": "training:experiments.runs[id=R3].primary",
+  "r5": "training:experiments.runs[id=R5].primary",
+  "r6": "training:experiments.runs[id=R6].primary",
+  "r7": "training:experiments.runs[id=R7].primary",
+  "r8": "training:experiments.runs[id=R8].primary",
+  "r9": "training:experiments.runs[id=R9].primary",
+  "r10": "training:experiments.runs[id=R10].primary",
+  "r7_epochs": "training:experiments.runs[id=R7].epochs",
+  "r7_best": "training:experiments.runs[id=R7].best_epoch",
+  "f1": "evaluation:metrics.models.network.f1_macro",
+  "tree": "evaluation:metrics.models.tree.f1_macro",
+  "linear": "evaluation:metrics.models.linear.f1_macro",
+  "trivial": "evaluation:metrics.models.trivial.f1_macro",
+  "diff_tree": "evaluation:metrics.differences.tree",
+  "diff_linear": "evaluation:metrics.differences.linear",
+  "accuracy": "evaluation:metrics.models.network.accuracy",
+  "balanced": "evaluation:metrics.models.network.balanced_accuracy",
+  "ece": "evaluation:metrics.models.network.ece",
+  "per_class": "evaluation:metrics.models.network.f1_per_class.values",
+  "n_test": "evaluation:metrics.n_test",
+  "r_arch": "report:sec:method:architecture",
+  "r_arch_p": "report:sec:method:architecture.page",
+  "r_fig_arch": "report:fig:architecture",
+  "r_fig_arch_p": "report:fig:architecture.page",
+  "r_fig_serving": "report:fig:serving",
+  "r_fig_serving_p": "report:fig:serving.page",
+  "r_net": "report:sec:method:network",
+  "r_net_p": "report:sec:method:network.page",
+  "r_eq_mlp": "report:eq:mlp",
+  "r_eq_mlp_p": "report:eq:mlp.page",
+  "r_tab_net": "report:tab:network",
+  "r_tab_net_p": "report:tab:network.page",
+  "r_fig_net": "report:fig:network",
+  "r_fig_net_p": "report:fig:network.page",
+  "r_shaping": "report:sec:method:shaping",
+  "r_shaping_p": "report:sec:method:shaping.page",
+  "r_fig_shaping": "report:fig:shaping",
+  "r_fig_shaping_p": "report:fig:shaping.page"
+ },
+ "headline": "A small neural network reads the statistics of one network flow and names the attack in it, or says it is benign.",
+ "lead": "Trained on CIC-IDS2017, compared with the strongest model that needs no network, and tested once on data it had never seen.",
+ "sections": [
+  {
+   "id": "context",
+   "title": "Context",
+   "steps": [
+    {
+     "title": "The problem",
+     "text": "An intrusion detection system watches network traffic for attacks. A signature catches only what it already knows; a model trained on labelled traffic can learn what an attack looks like from the statistics of the traffic itself."
+    },
+    {
+     "title": "The data",
+     "text": "CIC-IDS2017 records five working days of a laboratory network under scripted attacks. Each of its {rows} rows is one bidirectional flow, described by {columns} statistics the CICFlowMeter tool extracts, and labelled benign or one of the attacks: {classes} classes in all."
+    },
+    {
+     "title": "Cleaning",
+     "text": "The published files repeat flows and hide missing values inside the numbers: an undefined rate is written as Infinity, an absent window as minus one, an overflowed counter as a negative. Duplicates went first, leaving {deduped} flows, so that no flow can sit on both sides of the split; each hidden encoding became an explicit missing value with its own indicator."
+    },
+    {
+     "title": "The split",
+     "text": "The flows were split at random, class by class, into {train} for training, {valid} for choosing, and {test} for one final test. The test part stayed sealed until the network had been chosen, and was opened once."
+    }
+   ],
+   "facts": [
+    {
+     "label": "flows in the capture",
+     "value": "rows"
+    },
+    {
+     "label": "after removing duplicates",
+     "value": "deduped"
+    },
+    {
+     "label": "statistics per flow",
+     "value": "columns"
+    },
+    {
+     "label": "classes",
+     "value": "classes",
+     "format": "count"
+    }
+   ]
+  },
+  {
+   "id": "network",
+   "title": "The network",
+   "lead": "{inputs} numbers in, one score per class out, {params} weights in between. Choose a decision to see where it lives in the network.",
+   "choices": [
+    {
+     "title": "Two hidden layers of {width}",
+     "focus": "hidden",
+     "text": "Gradient-boosted trees beat a linear model clearly on this data, so the problem is not linear and the network needs room. Two layers of this width are also the shape of the published neural baseline this work is compared with, which keeps the comparison fair."
+    },
+    {
+     "title": "GELU between the layers",
+     "focus": "activation",
+     "text": "A smooth relative of ReLU. In the ablations, ReLU scored {r3} macro F-score on validation against {r0} for the same network with GELU."
+    },
+    {
+     "title": "A little dropout",
+     "focus": "hidden",
+     "text": "A fraction of {dropout} of the hidden units is silenced at each training step, so no unit can carry a class alone. Without it the network scored {r10} on validation, slightly higher; that combination was never taken to the sealed test."
+    },
+    {
+     "title": "Unweighted loss, lightly smoothed",
+     "focus": "outputs",
+     "text": "The engineered version weighted rare classes up to ten times. The weights bought recall on the rare attacks at the price of precision everywhere else: without them the network scored {r7} on validation against {r0}, and the selection rule, fixed before the experiments, picked it. Label smoothing of {smoothing} keeps the network from betting everything on one class, which is also why its scores are not calibrated probabilities."
+    },
+    {
+     "title": "The destination port matters",
+     "focus": "feature:Destination Port",
+     "text": "Removing the destination port dropped validation macro F-score to {r6}. The loss fell on attacks tied to a service: web attacks, HTTP denial of service, infiltration. Part of that is legitimate, since a web attack goes to a web port; part may be the identity of the capture session."
+    },
+    {
+     "title": "How it was trained",
+     "focus": "all",
+     "text": "AdamW with a learning rate of {lr} on a cosine schedule, batches of {batch} flows, at most {max_epochs} epochs; training stopped when validation macro F-score had not improved for {patience} epochs. The selected run trained {r7_epochs} epochs and kept epoch {r7_best}."
+    }
+   ]
+  },
+  {
+   "id": "experiments",
+   "title": "What was tried",
+   "lead": "Each variant changes one thing in the engineered network and is scored on the validation part. The rule that picks the winner was written before any of them ran.",
+   "runs": [
+    {
+     "value": "r7",
+     "label": "unweighted loss",
+     "selected": true
+    },
+    {
+     "value": "r10",
+     "label": "no dropout"
+    },
+    {
+     "value": "r9",
+     "label": "twice as wide"
+    },
+    {
+     "value": "r3",
+     "label": "ReLU instead of GELU"
+    },
+    {
+     "value": "r8",
+     "label": "without the zero-duration indicator"
+    },
+    {
+     "value": "r0",
+     "label": "as engineered, class-weighted",
+     "reference": true
+    },
+    {
+     "value": "r5",
+     "label": "without gradient clipping"
+    },
+    {
+     "value": "r6",
+     "label": "without the destination port"
+    },
+    {
+     "value": "r2",
+     "label": "plateau schedule instead of cosine"
+    },
+    {
+     "value": "r1",
+     "label": "a linear model"
+    }
+   ],
+   "caption": "Macro F-score on the validation part: the mean of the per-class scores, so a rare attack counts as much as benign traffic."
+  },
+  {
+   "id": "results",
+   "title": "Results",
+   "headline": "On the sealed test part the network reaches a macro F-score of {f1}, ahead of gradient-boosted trees by {diff_tree} and of logistic regression by {diff_linear}.",
+   "models": [
+    {
+     "label": "this network",
+     "value": "f1",
+     "selected": true
+    },
+    {
+     "label": "gradient-boosted trees",
+     "value": "tree"
+    },
+    {
+     "label": "logistic regression",
+     "value": "linear"
+    },
+    {
+     "label": "always the majority class",
+     "value": "trivial"
+    }
+   ],
+   "per_class": {
+    "names": "classes",
+    "values": "per_class",
+    "caption": "F-score per class on the test part. The weak spots are real: bots mostly pass as benign, and cross-site scripting is mistaken for web brute force."
+   },
+   "facts": [
+    {
+     "label": "accuracy",
+     "value": "accuracy",
+     "note": "high because most traffic is benign; it says little"
+    },
+    {
+     "label": "balanced accuracy",
+     "value": "balanced"
+    },
+    {
+     "label": "calibration error",
+     "value": "ece",
+     "note": "the scores are not probabilities"
+    },
+    {
+     "label": "test flows",
+     "value": "n_test"
+    }
+   ],
+   "limits": [
+    {
+     "title": "In distribution only",
+     "text": "Training, choosing and testing all use the same capture days, hosts and attack tools. Nothing here measures traffic from another network, another year or another tool."
+    },
+    {
+     "title": "Rare classes are anecdotes",
+     "text": "A few classes have only a handful of test flows; their scores swing on a single flow and are shown, not trusted."
+    },
+    {
+     "title": "Not every check ran",
+     "text": "The robustness checks did not run, because two tools disagreed on where the drift and importance findings are stored. The drift monitor's thresholds are conventions, not measurements on this network."
+    }
+   ]
+  }
+ ],
+ "neutral_class": "BENIGN",
+ "input_groups": [
+  {
+   "label": "destination port",
+   "text": "the service the flow was addressed to",
+   "match": [
+    "^Destination Port$"
+   ]
+  },
+  {
+   "label": "cleaning markers",
+   "text": "indicators the cleaning added: a zero-length flow, an overflowed counter, an absent window",
+   "match": [
+    "^degenerate_flow$",
+    "^negative_duration$",
+    "^int32_overflow$",
+    "_missing$"
+   ]
+  },
+  {
+   "label": "timing",
+   "text": "how long the flow lasted, the gaps between its packets, its active and idle spells",
+   "match": [
+    "Duration",
+    "IAT",
+    "^Active",
+    "^Idle"
+   ]
+  },
+  {
+   "label": "rates",
+   "text": "bytes and packets per second",
+   "match": [
+    "/s$"
+   ]
+  },
+  {
+   "label": "flags and TCP header",
+   "text": "TCP flags, header sizes and the initial window",
+   "match": [
+    "Flag",
+    "Header Length",
+    "^Init_Win",
+    "^min_seg"
+   ]
+  },
+  {
+   "label": "packet counts",
+   "text": "how many packets went each way",
+   "match": [
+    "^Total (Fwd|Backward) Packets$",
+    "^act_data_pkt"
+   ]
+  },
+  {
+   "label": "sizes",
+   "text": "how large the packets and the payloads were",
+   "match": [
+    "Length",
+    "Bytes$",
+    "Size"
+   ]
+  }
+ ],
+ "code_notes": {
+  "root": {
+   "label": "§{r_arch} System architecture · “Ports and adapters” · Figure {r_fig_arch}",
+   "note": "one adapter per role, wired in this one place; nothing else imports its neighbours",
+   "page": "{r_fig_arch_p}"
+  },
+  "store": {
+   "label": "§{r_arch} · “From a raw flow to an answer” · Figure {r_fig_serving}",
+   "note": "the weights are refused if their digest differs from the one recorded when the model was evaluated",
+   "page": "{r_fig_serving_p}"
+  },
+  "build": {
+   "label": "§{r_net} Network architecture · Table {r_tab_net}",
+   "note": "the layers and parameters this builder instantiates from the spec",
+   "page": "{r_tab_net_p}"
+  },
+  "dense": {
+   "label": "§{r_net} · Equation ({r_eq_mlp})",
+   "note": "W·x + b, the affine part of every layer",
+   "page": "{r_eq_mlp_p}"
+  },
+  "act": {
+   "label": "§{r_net} · Equation ({r_eq_mlp})",
+   "note": "GELU(u) = u·Φ(u), and why GELU rather than the competitor's SELU",
+   "page": "{r_eq_mlp_p}"
+  },
+  "dropout": {
+   "label": "§{r_net} · Equation ({r_eq_mlp}) and Figure {r_fig_net}",
+   "note": "“drop”: dropout, active only in training; the dashed units of the figure",
+   "page": "{r_fig_net_p}"
+  },
+  "head": {
+   "label": "§{r_net} · Equation ({r_eq_mlp}), its last term",
+   "note": "z = W·h + b with one row per class: the logits",
+   "page": "{r_eq_mlp_p}"
+  },
+  "forward": {
+   "label": "§{r_net} · Equation ({r_eq_mlp}) as a whole",
+   "note": "the layers applied in the order the equation writes them",
+   "page": "{r_eq_mlp_p}"
+  },
+  "softmax": {
+   "label": "§{r_net} · the paragraph after Equation ({r_eq_mlp})",
+   "note": "softmax p_c = exp(z_c) / Σ_k exp(z_k), then the arg-max",
+   "page": "{r_eq_mlp_p}"
+  },
+  "shape": {
+   "label": "§{r_shaping} Preparing the data · Figure {r_fig_shaping}",
+   "note": "the steps this file replays, each one answering a finding of the data section",
+   "page": "{r_fig_shaping_p}"
+  },
+  "run": {
+   "label": "§{r_arch} · “From a raw flow to an answer” · Figure {r_fig_serving}",
+   "note": "transformer, then network, then class, probabilities, scores and warnings",
+   "page": "{r_fig_serving_p}"
+  },
+  "explain": {
+   "label": "§{r_net} · Equation ({r_eq_mlp}), the function differentiated here",
+   "note": "the explanation itself is not in the report: it is this page's addition, the gradient of that function",
+   "page": "{r_eq_mlp_p}"
+  },
+  "route": {
+   "label": "§{r_arch} · “From a raw flow to an answer”",
+   "note": "what a request carries and what every answer returns",
+   "page": "{r_fig_serving_p}"
+  }
+ }
+}

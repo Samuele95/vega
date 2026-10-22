@@ -1,0 +1,349 @@
+{
+  "schema": "vega/eval-catalog@1",
+  "source": "references/eval-contract.md §3–§4",
+  "note": "The machine copy of the metric and baseline catalog. evaluate.py reads its metric rows, its threshold-dependent set and its baseline definitions from here rather than holding a second copy in code; tests/test_catalog_sync.py fails when this file and the prose diverge.",
+  "tasks": {
+    "binary": {
+      "primary": "pr_auc when the train minority share is below 0.3, else roc_auc — as the spec's metrics.primary says",
+      "secondary": [
+        "roc_auc",
+        "pr_auc",
+        "log_loss",
+        "brier",
+        "ece",
+        "accuracy",
+        "balanced_accuracy",
+        "precision",
+        "recall",
+        "f1",
+        "mcc",
+        "specificity"
+      ],
+      "threshold_dependent": [
+        "precision",
+        "recall",
+        "f1",
+        "mcc",
+        "accuracy"
+      ],
+      "curves": [
+        "roc",
+        "pr",
+        "reliability",
+        "confusion",
+        "scores"
+      ]
+    },
+    "multiclass": {
+      "primary": "f1_macro",
+      "secondary": [
+        "accuracy",
+        "balanced_accuracy",
+        "log_loss",
+        "f1_micro",
+        "f1_weighted",
+        "mcc",
+        "f1_per_class",
+        "top_k",
+        "ece"
+      ],
+      "threshold_dependent": [],
+      "curves": [
+        "confusion",
+        "pr_per_class",
+        "reliability"
+      ],
+      "planned": {
+        "collapsed_binary": [
+          "mcc_binary",
+          "roc_auc_binary",
+          "pr_auc_binary"
+        ],
+        "when": "data_contract.classes[].negative is set",
+        "note": "build obligation C9: neither built nor planned by the pytorch backend (its coverage.json planned note says so); a spec that names one is refused by compile_spec's rule B2, so this stage never reports them"
+      }
+    },
+    "multilabel": {
+      "primary": "f1_micro",
+      "secondary": [
+        "f1_macro",
+        "pr_auc",
+        "pr_auc_macro",
+        "hamming",
+        "subset_accuracy"
+      ],
+      "threshold_dependent": [
+        "f1_macro",
+        "pr_auc_macro",
+        "hamming",
+        "subset_accuracy"
+      ],
+      "curves": [
+        "pr_per_label"
+      ]
+    },
+    "regression": {
+      "primary": "rmse",
+      "secondary": [
+        "mae",
+        "r2",
+        "mape",
+        "median_ae",
+        "residual_quantiles",
+        "spearman"
+      ],
+      "threshold_dependent": [],
+      "curves": [
+        "predicted_vs_actual",
+        "residuals",
+        "residual_hist",
+        "qq"
+      ]
+    },
+    "ordinal": {
+      "primary": "mae_ordinal",
+      "secondary": [
+        "accuracy",
+        "qwk",
+        "spearman"
+      ],
+      "threshold_dependent": [],
+      "curves": [
+        "confusion"
+      ]
+    },
+    "unsupervised": {
+      "primary": "reconstruction_error",
+      "secondary": [
+        "per_feature_error",
+        "r2"
+      ],
+      "threshold_dependent": [],
+      "curves": [
+        "error_hist",
+        "per_feature_error"
+      ]
+    },
+    "anomaly": {
+      "primary": "pr_auc on the score when a label exists, else anomaly_score_mean",
+      "secondary": [
+        "roc_auc",
+        "precision_at_k",
+        "recall_at_k",
+        "f1",
+        "anomaly_score_mean"
+      ],
+      "threshold_dependent": [
+        "precision_at_k",
+        "recall_at_k",
+        "f1"
+      ],
+      "curves": [
+        "pr",
+        "scores"
+      ]
+    },
+    "sequence-classification": {
+      "primary": "as the base task",
+      "secondary": [
+        "roc_auc",
+        "pr_auc",
+        "log_loss",
+        "accuracy",
+        "f1"
+      ],
+      "threshold_dependent": [
+        "accuracy",
+        "f1"
+      ],
+      "curves": [
+        "roc",
+        "pr",
+        "reliability"
+      ],
+      "derives_from": "sequence-*"
+    },
+    "sequence-regression": {
+      "primary": "as the base task",
+      "secondary": [
+        "mae",
+        "r2",
+        "median_ae",
+        "spearman"
+      ],
+      "threshold_dependent": [],
+      "curves": [
+        "predicted_vs_actual",
+        "residuals"
+      ],
+      "derives_from": "sequence-*"
+    },
+    "forecast": {
+      "primary": "mase",
+      "secondary": [
+        "smape",
+        "rmse",
+        "mae",
+        "per_horizon_error"
+      ],
+      "threshold_dependent": [],
+      "curves": [
+        "per_horizon_error"
+      ],
+      "derives_from": "sequence-*"
+    }
+  },
+  "classification_kinds": [
+    "binary",
+    "multiclass",
+    "multilabel",
+    "sequence-classification"
+  ],
+  "threshold_tasks": [
+    "binary",
+    "multilabel",
+    "anomaly",
+    "sequence-classification"
+  ],
+  "threshold_scale": {
+    "binary": "probability",
+    "multilabel": "probability",
+    "anomaly": "score"
+  },
+  "ranking_metrics": [
+    "roc_auc",
+    "pr_auc",
+    "pr_auc_macro",
+    "top_k",
+    "precision_at_k",
+    "recall_at_k",
+    "spearman",
+    "qwk",
+    "mcc"
+  ],
+  "ece_bins": 15,
+  "upstream_numbers": [
+    "the selected run's valid metrics from the ledger",
+    "campaign-baseline's ledger value"
+  ],
+  "metric_gates": {
+    "mape": {
+      "tasks": [
+        "regression"
+      ],
+      "abs_y_above": 0.1,
+      "share": 0.99,
+      "part": "train",
+      "rule": "|y| > 0.1 for 99 % of the train part's rows",
+      "why": "a percentage error divides by the truth: on a target near zero it measures the denominator, not the model"
+    }
+  },
+  "baselines": {
+    "required": [
+      "trivial"
+    ],
+    "required_one_of": [
+      "linear",
+      "tree"
+    ],
+    "default_set": [
+      "trivial",
+      "linear",
+      "tree",
+      "lens",
+      "campaign-baseline"
+    ],
+    "default_when": {
+      "naive": {
+        "tasks": [
+          "forecast",
+          "sequence-regression"
+        ]
+      },
+      "seasonal-naive": {
+        "tasks": [
+          "forecast",
+          "sequence-regression"
+        ],
+        "season": true
+      },
+      "graph-linear": {
+        "shape": "graph",
+        "level": "node"
+      }
+    },
+    "rows": {
+      "trivial": {
+        "definition": "majority class / class prior (classification), the mean (regression), the mean row (reconstruction)",
+        "by_task": {
+          "unsupervised": "the mean row (mean reconstruction)"
+        },
+        "why": "the floor every metric is read against; a network below it is broken",
+        "fitted": true,
+        "by_shape": {
+          "window": "the train target's mean (values) or the class prior, whatever the window holds",
+          "graph-node": "the prior / mean of the train nodes' labels",
+          "graph-level": "the prior / mean of the train graphs' labels"
+        }
+      },
+      "linear": {
+        "definition": "logistic regression / ridge on the shaped features, L2 chosen on valid",
+        "by_task": {
+          "unsupervised": "PCA reconstruction at the network's bottleneck size (the pca-floor)",
+          "anomaly": "PCA reconstruction at the network's bottleneck size (the pca-floor)"
+        },
+        "why": "the linear floor: what the network's non-linearity buys",
+        "fitted": true,
+        "by_shape": {
+          "window": "on the flattened window (L·F′ + L·C columns)",
+          "graph-node": "on the node's own features — structure-blind, and named so",
+          "graph-level": "on the [mean | max | sum]-pooled node features of each graph"
+        }
+      },
+      "tree": {
+        "definition": "gradient-boosted trees, depth and rounds chosen on valid with early stopping",
+        "by_task": {
+          "anomaly": "isolation forest (an anomaly task without a label has nothing to boost against)",
+          "unsupervised": "not defined for reconstruction, and the row says so"
+        },
+        "why": "the honest tabular contender; on most tabular sets it is the number to beat",
+        "fitted": true,
+        "by_shape": {
+          "window": "on the flattened window (L·F′ + L·C columns)",
+          "graph-node": "on the node's own features — structure-blind, and named so",
+          "graph-level": "on the [mean | max | sum]-pooled node features of each graph"
+        }
+      },
+      "lens": {
+        "definition": "the algorithm and protocol /data-lens's importance module recorded, re-fitted here on the shaped features",
+        "by_task": {},
+        "why": "continuity with the analysis's learnability estimate, on the features the network saw",
+        "fitted": true
+      },
+      "campaign-baseline": {
+        "definition": "the network's own R0 run — the spec as engineered",
+        "by_task": {},
+        "why": "what the ladder and the search bought",
+        "fitted": false
+      },
+      "naive": {
+        "definition": "persistence: the last observed target, repeated over the horizon (a sequence regression repeats the row before the anchor)",
+        "by_task": {},
+        "why": "the forecast floor: a network that cannot beat yesterday's value has learned nothing about the series",
+        "fitted": true
+      },
+      "seasonal-naive": {
+        "definition": "seasonal persistence: horizon step h repeats the target s·⌈h/s⌉ rows before it, s = sample.season",
+        "by_task": {},
+        "why": "the floor of a seasonal series: a network that cannot beat last season's value has learned only the season",
+        "fitted": true
+      },
+      "graph-linear": {
+        "definition": "logistic / ridge on [x ‖ mean of the in-neighbours' x] over the scored view's edges — one fixed propagation (SGC-style)",
+        "by_task": {},
+        "why": "the honest contender at node level: what learned message passing bought over one fixed propagation, where linear and tree are structure-blind",
+        "fitted": true
+      }
+    }
+  }
+}

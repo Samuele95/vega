@@ -1,0 +1,91 @@
+/* showcase-layer.css — /vega-show's `showcase` tab (contract: references/show-contract.md §8).
+   Scoped entirely under .layer-showcase so the layer cannot restyle the document it is written
+   into. Colours come from the host's custom properties where they exist and fall back to their
+   own, so the tab reads correctly in a model that defines none. */
+
+.layer-showcase {
+  --sc-fg: var(--fg, #16181d);
+  --sc-dim: var(--fg-dim, #5d6470);
+  --sc-line: var(--line, #dfe3ea);
+  --sc-panel: var(--panel, #f7f8fa);
+  --sc-accent: var(--accent, #2f6fdb);
+  --sc-good: #1c7a4a;
+  --sc-bad: #b03030;
+  --sc-warn: #8a6100;
+  --sc-neutral: #5b6b7d;
+  --sc-alert: #c2410c;
+  --sc-plain: #9aa3ad;
+  --sc-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--sc-fg);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .layer-showcase {
+    --sc-fg: var(--fg, #e6e8ec);
+    --sc-dim: var(--fg-dim, #99a0ac);
+    --sc-line: var(--line, #333842);
+    --sc-panel: var(--panel, #1b1e24);
+    --sc-accent: var(--accent, #7aa7f0);
+    --sc-good: #4fbe86;
+    --sc-bad: #ec7a7a;
+    --sc-warn: #d6a740;
+    --sc-neutral: #8fa3b8;
+    --sc-alert: #f08a54;
+    --sc-plain: #6b737d;
+  }
+}
+
+.layer-showcase :where(h2, h3, h4, p, table, ul, ol, pre) { margin: 0 0 .6rem; }
+.layer-showcase h3 { font-size: 1.05rem; }
+.layer-showcase h4 { font-size: .85rem; letter-spacing: .02em; text-transform: uppercase;
+                     color: var(--sc-dim); }
+.layer-showcase .sc-surface { margin-bottom: 1.4rem; padding-bottom: .8rem;
+                              border-bottom: 1px solid var(--sc-line); }
+
+.layer-showcase .sc-headline { font-size: 1.3rem; font-weight: 600; }
+.layer-showcase .sc-lead { color: var(--sc-dim); max-width: 70ch; }
+.layer-showcase .sc-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.layer-showcase .sc-chip { border: 1px solid var(--sc-line); border-radius: 999px; padding: 0 .6rem;
+                           background: var(--sc-panel); }
+.layer-showcase .sc-chip-k { color: var(--sc-dim); margin-right: .35rem; }
+.layer-showcase .sc-outline li { margin-bottom: .15rem; }
+
+.layer-showcase .sc-roles { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .3rem 1rem; }
+.layer-showcase .sc-swatch { display: inline-block; width: .8rem; height: .8rem; border-radius: 2px;
+                             margin-right: .35rem; vertical-align: -1px; }
+.layer-showcase .sc-role-neutral { background: var(--sc-neutral); }
+.layer-showcase .sc-role-alert { background: var(--sc-alert); }
+.layer-showcase .sc-role-plain { background: var(--sc-plain); }
+.layer-showcase .sc-basis { color: var(--sc-dim); }
+
+.layer-showcase table { border-collapse: collapse; width: 100%; }
+.layer-showcase th, .layer-showcase td { border-bottom: 1px solid var(--sc-line); padding: .2rem .5rem;
+                                         text-align: left; vertical-align: top; }
+.layer-showcase th { cursor: pointer; user-select: none; }
+.layer-showcase th[aria-sort="ascending"]::after { content: " \2191"; }
+.layer-showcase th[aria-sort="descending"]::after { content: " \2193"; }
+.layer-showcase .sc-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.layer-showcase .sc-code, .layer-showcase .sc-snippet { font-family: var(--sc-mono); font-size: .85em;
+                                                        overflow-wrap: anywhere; }
+.layer-showcase .sc-filter { width: min(28rem, 100%); padding: .25rem .5rem;
+                             border: 1px solid var(--sc-line); border-radius: 4px; }
+
+.layer-showcase .sc-use { display: flex; gap: .5rem; align-items: flex-start; }
+.layer-showcase .sc-snippet { flex: 1; background: var(--sc-panel); border: 1px solid var(--sc-line);
+                              border-radius: 4px; padding: .4rem .6rem; white-space: pre-wrap; }
+.layer-showcase .sc-copy { border: 1px solid var(--sc-line); background: var(--sc-panel);
+                           border-radius: 4px; padding: .2rem .6rem; cursor: pointer; color: inherit; }
+
+.layer-showcase .sc-status { font-weight: 600; padding: 0 .35rem; border-radius: 3px; }
+.layer-showcase .sc-ok { color: var(--sc-good); }
+.layer-showcase .sc-notok { color: var(--sc-bad); }
+.layer-showcase .sc-warnword { color: var(--sc-warn); }
+.layer-showcase .sc-warn { color: var(--sc-warn); border-left: 3px solid var(--sc-warn); padding-left: .5rem; }
+.layer-showcase .sc-note, .layer-showcase .sc-empty { color: var(--sc-dim); }
+.layer-showcase .sc-markers { font-family: var(--sc-mono); font-size: .85em; padding-left: 1.1rem; }
+.layer-showcase .sc-m-warn { color: var(--sc-warn); }
+.layer-showcase .sc-m-error { color: var(--sc-bad); }
+.layer-showcase .sc-abstract { max-width: 70ch; }
+.layer-showcase .sc-fold summary { cursor: pointer; color: var(--sc-dim); }

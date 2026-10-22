@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{dist}"
+version = "{version}"
+description = "{title} ({run}): the packed network, its preprocessing and {what}"
+readme = "README.md"
+requires-python = ">={python}"
+dependencies = [{deps}]
+
+[project.optional-dependencies]
+serve = [{serve_deps}]
+test = ["pytest", "httpx"]
+
+[project.scripts]
+{cmd}-predict = "predict:main"
+{cmd}-serve = "{serve_entry}"
+
+# The wheel is the code — predict.py, the package, the service. The weights, the recipe's fitted
+# parameters and the examples are the bundle directory, which the installed commands are pointed
+# at (--bundle, or {env}_BUNDLE); an editable install inside the bundle finds it by itself.
+[tool.setuptools]
+py-modules = ["predict"]
+
+[tool.setuptools.packages.find]
+include = ["{package}*", "serve*"]
+
+[tool.setuptools.package-data]
+"{package}" = ["*.json"]
+serve = ["static/*"]

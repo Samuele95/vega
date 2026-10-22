@@ -1,0 +1,20 @@
+{
+  "from_eval": "eval/H1-3",
+  "readings": {
+    "verdict": "H1-3 scores pr_auc 0.8612 [0.6975, 0.9735] on the 119 held-out rows, well clear of the trivial floor: that difference is 0.7267 [0.573, 0.8564]. Against the strongest fitted baseline the finding is the opposite one. Linear scores 0.95 and the paired difference network minus linear is -0.0888 [-0.2042, -0.0104] — an interval that excludes zero on the wrong side, so this part does not merely fail to separate them, it says a logistic regression on the same shaped features is better than the network. Against tree the difference is -0.0644 [-0.1613, 0.013] and the interval does cover zero, so that comparison is undecided. The network has not earned its cost, and what the user gets instead is not a caveat but a recommendation: ship linear. The one thing the network offers that linear does not is a calibrated score, and the calibration reading below is where to look if that is the reason it exists.",
+    "calibration": "ECE is 0.0593 [0.0295, 0.1116] over 15 bins and the Brier score is 0.0668 [0.0296, 0.1099]. Both are small in absolute terms, but on a part where only a small minority of rows are positive a low Brier score is largely the cost of predicting near zero everywhere, so it is the reliability curve rather than the summary number that carries the information. No pos_weight was applied in the selected run, so this is the shape of the raw head.",
+    "slices": "The worst slice on pr_auc is dist_km<=median at 0.04, with n = 61 — against 0.9056 on the other side of the same split, dist_km>median at n = 58. That is not a small difference at the edges, it is the network working on one half of the data and not the other, and it is the finding of this evaluation that most deserves a follow-up. dist_km is the strongest term in the label's construction, so the half where distance is short is the half where the remaining signal is weakest; the whole-part number of 0.8612 is an average over these two very different regimes and should not be quoted without them.",
+    "robustness": "The drifted half of dist_km scores 0.9056 [0.7722, 0.9889] and the stable half 0.04 [0.0, 0.1333]. The two intervals do not come close to overlapping, which makes the slice reading above a robustness finding as well: performance is conditional on the drifting column rather than merely varying with it. The importance perturbation was skipped, because the analysis layer records a family for its importance module but no ranking, and there is nothing to perturb in an order that was never written down. The time-quartile checks were skipped for the same kind of reason — the analysis records no time context.",
+    "limits": "One test part, one seed, 119 rows. The interval on the primary metric runs from 0.6975 to 0.9735, and every comparison above inherits that width: the difference against tree, -0.0644, is not evidence that tree is better or worse, only that 119 rows cannot tell. The difference against linear is the exception — its interval clears zero — but its upper bound is -0.0104, a margin one resample of a different 119 rows could plausibly move across zero. The threshold 0.9799 was chosen on the valid part, on the probability scale the metrics read, and every metric that depends on it moves with it. The lens baseline re-fitted to the same algorithm as tree and scored identically, so it is a check that the two stages agree rather than a fifth opinion."
+  },
+  "forks": [
+    {
+      "asked": "linear beats the network on this part — ship linear, ship the network for its calibrated score, or return to /vega-train?",
+      "or": [
+        "ship linear and stop here",
+        "ship the network anyway with the stance recorded",
+        "return to /vega-train with a ladder aimed at the short-distance half"
+      ]
+    }
+  ]
+}

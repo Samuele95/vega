@@ -1,0 +1,184 @@
+{
+  "schema": "blueprint/pipeline@1",
+  "system": {
+    "name": "demo-pipeline",
+    "package": "demo_pipeline",
+    "source": "[conformance fixture]"
+  },
+  "serving": {
+    "mode": "batch"
+  },
+  "ports": [
+    {
+      "name": "DataSource",
+      "role": "DataSource",
+      "responsibility": "the DataSource port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def load_part(self, spec: NetSpec, part: Part) -> Any: ...",
+        "def load_sealed_part(self, spec: NetSpec, token: str, seal_path: str = \"test_seal.json\") -> Any: ..."
+      ]
+    },
+    {
+      "name": "Recipe",
+      "role": "FeatureTransformer",
+      "responsibility": "the FeatureTransformer port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def transform(self, df_raw, history=None) -> Any: ..."
+      ]
+    },
+    {
+      "name": "Model",
+      "role": "Model",
+      "responsibility": "the Model port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def score(self, batch: dict) -> Any: ...",
+        "def param_count(self) -> tuple: ..."
+      ]
+    },
+    {
+      "name": "Trainer",
+      "role": "Trainer",
+      "responsibility": "the Trainer port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def fit(self, model, spec: NetSpec, data, callbacks=None, run=None) -> Any: ...",
+        "def evaluate(self, model, spec: NetSpec, loader) -> Any: ..."
+      ]
+    },
+    {
+      "name": "Evaluator",
+      "role": "Evaluator",
+      "responsibility": "the Evaluator port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def score_part(self, spec: NetSpec, part: Part, checkpoint=None, model=None) -> Any: ...",
+        "def score_sealed_test(self, spec: NetSpec, token: str, checkpoint=None, model=None, seal_path: str = \"test_seal.json\") -> Any: ..."
+      ]
+    },
+    {
+      "name": "Registry",
+      "role": "ModelStore",
+      "responsibility": "the ModelStore port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def save(self, model, path, spec=None, epoch=None) -> str: ...",
+        "def load(self, ref, expected_digest=None, spec=None, build=None, run_dir=None) -> Any: ..."
+      ]
+    },
+    {
+      "name": "Predictor",
+      "role": "Predictor",
+      "responsibility": "the Predictor port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def predict(self, rows, history=None) -> Any: ..."
+      ]
+    },
+    {
+      "name": "Monitor",
+      "role": "Monitor",
+      "responsibility": "the Monitor port of the conformance fixture",
+      "source": "[conformance fixture]",
+      "signature": [
+        "def check(self, batch, predictions=None) -> tuple: ..."
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "name": "domain",
+      "paradigm": "FP",
+      "ports_owned": [],
+      "depends_on": []
+    },
+    {
+      "name": "ingestion",
+      "paradigm": "OOP",
+      "ports_owned": [
+        "DataSource"
+      ],
+      "depends_on": [
+        "domain"
+      ]
+    },
+    {
+      "name": "features",
+      "paradigm": "OOP",
+      "ports_owned": [
+        "Recipe"
+      ],
+      "depends_on": [
+        "domain"
+      ]
+    },
+    {
+      "name": "model",
+      "paradigm": "OOP",
+      "ports_owned": [
+        "Model",
+        "Registry"
+      ],
+      "depends_on": [
+        "domain"
+      ]
+    },
+    {
+      "name": "training",
+      "paradigm": "OOP",
+      "ports_owned": [
+        "Trainer"
+      ],
+      "depends_on": [
+        "domain",
+        "ingestion",
+        "model"
+      ]
+    },
+    {
+      "name": "evaluation",
+      "paradigm": "OOP",
+      "ports_owned": [
+        "Evaluator"
+      ],
+      "depends_on": [
+        "domain",
+        "ingestion",
+        "model"
+      ]
+    },
+    {
+      "name": "serving",
+      "paradigm": "OOP",
+      "ports_owned": [
+        "Predictor",
+        "Monitor"
+      ],
+      "depends_on": [
+        "domain",
+        "features",
+        "model"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "NetSpec",
+      "kind": "value",
+      "identity": "digest"
+    },
+    {
+      "name": "Metrics",
+      "kind": "value",
+      "identity": "run"
+    }
+  ],
+  "anchors": [
+    "EJ-15",
+    "EJ-20",
+    "EJ-25",
+    "EJ-51"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "effective": "binary",
+  "extra": null,
+  "family": "gat",
+  "files": {
+    "explain": "gat__graph-node__binary__inductive-full/explain.json",
+    "network": "gat__graph-node__binary__inductive-full/network.json"
+  },
+  "id": "gat/graph-node/binary/inductive-full",
+  "level": "node",
+  "reading": "binary",
+  "shape": "graph",
+  "slug": "gat__graph-node__binary__inductive-full",
+  "target": "binary_logit",
+  "task": "binary",
+  "variant": "inductive-full"
+}

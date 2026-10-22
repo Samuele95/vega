@@ -1,0 +1,198 @@
+{
+  "schema": "vega/label-roles@1",
+  "lane": "L01",
+  "generated_at": "2026-10-09T00:00:00Z",
+  "adapter": "latex-aux",
+  "report": {
+    "tex": "docs/main.tex",
+    "pdf": "docs/main.pdf",
+    "aux": "docs/main.aux",
+    "aux_digest": "sha256:1618c2d3a6952579a0759cb0833da5bc8ae755035a6368f348b48c854862c084"
+  },
+  "roles": {
+    "intro.lane": {
+      "label": "vega:intro.lane",
+      "kind": "figure",
+      "stage": "forge-data",
+      "number": "3.1",
+      "page": 2,
+      "title": "intro.lane"
+    },
+    "chapter.forge-data": {
+      "label": "vega:chapter.forge-data",
+      "kind": "section",
+      "stage": "forge-data",
+      "number": "3.2",
+      "page": 2,
+      "title": "chapter.forge-data"
+    },
+    "chapter.lens": {
+      "label": "vega:chapter.lens",
+      "kind": "section",
+      "stage": "lens",
+      "number": "3.3",
+      "page": 2,
+      "title": "chapter.lens"
+    },
+    "chapter.shape": {
+      "label": "vega:chapter.shape",
+      "kind": "section",
+      "stage": "shape",
+      "number": "3.4",
+      "page": 3,
+      "title": "chapter.shape"
+    },
+    "chapter.blueprint": {
+      "label": "vega:chapter.blueprint",
+      "kind": "section",
+      "stage": "blueprint",
+      "number": "3.5",
+      "page": 3,
+      "title": "chapter.blueprint"
+    },
+    "chapter.net": {
+      "label": "vega:chapter.net",
+      "kind": "section",
+      "stage": "net",
+      "number": "3.6",
+      "page": 3,
+      "title": "chapter.net"
+    },
+    "chapter.train": {
+      "label": "vega:chapter.train",
+      "kind": "section",
+      "stage": "train",
+      "number": "3.7",
+      "page": 4,
+      "title": "chapter.train"
+    },
+    "chapter.eval": {
+      "label": "vega:chapter.eval",
+      "kind": "section",
+      "stage": "eval",
+      "number": "3.8",
+      "page": 4,
+      "title": "chapter.eval"
+    },
+    "chapter.pack": {
+      "label": "vega:chapter.pack",
+      "kind": "section",
+      "stage": "pack",
+      "number": "3.9",
+      "page": 4,
+      "title": "chapter.pack"
+    },
+    "shape.lineage": {
+      "label": "vega:shape.lineage",
+      "kind": "figure",
+      "stage": "shape",
+      "number": "3.10",
+      "page": 5,
+      "title": "shape.lineage"
+    },
+    "blueprint.modules": {
+      "label": "vega:blueprint.modules",
+      "kind": "figure",
+      "stage": "blueprint",
+      "number": "3.11",
+      "page": 5,
+      "title": "blueprint.modules"
+    },
+    "net.blocks": {
+      "label": "vega:net.blocks",
+      "kind": "figure",
+      "stage": "net",
+      "number": "3.12",
+      "page": 5,
+      "title": "net.blocks"
+    },
+    "net.decisions": {
+      "label": "vega:net.decisions",
+      "kind": "table",
+      "stage": "net",
+      "number": "3.13",
+      "page": 6,
+      "title": "net.decisions"
+    },
+    "net.forward": {
+      "label": "vega:net.forward",
+      "kind": "equation",
+      "stage": "net",
+      "number": "3.14",
+      "page": 6,
+      "title": "net.forward"
+    },
+    "net.loss": {
+      "label": "vega:net.loss",
+      "kind": "equation",
+      "stage": "net",
+      "number": "3.15",
+      "page": 6,
+      "title": "net.loss"
+    },
+    "net.update": {
+      "label": "vega:net.update",
+      "kind": "equation",
+      "stage": "net",
+      "number": "3.16",
+      "page": 7,
+      "title": "net.update"
+    },
+    "train.ladder": {
+      "label": "vega:train.ladder",
+      "kind": "figure",
+      "stage": "train",
+      "number": "3.17",
+      "page": 7,
+      "title": "train.ladder"
+    },
+    "train.curves": {
+      "label": "vega:train.curves",
+      "kind": "figure",
+      "stage": "train",
+      "number": "3.18",
+      "page": 7,
+      "title": "train.curves"
+    },
+    "eval.metrics": {
+      "label": "vega:eval.metrics",
+      "kind": "table",
+      "stage": "eval",
+      "number": "3.19",
+      "page": 8,
+      "title": "eval.metrics"
+    },
+    "eval.calibration": {
+      "label": "vega:eval.calibration",
+      "kind": "figure",
+      "stage": "eval",
+      "number": "3.20",
+      "page": 8,
+      "title": "eval.calibration"
+    },
+    "pack.layout": {
+      "label": "vega:pack.layout",
+      "kind": "figure",
+      "stage": "pack",
+      "number": "3.21",
+      "page": 8,
+      "title": "pack.layout"
+    },
+    "pack.slice": {
+      "label": "vega:pack.slice",
+      "kind": "figure",
+      "stage": "pack",
+      "number": "3.22",
+      "page": 9,
+      "title": "pack.slice"
+    },
+    "conclusion": {
+      "label": "vega:conclusion",
+      "kind": "section",
+      "stage": "pack",
+      "number": "3.23",
+      "page": 9,
+      "title": "conclusion"
+    }
+  }
+}

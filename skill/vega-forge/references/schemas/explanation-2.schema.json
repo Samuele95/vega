@@ -1,0 +1,1639 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:explanation:2",
+  "title": "vega/explanation@2",
+  "description": "The `explanation` member of the POST /v1/explain body (the serving envelope carries the rest): what one sample did as it passed through the network. Normative text: vega-forge/references/inspect-contract.md §4 and §5.4.",
+  "type": "object",
+  "required": [
+    "schema",
+    "detail",
+    "degraded",
+    "sample",
+    "prediction",
+    "target",
+    "outputs",
+    "inputs",
+    "attribution",
+    "nodes",
+    "chain",
+    "fidelity",
+    "recompute",
+    "budget",
+    "warnings"
+  ],
+  "properties": {
+    "schema": {
+      "const": "vega/explanation@2"
+    },
+    "detail": {
+      "enum": [
+        "full",
+        "summary",
+        "exact"
+      ]
+    },
+    "degraded": {
+      "type": "boolean"
+    },
+    "sample": {
+      "type": "object",
+      "required": [
+        "shape",
+        "index",
+        "row",
+        "span",
+        "graph"
+      ],
+      "properties": {
+        "shape": {
+          "enum": [
+            "row",
+            "window",
+            "graph"
+          ]
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "row": {
+          "type": "integer"
+        },
+        "span": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ]
+        },
+        "graph": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "level",
+                "nodes",
+                "edges",
+                "target_node"
+              ],
+              "properties": {
+                "level": {
+                  "enum": [
+                    "node",
+                    "graph"
+                  ]
+                },
+                "nodes": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "edges": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "target_node": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  ]
+                },
+                "names": {
+                  "description": "Node level, when the graph names its nodes (a two-column key_pair): the raw column that names a node and, by node id, the value of that column for each reference node the explanation mentions. A node id is the node's index in the assembled graph, never its name.",
+                  "type": "object",
+                  "required": [
+                    "column",
+                    "of"
+                  ],
+                  "properties": {
+                    "column": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "of": {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[0-9]+$"
+                      },
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "prediction": {
+      "type": "object",
+      "required": [
+        "warnings"
+      ],
+      "properties": {
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "kind",
+        "index",
+        "name",
+        "sign",
+        "value",
+        "why",
+        "unit"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/target_kind"
+        },
+        "index": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "sign": {
+          "enum": [
+            1,
+            -1
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "why": {
+          "enum": [
+            "predicted",
+            "requested",
+            "default"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "distance",
+            "error",
+            "logit",
+            "rank",
+            "target"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "kind",
+        "names",
+        "link",
+        "raw",
+        "read",
+        "answer"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/output_kind"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "link": {
+          "$ref": "#/$defs/link"
+        },
+        "raw": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "read": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          ]
+        },
+        "answer": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "order",
+        "shaped",
+        "raw"
+      ],
+      "properties": {
+        "order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shaped": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/heat"
+            },
+            {
+              "$ref": "#/$defs/reduced"
+            }
+          ]
+        },
+        "raw": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "attribution": {
+      "$ref": "#/$defs/attribution"
+    },
+    "nodes": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/id"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/node_payload"
+      }
+    },
+    "chain": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "inputs",
+            "pre",
+            "post",
+            "grad_pre"
+          ],
+          "properties": {
+            "inputs": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "pre": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "post": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "grad_pre": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "fidelity": {
+      "type": "object",
+      "required": [
+        "head_max_abs_diff",
+        "served_max_abs_diff",
+        "tolerance",
+        "ok"
+      ],
+      "properties": {
+        "head_max_abs_diff": {
+          "type": "number",
+          "minimum": 0
+        },
+        "served_max_abs_diff": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        },
+        "tolerance": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "ok": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "recompute": {
+      "type": "object",
+      "required": [
+        "nodes",
+        "worst",
+        "worst_node"
+      ],
+      "properties": {
+        "nodes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "worst": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        },
+        "worst_node": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "required": [
+        "limit",
+        "used",
+        "summarised",
+        "omitted"
+      ],
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "used": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "summarised": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "omitted": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.@:-]{1,128}$"
+    },
+    "link": {
+      "enum": [
+        "softmax",
+        "sigmoid",
+        "sigmoid_each",
+        "identity",
+        "cumulative",
+        "reconstruction",
+        "distance",
+        "horizon"
+      ]
+    },
+    "target_kind": {
+      "enum": [
+        "logit",
+        "binary_logit",
+        "label_logit",
+        "value",
+        "quantile",
+        "expected_rank",
+        "threshold_logit",
+        "reconstruction_error",
+        "feature_error",
+        "svdd_distance",
+        "forecast_step"
+      ]
+    },
+    "output_kind": {
+      "enum": [
+        "classes",
+        "score",
+        "labels",
+        "value",
+        "quantiles",
+        "thresholds",
+        "reconstruction",
+        "embedding",
+        "horizon"
+      ]
+    },
+    "heat": {
+      "type": "object",
+      "required": [
+        "rows",
+        "cols",
+        "row_edges",
+        "col_edges",
+        "values"
+      ],
+      "properties": {
+        "rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cols": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "row_edges": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "col_edges": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "n",
+        "mean",
+        "std",
+        "min",
+        "max",
+        "l2",
+        "abs_q",
+        "hist"
+      ],
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mean": {
+          "type": "number"
+        },
+        "std": {
+          "type": "number"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "l2": {
+          "type": "number"
+        },
+        "abs_q": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "hist": {
+          "type": "object",
+          "required": [
+            "lo",
+            "hi",
+            "counts"
+          ],
+          "properties": {
+            "lo": {
+              "type": "number"
+            },
+            "hi": {
+              "type": "number"
+            },
+            "counts": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "minItems": 32,
+              "maxItems": 32
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "outputs": {
+      "type": "object",
+      "required": [
+        "kind",
+        "names"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/output_kind"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "reduced": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "value"
+          ],
+          "properties": {
+            "form": {
+              "const": "scalar"
+            },
+            "value": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "n",
+            "values"
+          ],
+          "properties": {
+            "form": {
+              "const": "vector"
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "n",
+            "top",
+            "summary"
+          ],
+          "properties": {
+            "form": {
+              "const": "vector"
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "top": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "minItems": 2,
+                "maxItems": 2
+              }
+            },
+            "summary": {
+              "$ref": "#/$defs/summary"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "steps",
+            "width",
+            "per_step",
+            "per_channel",
+            "heat"
+          ],
+          "properties": {
+            "form": {
+              "const": "sequence"
+            },
+            "steps": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "per_step": {
+              "type": "object",
+              "required": [
+                "norm",
+                "mean"
+              ],
+              "properties": {
+                "norm": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "mean": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "per_channel": {
+              "type": "object",
+              "required": [
+                "mean",
+                "absmax"
+              ],
+              "properties": {
+                "mean": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "absmax": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "heat": {
+              "$ref": "#/$defs/heat"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "ids",
+            "hop",
+            "norm",
+            "target"
+          ],
+          "properties": {
+            "form": {
+              "const": "nodes"
+            },
+            "ids": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "hop": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "norm": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "target": {
+              "type": "object",
+              "required": [
+                "id",
+                "values"
+              ],
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "heads",
+            "q",
+            "k",
+            "maps"
+          ],
+          "properties": {
+            "form": {
+              "const": "attention"
+            },
+            "heads": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "q": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "k": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "maps": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/heat"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "form",
+            "norms",
+            "sums"
+          ],
+          "properties": {
+            "form": {
+              "const": "summary"
+            },
+            "norms": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "sums": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "exact_tensor": {
+      "type": "object",
+      "required": [
+        "shape",
+        "axes",
+        "dtype",
+        "encoding",
+        "data"
+      ],
+      "properties": {
+        "shape": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "axes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dtype": {
+          "enum": [
+            "float32",
+            "int64"
+          ]
+        },
+        "encoding": {
+          "const": "base64-le"
+        },
+        "data": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "exact": {
+      "type": "object",
+      "required": [
+        "in",
+        "out",
+        "grad_out"
+      ],
+      "properties": {
+        "in": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "out": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "grad_out": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "pre": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "post": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "grad_pre": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "hidden": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "alpha": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        },
+        "edge_index": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact_tensor"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "node_payload": {
+      "type": "object",
+      "required": [
+        "level",
+        "why",
+        "in",
+        "out",
+        "grad_out",
+        "relevance",
+        "extra",
+        "recompute",
+        "exact"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "full",
+            "summary",
+            "omitted",
+            "exact"
+          ]
+        },
+        "why": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "in": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/reduced"
+            }
+          ]
+        },
+        "out": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/reduced"
+            }
+          ]
+        },
+        "grad_out": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/reduced"
+            }
+          ]
+        },
+        "relevance": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/reduced"
+            }
+          ]
+        },
+        "extra": {
+          "type": "object"
+        },
+        "recompute": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 0
+            }
+          ]
+        },
+        "exact": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/exact"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "level": {
+                "const": "exact"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exact": {
+                "$ref": "#/$defs/exact"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "level": {
+                "const": "omitted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "why": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "completeness": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "sum",
+            "target_minus_baseline",
+            "gap"
+          ],
+          "properties": {
+            "sum": {
+              "type": "number"
+            },
+            "target_minus_baseline": {
+              "type": "number"
+            },
+            "gap": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "attribution": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "method",
+            "unit",
+            "shape",
+            "features",
+            "total",
+            "completeness"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "grad_x_input",
+                "integrated_gradients"
+              ]
+            },
+            "unit": {
+              "type": "string"
+            },
+            "shape": {
+              "const": "row"
+            },
+            "features": {
+              "type": "object",
+              "required": [
+                "names",
+                "values",
+                "attribution",
+                "grad"
+              ],
+              "properties": {
+                "names": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "attribution": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "grad": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "total": {
+              "type": "number"
+            },
+            "completeness": {
+              "$ref": "#/$defs/completeness"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "method",
+            "unit",
+            "shape",
+            "steps",
+            "step_labels",
+            "features",
+            "matrix",
+            "per_step",
+            "per_feature",
+            "nominal",
+            "total",
+            "completeness"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "grad_x_input",
+                "integrated_gradients"
+              ]
+            },
+            "unit": {
+              "type": "string"
+            },
+            "shape": {
+              "const": "window"
+            },
+            "steps": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "step_labels": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "features": {
+              "type": "object",
+              "required": [
+                "names"
+              ],
+              "properties": {
+                "names": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "matrix": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/$defs/heat"
+                }
+              ]
+            },
+            "per_step": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "per_feature": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "nominal": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "names",
+                    "values",
+                    "attribution"
+                  ],
+                  "properties": {
+                    "names": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "values": {
+                      "type": "array"
+                    },
+                    "attribution": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "total": {
+              "type": "number"
+            },
+            "completeness": {
+              "$ref": "#/$defs/completeness"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "method",
+            "unit",
+            "shape",
+            "level",
+            "target_node",
+            "features",
+            "self",
+            "neighbours",
+            "hops",
+            "outside",
+            "edges",
+            "total",
+            "completeness"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "grad_x_input",
+                "integrated_gradients"
+              ]
+            },
+            "unit": {
+              "type": "string"
+            },
+            "shape": {
+              "const": "graph"
+            },
+            "level": {
+              "enum": [
+                "node",
+                "graph"
+              ]
+            },
+            "target_node": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              ]
+            },
+            "features": {
+              "type": "object",
+              "required": [
+                "names"
+              ],
+              "properties": {
+                "names": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "self": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              ]
+            },
+            "neighbours": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "node",
+                  "hop",
+                  "total",
+                  "top"
+                ],
+                "properties": {
+                  "node": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "hop": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "total": {
+                    "type": "number"
+                  },
+                  "top": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "prefixItems": [
+                        {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ],
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "hops": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "outside": {
+              "type": "number"
+            },
+            "edges": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "src",
+                      "dst",
+                      "hop",
+                      "relevance"
+                    ],
+                    "properties": {
+                      "src": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "dst": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "hop": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "relevance": {
+                        "type": "number"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              ]
+            },
+            "total": {
+              "type": "number"
+            },
+            "completeness": {
+              "$ref": "#/$defs/completeness"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

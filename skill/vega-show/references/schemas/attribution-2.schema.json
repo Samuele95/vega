@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:attribution:2",
+  "title": "vega/attribution@2 — showcase/data/attribution.json, real-row attribution for \"the weights, read\"",
+  "description": "Built by vega-show (attribution_build.py, H06) through predict.load_inspector(bundle).attribute(...) over the demo strata of examples/demo.json — the training part, never the test part — and pinned in SHOWCASE.json with role data. D2's write_attribution and vega/stratum-attribution@1 are dropped (R-D9). One column per stratum of the lane's weights axis (class, label, bin, group or horizon); every cell holds the per-sample attribution rows over the network inputs, in network order, and the count the network got right. target is one of the inspection target kinds (D3's 11, vega-forge catalog inspection.targets).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "source", "method", "target", "inputs", "reduce", "axis", "cells"],
+  "properties": {
+    "schema": { "const": "vega/attribution@2" },
+    "source": { "type": "object", "additionalProperties": false, "required": ["file", "part"],
+                "properties": { "file": { "const": "examples/demo.json" }, "part": { "const": "train" } } },
+    "method": { "type": "object", "additionalProperties": false, "required": ["name", "steps"],
+                "properties": { "name": { "enum": ["grad_x_input", "integrated_gradients"] },
+                                "steps": { "type": ["integer", "null"], "minimum": 1 } } },
+    "target": { "enum": ["logit", "binary_logit", "label_logit", "value", "quantile", "expected_rank", "threshold_logit",
+                         "reconstruction_error", "feature_error", "svdd_distance", "forecast_step"] },
+    "inputs": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "reduce": { "enum": [null, "sum_over_steps", "self_only"] },
+    "axis": {
+      "type": "object", "additionalProperties": false, "required": ["kind", "columns"],
+      "properties": {
+        "kind": { "enum": ["class", "label", "bin", "group", "horizon"] },
+        "columns": {
+          "type": "array", "minItems": 1,
+          "items": { "type": "object", "additionalProperties": false, "required": ["id", "name", "range"],
+                     "properties": { "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$" },
+                                     "name": { "type": "string", "minLength": 1 },
+                                     "range": { "oneOf": [ { "type": "null" },
+                                                           { "type": "array", "prefixItems": [ { "type": ["number", "null"] }, { "type": ["number", "null"] } ],
+                                                             "minItems": 2, "maxItems": 2 } ] } } }
+        }
+      }
+    },
+    "cells": {
+      "type": "object", "minProperties": 1,
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false, "required": ["n", "correct", "rows"],
+        "properties": {
+          "n": { "type": "integer", "minimum": 0 },
+          "correct": { "type": ["integer", "null"], "minimum": 0 },
+          "rows": { "type": "array", "items": { "type": "array", "items": { "type": "number" } } }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "vega/attribution@2",
+      "source": { "file": "examples/demo.json", "part": "train" },
+      "method": { "name": "grad_x_input", "steps": null },
+      "target": "logit",
+      "inputs": ["amount", "items", "region_north", "region_south"],
+      "reduce": null,
+      "axis": { "kind": "class", "columns": [ { "id": "c0", "name": "on-time", "range": null }, { "id": "c1", "name": "late", "range": null } ] },
+      "cells": { "c0": { "n": 2, "correct": 2, "rows": [ [0.01, -0.2, 0.0, 0.03], [0.02, -0.1, 0.01, 0.0] ] },
+                 "c1": { "n": 1, "correct": 0, "rows": [ [0.4, 0.3, -0.05, 0.0] ] } }
+    },
+    {
+      "schema": "vega/attribution@2",
+      "source": { "file": "examples/demo.json", "part": "train" },
+      "method": { "name": "integrated_gradients", "steps": 32 },
+      "target": "forecast_step",
+      "inputs": ["temp", "hour_sin", "hour_cos", "count"],
+      "reduce": "sum_over_steps",
+      "axis": { "kind": "horizon", "columns": [ { "id": "h1", "name": "h1", "range": null }, { "id": "h2", "name": "h2", "range": null } ] },
+      "cells": { "h1": { "n": 1, "correct": null, "rows": [ [0.1, 0.0, 0.02, 0.9] ] },
+                 "h2": { "n": 1, "correct": null, "rows": [ [0.12, 0.01, 0.03, 0.7] ] } }
+    }
+  ]
+}

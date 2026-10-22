@@ -1,0 +1,17 @@
+{
+  "effective": "multiclass",
+  "extra": null,
+  "family": "gin",
+  "files": {
+    "explain": "gin__graph-graph__multiclass__graphs/explain.json",
+    "network": "gin__graph-graph__multiclass__graphs/network.json"
+  },
+  "id": "gin/graph-graph/multiclass/graphs",
+  "level": "graph",
+  "reading": "multiclass",
+  "shape": "graph",
+  "slug": "gin__graph-graph__multiclass__graphs",
+  "target": "logit",
+  "task": "multiclass",
+  "variant": "graphs"
+}

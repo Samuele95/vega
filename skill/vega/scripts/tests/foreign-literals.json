@@ -1,0 +1,39 @@
+{
+  "schema": "vega/foreign-literals@1",
+  "about": "The dataset literals no shared template may carry (D6 §10.6, §15.2; BUILD-PLAN R-F10: the one deny-list gate). lint_templates.py scans every shared template for the hard and the soft tokens and for every lane generator's VOCAB; a shared template belongs to no lane, so a soft token is a hit there too. The page smoke (P-LEAK) reads the same file: a hard token never appears in a non-G00 page, a soft token only in a page whose lane VOCAB holds it. Each regex is Python `re` syntax and says which sense of the word is the dataset's: a word English uses in a second sense (a CUDA-graph capture, an architecture port, Python's zip) is matched only in the dataset's sense.",
+  "hard": [
+    {"token": "BENIGN", "regex": "(?i)\\bbenign\\b", "note": "CIC-IDS2017's normal class"},
+    {"token": "CIC", "regex": "(?i)\\bcic(?:[-_ ]?ids\\d*)?\\b", "note": "CIC, CIC-IDS, CICIDS2017 (the dataset's name)"},
+    {"token": "CIDS", "regex": "(?i)(?<![a-z0-9])cids(?![a-z0-9])", "note": "the project's name: CIDS, cids, cids-serve, CIDS_BUNDLE"},
+    {"token": "IDS2017", "regex": "(?i)\\bids[-_ ]?2017\\b"},
+    {"token": "CICFlowMeter", "regex": "(?i)\\bcic[-_ ]?flow[-_ ]?meter\\b", "note": "the dataset's feature extractor"},
+    {"token": "Destination Port", "regex": "(?i)\\b(?:destination|dst)[ _-]?port\\b", "note": "a CIC column"},
+    {"token": "intrusion", "regex": "(?i)\\bintrusions?\\b"},
+    {"token": "attack", "regex": "(?i)\\battacks?\\b"},
+    {"token": "packet", "regex": "(?i)\\bpackets?\\b"},
+    {"token": "threat", "regex": "(?i)\\bthreats?\\b", "note": "also the v2.2 page's .threat class (the role map says role-alert)"},
+    {"token": "IDS", "regex": "\\bIDS\\b", "note": "the intrusion detection system, by its acronym (v2.2 domain.py's \"an IDS answer\", D3 G7, D2 gap 11); lower-case ids (identifiers) is not this sense"}
+  ],
+  "soft": [
+    {"token": "flow", "regex": "(?i)\\bflow\\b", "unless_in_vocab": true, "note": "the CIC row noun"},
+    {"token": "flows", "regex": "(?i)\\bflows\\b", "unless_in_vocab": true, "note": "the CIC row noun, plural"},
+    {"token": "capture", "regex": "(?i)\\bcapture(?:'s)?\\s+(?:days?|order|own|files?)\\b|\\ba\\s+capture\\s+writes\\b", "unless_in_vocab": true, "note": "the traffic capture (a capture day, capture order, the capture's own spelling); a CUDA-graph capture is not this sense"},
+    {"token": "Label", "regex": "\\bLabel\\b", "unless_in_vocab": true, "note": "CIC's label column, by its spelling"},
+    {"token": "port", "regex": "(?i)(?:\\b|_)ports?(?:\\s+sent)?(?:\\s+|_)as(?:\\s+a)?(?:\\s+|_)(?:number|text)(?![a-z])|\\bports?\\s+(?:columns?|codes?)\\b", "unless_in_vocab": true, "note": "a network port as a data column (a port sent as a number or as text); an architecture port or a service's TCP port is not this sense"},
+    {"token": "extractor", "regex": "(?i)\\bextractors?\\b", "unless_in_vocab": true, "note": "the CIC flow extractor that writes the Infinity tokens"},
+    {"token": "late", "regex": "(?i)\\blate\\b", "unless_in_vocab": true, "note": "the acceptance fixture's label (orders, L01)"},
+    {"token": "zip", "regex": "(?i)\\bzip\\b(?!\\s*\\()", "unless_in_vocab": true, "note": "the acceptance fixture's column; Python's and JavaScript's zip( is not this sense"},
+    {"token": "unit_price", "regex": "\\bunit_price\\b", "unless_in_vocab": true, "note": "the acceptance fixture's column"},
+    {"token": "traffic", "regex": "(?i)\\btraffic", "unless_in_vocab": true, "note": "the network traffic CIC classifies: v2.2 domain.py's TrafficClass (D3 G7, D2 gap 11), the v2.2 page's #traffic field; soft because a lane may bring the word in its own sense (L21's roads: a traffic network)"},
+    {"token": "orders", "regex": "(?i)\\borders(?=\\.(?:csv|domain|html|parquet)\\b)|\\borders\\s+(?:fixture|dataset)\\b", "unless_in_vocab": true, "note": "the acceptance fixture by its name (orders.csv, the orders fixture); the verb is not this sense"}
+  ],
+  "generic": [
+    "rate", "level", "value", "values", "score", "scores", "class", "classes", "label", "labels", "input", "inputs",
+    "output", "outputs", "row", "rows", "feature", "features", "window", "windows", "step", "steps", "hour", "hours",
+    "minute", "minutes", "second", "seconds", "day", "days", "reading", "readings", "signal", "signals", "sensor",
+    "sensors", "measurement", "measurements", "statistic", "statistics", "field", "fields", "attribute", "attributes",
+    "property", "properties", "node", "nodes", "edge", "edges", "graph", "graphs", "source", "sources", "frame",
+    "frames", "state", "time", "ts", "id", "key", "type", "kind", "count", "total", "mean", "min", "max", "error",
+    "normal", "high", "low", "year", "length", "name", "date", "size", "status", "group"
+  ]
+}

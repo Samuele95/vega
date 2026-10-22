@@ -1,0 +1,7 @@
+{
+  "note": "The layer reading the acceptance lanes author in the model's place (SKILL step 8): the abstract, prose without a digit, and the markers, which acceptance.sh fills with every WARN: line of the run's showcase/.work/markers.json verbatim (from_showcase is the lane's showcase). Read by _acceptance_lanes.py.",
+  "readings": {
+    "abstract": "The page shows a reader outside the chain what the shipped network reads, how the chain chose it among the rungs it tried, and how it did on the sealed test part, every figure read from the bundle's own records."
+  },
+  "markers": []
+}

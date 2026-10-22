@@ -1,0 +1,370 @@
+{
+ "schema": "dataset-shaper/recipe@1",
+ "input": {
+  "path": "dataset-forge/fixtures/orders.csv",
+  "digest": "sha256:9174bdf0046ac438c3c8be411bf6e1d3d356aa8babc3841a11af0931720808a6",
+  "rows": 600,
+  "columns": 15,
+  "model": "/root/work/chain/orders.domain.analysis.html",
+  "layers_read": [
+   "geometry",
+   "analysis"
+  ]
+ },
+ "seed": 7,
+ "goal": "train-ready",
+ "target": "late",
+ "steps": [
+  {
+   "id": "S1",
+   "op": "retype",
+   "columns": [
+    "zip"
+   ],
+   "params": {
+    "to": "nominal"
+   },
+   "source": "geometry:typing/zip",
+   "rationale": "a postal code parsed as an integer is categorical by meaning",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "zip is encoded, never scaled",
+     "model_family": "a linear model would otherwise read distance between postal codes as meaning",
+     "leakage": "none",
+     "dimensionality": "none",
+     "interpretability": "the levels stay readable"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S2",
+   "op": "drop_identity",
+   "columns": [
+    "order_id",
+    "customer_id"
+   ],
+   "params": {},
+   "source": "geometry:typing/order_id",
+   "rationale": "order_id is unique on every row and customer_id is a foreign key: a key determines every column and poisons every dependency measure",
+   "alternatives": [
+    {
+     "op": "keep_columns",
+     "params": {},
+     "when": "if a downstream join needs the ids, keep them outside the feature set rather than in it"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "-2",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a tree would memorise an id",
+     "leakage": "an id can encode collection order",
+     "dimensionality": "two fewer columns",
+     "interpretability": "none"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S3",
+   "op": "orient_cycle",
+   "columns": [],
+   "params": {
+    "cycle_id": "price-qty-total",
+    "orientation_id": "total-derived"
+   },
+   "source": "geometry:cycles/price-qty-total",
+   "rationale": "unit_price and qty are the quantities the business sets; total is the outcome",
+   "alternatives": [
+    {
+     "op": "orient_cycle",
+     "params": {
+      "orientation_id": "unit-price-derived"
+     },
+     "when": "if the total is the observed quantity at prediction time and the unit price is not"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "none",
+     "dimensionality": "the cycle contributes two dimensions, not three",
+     "interpretability": "the controllable quantities stay as inputs"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S4",
+   "op": "orient_cycle",
+   "columns": [],
+   "params": {
+    "cycle_id": "zip-city-region",
+    "orientation_id": "zip-basis"
+   },
+   "source": "geometry:cycles/zip-city-region",
+   "rationale": "the postal code is the finest of the three and determines the other two",
+   "alternatives": [
+    {
+     "op": "orient_cycle",
+     "params": {
+      "orientation_id": "region-basis"
+     },
+     "when": "if the model should generalise across postal codes within a region"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "one 5-level nominal instead of three collinear ones",
+     "leakage": "none",
+     "dimensionality": "one dimension for geography, not three",
+     "interpretability": "the postal code is the finest available grain"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S5",
+   "op": "drop_derived",
+   "columns": [],
+   "params": {},
+   "source": "geometry:derivations",
+   "rationale": "total, subtotal, city and region are the heads of active rules under the chosen orientations; keeping them beside their parents is exact collinearity",
+   "alternatives": [
+    {
+     "op": "drop_derived",
+     "params": {
+      "keep": [
+       "total"
+      ]
+     },
+     "when": "if a downstream consumer needs the total as a displayed quantity rather than a feature"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "-4",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a linear model no longer sees exactly collinear columns; coefficients become identifiable",
+     "leakage": "none",
+     "dimensionality": "four fewer columns for no loss of information",
+     "interpretability": "every remaining column is primitive"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S6",
+   "op": "select_partition",
+   "columns": [],
+   "params": {
+    "label": "late",
+    "task": "binary classification"
+   },
+   "source": "geometry:partitions/late",
+   "rationale": "the single defensible candidate in the geometry layer",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a binary classifier",
+     "leakage": "its defining column must leave",
+     "dimensionality": "none",
+     "interpretability": "the task is 'was this order late'"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S7",
+   "op": "drop_leakage",
+   "columns": [],
+   "params": {},
+   "source": "geometry:partitions/late.dropped_for_leakage",
+   "rationale": "late is defined as delivered_days > 7; keeping delivered_days would teach the model the definition instead of the phenomenon",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "-1",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "none",
+     "leakage": "this step is the leakage control; without it the task is trivial and useless",
+     "dimensionality": "one fewer column",
+     "interpretability": "what remains is what is known before delivery"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S8",
+   "op": "split",
+   "columns": [],
+   "params": {
+    "kind": "time",
+    "time_column": "order_date",
+    "test": 0.2,
+    "valid": 0.1
+   },
+   "source": "analysis:F5/T2",
+   "rationale": "F5 — the rows are ordered in time; a random split would let the model see the future",
+   "alternatives": [
+    {
+     "op": "split",
+     "params": {
+      "kind": "stratified",
+      "by": "late",
+      "test": 0.2
+     },
+     "when": "if the model will never predict forward and class balance in the test part matters more than temporal honesty"
+    }
+   ],
+   "consequences": {
+    "rows": "600 -> 420 / 60 / 120",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "everything fitted after this point is fitted on train alone",
+     "model_family": "none",
+     "leakage": "a random split would leak the future through the seasonal structure",
+     "dimensionality": "none",
+     "interpretability": "the test score answers 'how would this have done on the last months'"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S9",
+   "op": "datetime_expand",
+   "columns": [
+    "order_date"
+   ],
+   "params": {
+    "parts": [
+     "year",
+     "month",
+     "dow",
+     "is_weekend"
+    ],
+    "cyclic": true
+   },
+   "source": "shaper:default",
+   "rationale": "a raw timestamp is not a feature; the calendar parts are, and the cyclic pair keeps December next to January",
+   "alternatives": [
+    {
+     "op": "datetime_expand",
+     "params": {
+      "cyclic": false
+     },
+     "when": "if a tree model is the only consumer, since it can split the integer month itself"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+8",
+    "downstream": {
+     "preprocessing": "the raw date stays for reference and is dropped by keep_columns downstream if a model cannot take it",
+     "model_family": "a linear model needs the sin/cos pair; a tree does not",
+     "leakage": "none",
+     "dimensionality": "eight calendar columns",
+     "interpretability": "month and weekday are readable; the sin/cos pair is not"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S10",
+   "op": "scale",
+   "columns": [],
+   "params": {
+    "kind": "robust",
+    "columns": [
+     "unit_price",
+     "qty",
+     "discount_pct",
+     "weight_kg"
+    ]
+   },
+   "source": "analysis:F2/T1",
+   "rationale": "F2 — unit_price is bimodal, so its mean is a value almost no row has; the median and the interquartile range describe it without pretending it is unimodal",
+   "alternatives": [
+    {
+     "op": "scale",
+     "params": {
+      "kind": "standard"
+     },
+     "when": "if every numeric column turns out unimodal after all, standard scaling is the conventional choice and slightly cheaper to explain"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "the four numeric features are centred on their medians",
+     "model_family": "a regularised linear model needs comparable scales; a tree is indifferent",
+     "leakage": "the statistics are fitted on the train part alone",
+     "dimensionality": "none",
+     "interpretability": "values are read in interquartile ranges from the median"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S11",
+   "op": "encode",
+   "columns": [
+    "zip",
+    "note"
+   ],
+   "params": {
+    "strategy": "one-hot",
+    "handle_unknown": "ignore"
+   },
+   "source": "shaper:default",
+   "rationale": "five postal codes and four note kinds: one-hot is exact at this cardinality and keeps every level readable in the coefficients",
+   "alternatives": [
+    {
+     "op": "encode",
+     "params": {
+      "strategy": "target"
+     },
+     "when": "if the postal code grows to hundreds of levels, at which point one-hot becomes a sparse wall and target encoding — fitted out of fold — is the honest alternative"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+9 / -2",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a linear model reads each level as its own coefficient",
+     "leakage": "none — one-hot uses no label information",
+     "dimensionality": "nine indicator columns replace two nominal ones",
+     "interpretability": "each level keeps its name in the column name"
+    }
+   },
+   "reversible": false
+  }
+ ],
+ "outputs": {
+  "dir": "shaped/",
+  "format": "parquet",
+  "files": [],
+  "recipe": "shaped/recipe.json",
+  "manifest": "shaped/manifest.json",
+  "lineage": "shaped/lineage.json",
+  "reproduce": "shaped/reproduce_orders.py"
+ }
+}

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — the data lane</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.72);--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:4px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/vega-panel.css">
+<style>
+/* shell placement (template: notes/page-template.md) */
+[data-brand]{position:fixed;z-index:10;top:calc(24px + 12px);left:calc(24px + 18px + 6px)}
+[data-pagebar]{position:fixed;z-index:9;top:24px;left:50%;transform:translate(-50%,-50%);width:min(340px,42vw);max-width:none!important;margin:0!important;padding:0 10px!important;background:var(--bg)}
+[data-ticks]{position:fixed;z-index:9;left:50%;bottom:calc(24px + 22px);transform:translateX(-50%);width:min(200px,36vw);display:flex;gap:4px;pointer-events:none}
+[data-fighud]{position:fixed;z-index:9;right:calc(24px + 22px);bottom:calc(24px + 56px);display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none;text-align:right;max-width:300px}
+[data-stop-card]{min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;justify-content:flex-end;align-items:flex-start;padding:18vh calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-stop-card] > .vp{width:min(600px,42vw)}
+[data-stop-card] .vp h1{font-size:clamp(46px,5.4vw,78px)!important;line-height:1.02!important}
+[data-stop-card] .vp h2{font-size:clamp(34px,3.6vw,52px)!important;line-height:1.08!important}
+[data-stop-card] .vp > p,[data-stop-card] .vp > div > p{font-size:16.5px!important}
+[data-stop-wide] .vp h2{font-size:clamp(40px,4.6vw,64px)!important}
+[data-stop-wide]{box-sizing:border-box;display:flex;justify-content:flex-end;padding:14vh calc(24px + 40px) 6vh 0;pointer-events:none}
+[data-stop-wide] > .vp{width:min(1080px,calc(100vw - 400px))}
+[data-step]{flex-direction:column;align-items:flex-end;gap:12vh}
+[data-out]{width:min(1080px,calc(100vw - 400px))!important;cursor:default}
+[data-out] svg text{text-shadow:none}
+@media (max-width:1199px){[data-out]{width:100%!important}}
+@media (max-width:899px){[data-step]{align-items:stretch}}
+[aria-labelledby="h-data"] .vp > div > span:first-child,[aria-label="Run it on its own"] .vp > span{line-height:1.6!important}
+@media (max-width:1199px){[data-stop-wide]{justify-content:center;padding:14vh 24px 6vh}[data-stop-wide] > .vp{width:100%}}
+@media (max-width:899px){[data-stop-card]{justify-content:center;padding:52vh 24px 8vh}[data-stop-card] > .vp{width:100%}}
+@media (max-width:600px){[data-brand]{top:calc(12px + 12px);left:calc(12px + 12px + 6px)}[data-pagebar]{top:12px;width:44vw}[data-ticks]{bottom:calc(12px + 56px);width:40vw}
+  /* the step HUD (stage, layer bars, legend) stays at 390, compact, under the breadcrumb */
+  [data-fighud]{left:calc(12px + 18px);right:auto;top:calc(12px + 54px);bottom:auto;align-items:flex-start;text-align:left;gap:6px;max-width:62vw;transform:scale(.88);transform-origin:top left}
+  [data-fighud] > div{align-items:flex-start!important}}
+</style>
+</helmet>
+<div style="position:relative;color:var(--fg)">
+  <div data-stage="1" style="position:fixed;inset:0;z-index:0;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)"></div>
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="23" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0;pointer-events:none"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:var(--bg);opacity:.38"></div>
+    <div data-fig="data" style="position:absolute;inset:0">
+        <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="Schematic of the data lane: a cloud of rows and a ring of columns. dataset-forge reveals the basis and the derived columns and flattens the cloud to its intrinsic dimension; data-lens rings the outliers and flags the column that leaks the label; dataset-shaper drops derived and leaking columns, clips and scales the rows and splits them into train, valid and test." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <x-import component-from-global-scope="vega-readouts" from="../assets/vega-readouts.js"></x-import>
+  </div>
+
+  <header>
+    <a data-brand="1" href="index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg)">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span>THE DATA LANE</span></span>
+    </a>
+  </header>
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="data" brand="page"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters" room="320"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+
+  <div data-pagebar="1" aria-label="Page 2 of 6" style="max-width:1200px;margin:0 auto;padding:4px clamp(20px,4vw,48px) 0;display:flex;align-items:center;gap:6px">
+    <a href="chain.dc.html" title="The chain" aria-label="The chain" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="data.dc.html" aria-current="page" title="The data lane" aria-label="The data lane" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--fg)"></span></a>
+    <a href="promise.dc.html" title="The rules" aria-label="The rules" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="proof.dc.html" title="The proof" aria-label="The proof" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="coverage.dc.html" title="Coverage" aria-label="Coverage" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="install.dc.html" title="Install" aria-label="Install" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <span style="margin-left:14px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);white-space:nowrap">02 / 06</span>
+  </div>
+
+  <main style="position:relative;pointer-events:none">
+
+    <section aria-labelledby="h-data" data-stop="0" data-rail="Know the data" data-rail-full="Know the data before the network does." data-stop-card="1">
+      <div class="vp" style="display:flex;flex-wrap:wrap;gap:24px 40px;align-items:flex-end">
+      <div style="flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:18px">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">dataset-forge · data-lens · dataset-shaper</span>
+        <h1 id="h-data" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(34px,5vw,58px);line-height:1.04;letter-spacing:-.01em;font-family:'Newsreader',Georgia,serif">Know the data before the network does.</h1>
+        <p style="margin:0;max-width:34em;font-size:18px;line-height:1.6;color:var(--mut);text-wrap:pretty">Three skills find the data’s shape, name its problems and prepare it — every step traced. Use them alone, or as the ground every Vega network stands on.</p>
+      </div>
+      <div style="flex:0 1 380px;min-width:0;display:flex;flex-direction:column;gap:12px">
+        <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">USE IT</span>
+        <div role="group" aria-label="How the data lane is used" style="display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;align-self:flex-start">
+          <button type="button" onClick="{{ modeAlone }}" aria-pressed="{{ pAlone }}" style="appearance:none;border:0;cursor:pointer;border-radius:999px;padding:10px 16px;font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;background:{{ bAlone }};color:{{ cAlone }}">ON ITS OWN</button>
+          <button type="button" onClick="{{ modeVega }}" aria-pressed="{{ pVega }}" style="appearance:none;border:0;cursor:pointer;border-radius:999px;padding:10px 16px;font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;background:{{ bVega }};color:{{ cVega }}">INSIDE VEGA</button>
+        </div>
+        <p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--mut)">{{ modeLine }}</p>
+      </div>
+      </div>
+    </section>
+    <div data-hudparts="1">
+          <div data-fighud="1" aria-hidden="true" style="opacity:{{ fhOp }};transition:opacity .4s">
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">{{ hudTop }}</span>
+          <span style="font:500 15px/1.1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)">{{ hudName }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex:0 0 auto">
+          <span style="font:500 9.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">ONE FILE, GROWING</span>
+          <sc-for list="{{ layers }}" as="l" hint-placeholder-count="3">
+            <span style="display:flex;align-items:center;gap:8px;font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.14em;color:{{ l.tc }};transition:color .5s"><span style="width:{{ l.w }};height:6px;border-radius:2px;background:{{ l.bg }};box-shadow:{{ l.sh }};transition:all .6s cubic-bezier(.2,.8,.2,1)"></span>{{ l.name }}</span>
+          </sc-for>
+        </div>
+      <span style="font:500 10.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--mut)">{{ legend }}</span>
+      </div>
+      <div data-ticks="1" aria-hidden="true"><sc-for list="{{ ticks }}" as="t" hint-placeholder-count="5"><span style="flex:1;height:2px;border-radius:2px;background:{{ t.c }};box-shadow:{{ t.g }};transition:background .4s"></span></sc-for></div>
+    </div>
+
+    <section aria-label="The data lane, stage by stage">
+      <ol style="list-style:none;margin:0;padding:0">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="5">
+          <li data-step="{{ s.i }}" data-stop="{{ s.stop }}" data-rail="{{ s.rail }}" data-rail-full="{{ s.lead }}" data-stop-card="1">
+            <div class="vp" onClick="{{ s.pick }}" style="--vp-edge:{{ s.bc }};cursor:pointer;display:flex;flex-direction:column;gap:14px;opacity:{{ s.op }};transition:opacity .5s ease">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+              <span style="font:500 10.5px/1.4 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">{{ s.num }}</span>
+              <code style="font:12.5px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc);text-align:right">{{ s.cmd }}</code>
+            </div>
+            <h2 data-decode="1" style="margin:0;font-weight:300;font-size:clamp(22px,2.4vw,28px);line-height:1.2;text-wrap:balance;font-family:'Newsreader',Georgia,serif">{{ s.lead }}</h2>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:var(--mut);text-wrap:pretty">{{ s.text }}</p>
+            <sc-if value="{{ s.hasList }}" hint-placeholder-val="{{ false }}">
+              <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ s.list }}" as="x" hint-placeholder-count="0"><li style="padding:6px 10px;border:1px solid var(--line);border-radius:999px;font-size:12.5px;line-height:1.3;color:var(--fg)">{{ x }}</li></sc-for>
+              </ul>
+            </sc-if>
+            <sc-if value="{{ s.hasRule }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;display:grid;grid-template-columns:18px minmax(0,1fr);gap:8px;font-size:15px;line-height:1.5;color:var(--fg)"><span aria-hidden="true" style="color:var(--cy)">✦</span><span>{{ s.rule }}</span></p>
+            </sc-if>
+            <sc-if value="{{ s.hasIO }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:stretch">
+                <div class="vp-sub" style="padding:10px 12px;border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:4px"><span style="font:500 9.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">TAKES</span><span style="font-size:13.5px;line-height:1.45">{{ s.takes }}</span></div>
+                <span aria-hidden="true" style="align-self:center;color:var(--acc);font-size:16px">→</span>
+                <div class="vp-sub" style="padding:10px 12px;border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:4px"><span style="font:500 9.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">PRODUCES</span><span style="font-size:13.5px;line-height:1.45">{{ s.produces }}</span></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ s.hasNote }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;font-size:13.5px;line-height:1.55;color:var(--dim)">{{ s.note }}</p>
+            </sc-if>
+            </div>
+          <sc-if value="{{ s.o1 }}" hint-placeholder-val="{{ false }}">
+          <div class="vp" data-out="{{ s.i }}" style="display:flex;flex-direction:column;gap:clamp(36px,6vh,64px)">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 20px;padding-top:14px;border-top:1px solid var(--line)">
+              <span style="font:500 10.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">WHAT YOU GET · <span style="color:var(--fg)">{{ s.oWhat }}</span></span>
+              <span style="font:12.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">{{ s.oFile }}</span>
+              <span style="font:500 9.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--dim)">EXAMPLE · NO REAL VALUES</span>
+            </div>
+            <div data-view="geo" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">GEOMETRY</span>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:28px 40px">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">BASIS GRAPH</span>
+                <svg viewBox="0 0 360 260" style="width:100%;height:auto;display:block" role="img" aria-label="Example basis graph: four basis columns, four derived columns linked to the two basis columns each derives from, a label, and a leakage column linked to the label.">
+                  <sc-for list="{{ gEdges }}" as="e" hint-placeholder-count="0"><line sc-camel-x1="{{ e.x1 }}" sc-camel-y1="{{ e.y1 }}" sc-camel-x2="{{ e.x2 }}" sc-camel-y2="{{ e.y2 }}" stroke="{{ e.c }}" stroke-width="{{ e.w }}" stroke-dasharray="{{ e.d }}" stroke-opacity="{{ e.o }}" data-draw="1"></line></sc-for>
+                  <sc-for list="{{ gNodes }}" as="n" hint-placeholder-count="0">
+                    <g onMouseEnter="{{ n.pick }}" style="cursor:pointer">
+                      <circle sc-camel-cx="{{ n.x }}" sc-camel-cy="{{ n.y }}" sc-camel-r="{{ n.halo }}" fill="{{ n.hc }}" fill-opacity="{{ n.ho }}"></circle>
+                      <circle sc-camel-cx="{{ n.x }}" sc-camel-cy="{{ n.y }}" sc-camel-r="{{ n.r }}" fill="{{ n.fill }}" stroke="{{ n.sc }}" stroke-width="1.2" stroke-dasharray="{{ n.sd }}"></circle>
+                    </g>
+                  </sc-for>
+                  <text x="60" y="161" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL0c }}" style="pointer-events:none">x₁</text>
+                  <text x="140" y="161" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL1c }}" style="pointer-events:none">x₂</text>
+                  <text x="220" y="161" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL2c }}" style="pointer-events:none">x₃</text>
+                  <text x="300" y="161" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL3c }}" style="pointer-events:none">x₄</text>
+                  <text x="100" y="32" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL4c }}" style="pointer-events:none">x₅</text>
+                  <text x="180" y="32" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL5c }}" style="pointer-events:none">x₆</text>
+                  <text x="260" y="32" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL6c }}" style="pointer-events:none">x₇</text>
+                  <text x="90" y="248" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL7c }}" style="pointer-events:none">x₈</text>
+                  <text x="300" y="248" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL8c }}" style="pointer-events:none">x₉</text>
+                  <text x="200" y="248" text-anchor="middle" font-size="12" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="{{ gL9c }}" style="pointer-events:none">x₁₀</text>
+                </svg>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <span style="font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">DIMENSION · HOW MANY DIRECTIONS THE DATA REALLY USES</span>
+                  <svg viewBox="0 0 300 110" style="width:100%;height:auto;display:block" role="img" aria-label="Example spectrum: variance falls off quickly; a marker shows where the intrinsic dimension ends, well before the column count.">
+                    <sc-for list="{{ spec }}" as="b" hint-placeholder-count="0"><rect sc-camel-x="{{ b.x }}" sc-camel-y="{{ b.y }}" width="20" sc-camel-height="{{ b.h }}" rx="2" fill="{{ b.c }}" fill-opacity="{{ b.o }}" data-grow="1"></rect></sc-for>
+                    <line x1="121" y1="4" x2="121" y2="96" stroke="var(--cy)" stroke-dasharray="3 4"></line>
+                    <text x="126" y="14" font-size="10" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="var(--cy)" letter-spacing="1.5">INTRINSIC</text>
+                    <line x1="0" y1="96.5" x2="300" y2="96.5" stroke="var(--line)"></line>
+                    <text x="296" y="108" text-anchor="end" font-size="9.5" font-family="'Martian Mono',ui-monospace,Menlo,Consolas,monospace" fill="var(--dim)" letter-spacing="1.2">ONE BAR PER DIRECTION</text>
+                  </svg>
+                </div>
+                <div style="padding:14px 16px;border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:6px">
+                  <span style="font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:{{ gSelC }}">{{ gSelK }}</span>
+                  <span style="font:14px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)">{{ gSelT }}</span>
+                  <span style="font-size:13px;line-height:1.5;color:var(--mut)">{{ gSelD }}</span>
+                </div>
+              </div>
+            </div>
+            </div>
+            <div data-view="cols" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">COLUMNS</span>
+            <div style="overflow-x:auto">
+              <div role="table" aria-label="Columns" style="min-width:560px;font-size:14px">
+                <div role="row" style="display:grid;grid-template-columns:64px 130px minmax(0,1fr) 120px;align-items:baseline;font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--dim)"><span role="columnheader" style="padding:10px 12px 10px 0">COLUMN</span><span role="columnheader" style="padding:10px 12px">ROLE</span><span role="columnheader" style="padding:10px 12px">WHY</span><span role="columnheader" style="padding:10px 12px">PARTITION</span></div>
+                <sc-for list="{{ colRows }}" as="c" hint-placeholder-count="0">
+                  <div role="row" style="display:grid;grid-template-columns:64px 130px minmax(0,1fr) 120px;align-items:baseline;border-top:1px solid var(--line)"><span role="cell" style="padding:11px 12px 11px 0;font-family:'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace">{{ c.id }}</span><span role="cell" style="padding:11px 12px"><span style="padding:4px 9px;border:1px {{ c.bs }} {{ c.rc }};border-radius:999px;font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.14em;color:{{ c.rc }}">{{ c.role }}</span></span><span role="cell" style="padding:11px 12px;color:var(--mut)">{{ c.why }}</span><span role="cell" style="padding:11px 12px;font:12.5px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:{{ c.pc }}">{{ c.part }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+            </div>
+            <div data-view="rules" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">RULES</span>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px">
+              <sc-for list="{{ ruleBlocks }}" as="b" hint-placeholder-count="0">
+                <div style="border:1px solid var(--line);border-radius:6px;overflow:hidden">
+                  <div style="padding:10px 14px;border-bottom:1px solid var(--line);font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--acc)">{{ b.k }}</div>
+                  <pre style="margin:0;padding:14px;font:12.5px/1.8 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg);white-space:pre-wrap">{{ b.code }}</pre>
+                  <div style="padding:10px 14px;border-top:1px solid var(--line);font-size:12.5px;line-height:1.5;color:var(--mut)">{{ b.note }}</div>
+                </div>
+              </sc-for>
+            </div>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ s.o2 }}" hint-placeholder-val="{{ false }}">
+          <div class="vp" data-out="{{ s.i }}" style="display:flex;flex-direction:column;gap:clamp(36px,6vh,64px)">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 20px;padding-top:14px;border-top:1px solid var(--line)">
+              <span style="font:500 10.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">WHAT YOU GET · <span style="color:var(--fg)">{{ s.oWhat }}</span></span>
+              <span style="font:12.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">{{ s.oFile }}</span>
+              <span style="font:500 9.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--dim)">EXAMPLE · NO REAL VALUES</span>
+            </div>
+            <div data-view="find" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">FINDINGS</span>
+            <div aria-label="How an observation becomes a finding" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:18px;font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--dim)">
+              <span style="padding:6px 10px;border:1px solid var(--line);border-radius:999px">OBSERVATION</span><span aria-hidden="true">→</span>
+              <span style="padding:6px 10px;border:1px solid var(--acc);border-radius:999px;color:var(--fg)">CHANGES A DECISION?</span><span aria-hidden="true">→</span>
+              <span style="padding:6px 10px;border:1px solid var(--line);border-radius:999px">SO WHAT</span><span aria-hidden="true">→</span>
+              <span style="padding:6px 10px;border:1px solid var(--cy);border-radius:999px;color:var(--cy)">CANDIDATE → RECIPE</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px">
+              <sc-for list="{{ finds }}" as="f" hint-placeholder-count="0">
+                <article style="padding:16px 16px 14px;border:1px solid {{ f.bc }};border-radius:8px;display:flex;flex-direction:column;gap:10px;opacity:{{ f.op }};box-shadow:{{ f.sh }};transition:all .4s">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:{{ f.kc }}">{{ f.kind }}</span><span style="font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--dim)">{{ f.id }}</span></div>
+                  <svg viewBox="0 0 200 56" style="width:100%;height:56px;display:block" aria-hidden="true"><path sc-camel-d="{{ f.path }}" fill="none" stroke="{{ f.lc }}" stroke-width="1.6" data-draw="1"></path><path sc-camel-d="{{ f.path2 }}" fill="none" stroke="var(--cy)" stroke-width="1.4" stroke-dasharray="3 3" data-draw="1"></path><line x1="0" y1="54.5" x2="200" y2="54.5" stroke="var(--line)"></line></svg>
+                  <h3 style="margin:0;font-weight:400;font-size:16px;line-height:1.35">{{ f.title }}</h3>
+                  <p style="margin:0;font-size:13.5px;line-height:1.5;color:var(--mut)"><span style="font:500 9.5px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--fg);margin-right:6px">SO WHAT</span>{{ f.so }}</p>
+                  <sc-if value="{{ f.hasCand }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ f.go }}" style="appearance:none;cursor:pointer;align-self:flex-start;display:flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--cy);border-radius:999px;background:transparent;color:var(--fg);font:12px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace" style-hover="background:var(--hi)">{{ f.cand }} <span aria-hidden="true" style="color:var(--cy)">→ recipe</span></button></sc-if>
+                </article>
+              </sc-for>
+            </div>
+            </div>
+            <div data-view="sess" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">SESSION</span>
+            <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;max-width:760px">
+              <sc-for list="{{ turns }}" as="u" hint-placeholder-count="0">
+                <li style="display:grid;grid-template-columns:54px minmax(0,1fr);gap:14px">
+                  <span style="font:500 10px/1.6 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim)">{{ u.n }}</span>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <span style="font-size:15px;line-height:1.45;color:var(--fg)">{{ u.q }}</span>
+                    <pre style="margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:6px;font:12px/1.7 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--mut);white-space:pre-wrap">{{ u.code }}</pre>
+                    <span style="font-size:14px;line-height:1.5;color:var(--fg)"><span style="font:500 9.5px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--cy);margin-right:8px">ANSWER</span>{{ u.a }}</span>
+                    <span style="font:500 9.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--dim)">RECORDED · RE-RUNNABLE</span>
+                  </div>
+                </li>
+              </sc-for>
+            </ol>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ s.o3 }}" hint-placeholder-val="{{ false }}">
+          <div class="vp" data-out="{{ s.i }}" style="display:flex;flex-direction:column;gap:clamp(36px,6vh,64px)">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 20px;padding-top:14px;border-top:1px solid var(--line)">
+              <span style="font:500 10.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">WHAT YOU GET · <span style="color:var(--fg)">{{ s.oWhat }}</span></span>
+              <span style="font:12.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">{{ s.oFile }}</span>
+              <span style="font:500 9.5px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--dim)">EXAMPLE · NO REAL VALUES</span>
+            </div>
+            <div data-view="rec" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">RECIPE</span>
+            <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)">
+              <sc-for list="{{ recRows }}" as="r" hint-placeholder-count="0">
+                <li style="display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 10px;border-bottom:1px solid var(--line);background:{{ r.bg }};box-shadow:{{ r.sh }};transition:all .4s">
+                  <span style="font:12px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:{{ r.mc }};transition:color .3s">{{ r.mark }}</span>
+                  <span style="display:flex;flex-direction:column;gap:3px"><span style="font:14px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)">{{ r.op }}</span><span style="font-size:12.5px;color:var(--mut)">{{ r.what }}</span></span>
+                  <button type="button" onClick="{{ r.go }}" style="appearance:none;cursor:{{ r.cur }};padding:6px 11px;border:1px solid {{ r.pc }};border-radius:999px;background:transparent;color:var(--fg);font:500 10px/1.2 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.12em;white-space:nowrap">{{ r.prov }}</button>
+                </li>
+              </sc-for>
+            </ol>
+            </div>
+            <div data-view="man" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">MANIFEST &amp; SCRIPT</span>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px">
+              <div style="border:1px solid var(--line);border-radius:6px;overflow:hidden"><div style="padding:10px 14px;border-bottom:1px solid var(--line);font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--acc)">MANIFEST · EXCERPT</div><pre style="margin:0;padding:14px;font:12.5px/1.75 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg);white-space:pre-wrap">{{ manTxt }}</pre></div>
+              <div style="border:1px solid var(--line);border-radius:6px;overflow:hidden"><div style="padding:10px 14px;border-bottom:1px solid var(--line);font:500 10px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--acc)">REPRODUCTION SCRIPT · OUTLINE</div><pre style="margin:0;padding:14px;font:12.5px/1.75 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg);white-space:pre-wrap">{{ scrTxt }}</pre><div style="padding:10px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)">Standalone: runs without any skill installed.</div></div>
+            </div>
+            </div>
+            <div data-view="parts" style="display:flex;flex-direction:column;gap:16px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--acc)">PARTS</span>
+            <div style="display:flex;flex-direction:column;gap:22px">
+              <div style="display:flex;height:64px;border-radius:6px;overflow:hidden;border:1px solid var(--line)">
+                <sc-for list="{{ partBars }}" as="b" hint-placeholder-count="0"><div style="flex:{{ b.f }};display:flex;flex-direction:column;justify-content:center;gap:4px;padding:0 14px;background:{{ b.bg }};border-right:1px solid var(--line)" data-grow="1"><span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:{{ b.tc }}">{{ b.k }}</span><span style="font-size:12px;color:var(--mut)">{{ b.d }}</span></div></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px">
+                <sc-for list="{{ checks }}" as="c" hint-placeholder-count="0"><div style="padding:14px 16px;border:1px solid var(--line);border-radius:6px;display:flex;gap:10px;align-items:flex-start"><span style="color:var(--cy);font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace">✓</span><span style="display:flex;flex-direction:column;gap:3px"><span style="font-size:14px;line-height:1.4">{{ c.k }}</span><span style="font-size:12.5px;line-height:1.45;color:var(--mut)">{{ c.v }}</span></span></div></sc-for>
+              </div>
+            </div>
+            </div>
+          </div>
+          </sc-if>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+
+
+
+    <section aria-label="Run it on its own" data-stop-wide="1" style="padding-top:0;padding-bottom:10vh">
+      <div class="vp" style="display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center">
+      <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">ON ITS OWN · STOP WHEREVER YOU HAVE WHAT YOU NEED</span>
+      <ol style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 0">
+        <sc-for list="{{ runs }}" as="r" hint-placeholder-count="3">
+          <li style="display:flex;align-items:center">
+            <button type="button" onClick="{{ r.pick }}" style="appearance:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 20px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--fg)" style-hover="border-color:var(--acc)">
+              <code style="font:14px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">{{ r.cmd }}</code>
+              <span style="font-size:12.5px;color:var(--mut)">{{ r.keep }}</span>
+            </button>
+            <sc-if value="{{ r.arrow }}" hint-placeholder-val="{{ true }}"><span aria-hidden="true" style="width:34px;height:1px;background:var(--acc);opacity:.5"></span></sc-if>
+          </li>
+        </sc-for>
+      </ol>
+    <nav aria-label="Pages" style="padding:28px 0 8px;margin-top:10px;width:100%;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line)">
+      <a href="chain.dc.html" style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);padding:10px 0" style-hover="color:var(--fg)">← THE CHAIN</a>
+      <a href="promise.dc.html" style="display:inline-flex;align-items:center;gap:12px;padding:14px 22px;border:1px solid var(--line);border-radius:999px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">NEXT · THE RULES <span aria-hidden="true" style="color:var(--acc)">→</span></a>
+    </nav>
+  <footer style="display:flex;justify-content:center;padding:12px 0 0">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+      </div>
+    </section>
+
+  </main>
+
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PAGES = [
+  { num: '00', label: 'Threshold', href: 'index.dc.html', note: '' },
+  { num: '01', label: 'The chain', href: 'chain.dc.html', note: '' },
+  { num: '02', label: 'The data lane', href: 'data.dc.html', note: 'HERE' },
+  { num: '03', label: 'The rules', href: 'promise.dc.html', note: '' },
+  { num: '04', label: 'The proof', href: 'proof.dc.html', note: '' },
+  { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: '' },
+  { num: '06', label: 'Install', href: 'install.dc.html', note: '' },
+  { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+  { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+];
+const pad = (n) => (n < 10 ? '0' : '') + n;
+const STEPS = [
+  { num: '00 · THE RAW FILE', cmd: 'a CSV, parquet or spreadsheet', lead: 'A table nobody has looked at yet.', text: 'Some columns carry information, some are copies in disguise, one may leak the answer.', hud: 'BEFORE', name: 'the raw table', legend: 'CLOUD · ROWS   ·   RING · COLUMNS' },
+  { num: '01 · GEOMETRY', cmd: '/dataset-forge', lead: 'Find the shape of the data.', text: 'Measures the dimensions, finds the basis — the columns nothing else can derive — writes a rule for every other column and proposes features and label. Stated as an ontology, so engines check it.', takes: 'a tabular file', produces: 'a domain model with a geometry layer + an interactive explorer', hud: 'STAGE 01 · GEOMETRY', name: 'dataset-forge', legend: 'BRIGHT · BASIS   ·   DIM · DERIVED   ·   CYAN · LABEL' },
+  { num: '02 · ANALYSIS', cmd: '/data-lens', lead: 'Name only what changes a decision.', text: 'Quality, distributions, segments, leakage, drift — each kept only if it changes a decision, with its so-what. Then you ask, and every answer is executed code.', takes: 'the geometry model', produces: 'an analysis layer with findings and transformation candidates', hud: 'STAGE 02 · ANALYSIS', name: 'data-lens', legend: 'RINGS · OUTLIERS   ·   CYAN LINK · LEAKAGE' },
+  { num: '03 · SHAPE', cmd: '/dataset-shaper', lead: 'Apply only what was decided.', text: 'Turns those decisions into a recipe, runs it deterministically and verifies the result.', rule: 'No step without a traced decision.', takes: 'geometry + analysis', produces: 'train / valid / test parts, a manifest, a reproduction script, a shape layer', hud: 'STAGE 03 · SHAPE', name: 'dataset-shaper', legend: 'BASIS ONLY   ·   CLIPPED   ·   SPLIT' },
+  { num: '04 · THE HAND-OFF', cmd: '', lead: '', text: '', hud: 'AFTER', name: '', legend: '' }
+];
+const HAND = {
+  alone: { cmd: 'you keep the files', lead: 'A dataset you can defend.', text: 'Training-ready parts, a manifest and a script that rebuilds them. No network required.', name: 'yours to use', legend: 'PARTS · MANIFEST · SCRIPT' },
+  vega: { cmd: '→ /blueprint --mode pipeline', lead: 'The ground the network stands on.', text: 'The blueprint reads the shaped model; vega-forge builds the network inside it, citing these three layers.', name: 'into the chain', legend: 'PARTS → /blueprint → vega-forge' }
+};
+const OUTW = ['a model you can explore', 'findings + a session', 'a recipe + the parts'];
+const RUNS_K = ['geometry + explorer', 'findings + session', 'parts + manifest + script'];
+const RUNS = [
+  { cmd: '/dataset-forge', get: 'The geometry: dimensions, basis, derivations, partitions — and an explorer to read them in.', when: 'When you need to know which columns matter, which are redundant, and what can be a label.', step: 1 },
+  { cmd: '+ /data-lens', get: 'Findings that change decisions, each with its so-what — then a session where every answer is executed code.', when: 'When you need to know what is wrong with the data, and what to do about it.', step: 2 },
+  { cmd: '+ /dataset-shaper', get: 'Training-ready parts, a manifest and a script that reproduces them.', when: 'When you need the cleaned, basis-only, leakage-free dataset itself.', step: 3 }
+];
+
+class Component extends DCLogic {
+  state = { indexOpen: false, sel: 0, stop: 0, narrow: false, mode: 'alone', dv: 0, part: 0, ot: 0, an: 0, ss: 0, rc: 7, gSel: 4, hl: null };
+  closeRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  componentDidMount() {
+    const go = (u) => { if (window.VegaFly) window.VegaFly.go(u); else location.href = u; };
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 'n' || e.key === 'N') go('promise.dc.html');
+      else if (e.key === 'p' || e.key === 'P') go('chain.dc.html');
+      else if (/^[0-6]$/.test(e.key)) go(PAGES[+e.key].href);
+    };
+    addEventListener('keydown', this.onKey);
+    this.onResize = () => { const n = innerWidth < 900; if (n !== this.state.narrow) this.setState({ narrow: n }); };
+    this.onResize(); addEventListener('resize', this.onResize);
+    // the camera owns the active stop: stops 1–5 are the steps 0–4 (stop 0 the title); a step's outputs sit under its text (G7)
+    this.onStop = (e) => { const k = e.detail.index, sel = k >= 1 ? k - 1 : 0; if (sel !== this.state.sel || k !== this.state.stop) this.setState({ sel, stop: k }); };
+    addEventListener('vegastop', this.onStop);
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    this.reveal(); this.build(); this.revealViews();
+    const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (rm) this.setState({ an: 5, ss: 4, rc: 8 });
+    this.deepT = setInterval(() => {
+      if (rm) return;
+      const vis = (k) => { const e = document.querySelector('[data-deep="' + k + '"]'); if (!e) return false; const r = e.getBoundingClientRect(); return r.top < innerHeight * 0.8 && r.bottom > innerHeight * 0.2; };
+      const s = this.state, n = {};
+      if (vis('forge')) { this._ft = (this._ft || 0) + 1; if (this._ft % 3 === 0) n.ot = (s.ot + 1) % 3; if (!this._dvUser && this._ft % 3 === 0) n.dv = (s.dv + 1) % 4; }
+      if (vis('lens')) { this._lt = (this._lt || 0) + 1; if (s.an < 5) n.an = s.an + 1; else if (this._lt % 8 === 0) n.an = 0; if (s.ss < 4) { if (this._lt % 2 === 0) n.ss = s.ss + 1; } else if (this._lt % 10 === 0) n.ss = 0; }
+      const rv = document.querySelector('[data-view="rec"]'), rvr = rv && rv.getBoundingClientRect(); if (rvr && rvr.top < innerHeight * 0.8 && rvr.bottom > 0 && s.rc < 7) n.rc = s.rc + 1;
+      if (Object.keys(n).length) this.setState(n);
+    }, 900);
+  }
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); removeEventListener('vegastop', this.onStop); removeEventListener('vegaindex', this.onIndex); removeEventListener('resize', this.onResize); clearTimeout(this.tcam); clearInterval(this.deepT); clearTimeout(this.trv); this.vio && this.vio.disconnect(); clearTimeout(this.tb); this.io && this.io.disconnect(); }
+  componentDidUpdate() {
+    this.build();
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+  }
+  reveal() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const els = [].slice.call(document.querySelectorAll('[data-reveal]')).filter(el => el.getBoundingClientRect().top > innerHeight);
+    els.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(18px)'; });
+    let left = els.slice();
+    const chk = () => { left = left.filter(el => { if (el.getBoundingClientRect().top < innerHeight * 0.9) { el.style.opacity = '1'; el.style.transform = 'none'; return false; } return true; }); if (!left.length) this.io.disconnect(); };
+    const iv = setInterval(chk, 200); addEventListener('scroll', chk, { passive: true });
+    this.io = { disconnect: () => { clearInterval(iv); removeEventListener('scroll', chk); } };
+  }
+  // a step is a camera stop now: scroll to it and the camera flies there
+  goStep = (i) => {
+    const c = document.querySelector('[data-stop="' + (i + 1) + '"]'); this.setState({ sel: i });
+    if (!c) return;
+    scrollTo({ top: c.getBoundingClientRect().top + scrollY, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
+  // the camera's stops (spec §3, data): 0 the raw cloud wide, 1–5 each step (the scene morphs per step), (G7: the outputs moved into their steps)
+  setupCamera() {
+    clearTimeout(this.tcam);
+    if (this.camOn) return;
+    const sc = document.querySelector('[data-fig="data"] vega-constellation'), cam = document.querySelector('vega-camera'), ro = document.querySelector('vega-readouts');
+    const sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    if (!sc || !sc.d || !sc.d.nodes.length || !cam || !cam.configure || !ro || !ro.configure || sections.length !== 6) { this.tcam = setTimeout(() => this.setupCamera(), 150); return; }
+    this.camOn = true;
+    const wide = () => innerWidth >= 900, small = () => innerWidth <= 600;
+    // the scene sits mid-way across the stage gap between the rail (or the frame) and the content block; at 390 below the step HUD
+    const gapX = () => { const r = document.querySelector('vega-rail'), b = document.querySelector('[data-stop-card] .vp'); const l = r && !r.classList.contains('vr-compact') ? r.getBoundingClientRect().right : 24 + 40; const c = b ? b.getBoundingClientRect().left : innerWidth * 0.6; return (l + c) / 2; };
+    const at = (W, H) => wide() ? [gapX(), H * 0.52] : [W * 0.5, H * (small() ? 0.34 : 0.26)];
+    const P = (el, yaw, pitch, zw, zn, extra) => Object.assign({ el, focus: [0, 0, 0], yaw, pitch, at, get zoom() { return wide() ? zw : zn; } }, extra || {});
+    // yaw rises steadily through the lane; stop 3 turns the leaking column (node 9) to the middle of the frame
+    // every stop fits the whole table inside the stage gap (camera `fit`); a step's outputs, wide, mask the scene where they run
+    const F = { fit: true };
+    const stops = [P(sections[0], 0.5, -0.35, 0.5, 0.42, F), P(sections[1], 1.0, -0.3, 0.6, 0.5, F), P(sections[2], 1.8, -0.62, 0.56, 0.46, F),
+      P(sections[3], 3.0, -0.32, 0.58, 0.48, F), P(sections[4], 3.4, -0.28, 0.56, 0.46, F), P(sections[5], 3.8, -0.3, 0.5, 0.42, F)];
+    cam.configure({ scene: sc, sky: document.querySelector('vega-sky-lab'), stops, free: true, home: 1 });
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters (G2)
+    // each step's number and name (the cards' own copy) pinned to the part of the scene it is about
+    const nums = STEPS.map(s => s.num);
+    ro.configure({ scene: sc, activeOnly: true, showAt: (a) => a >= 1 && a <= 5, items: [
+      { text: nums[0], node: 85, stop: 1 }, { text: nums[1], node: 3, stop: 2 }, { text: nums[2], node: 9, stop: 3 },
+      { text: nums[3], node: 0, stop: 4 }, { text: nums[4], node: () => this.state.mode === 'vega' ? 160 : 0, stop: 5 }] });
+  }
+  build() {
+    const el = document.querySelector('[data-fig="data"] vega-constellation');
+    if (!el || !el.setData) { clearTimeout(this.tb); this.tb = setTimeout(() => this.build(), 150); return; }
+    const key = this.state.sel + '|' + this.state.mode + '|' + this.state.narrow; if (key === this._bk) return; this._bk = key;
+    if (!this.base) {
+      let s = 29; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }, g = () => { let u = 0; for (let k = 0; k < 4; k++) u += r(); return (u - 2) * 1.2; };
+      const rows = []; for (let k = 0; k < 150; k++) rows.push({ x: g(), y: g(), z: g(), seg: r() < 0.5 ? 0 : 1, out: k < 10, part: r(), lag: r() * 0.35 });
+      this.base = rows;
+    }
+    const st = this.state.sel, vega = this.state.mode === 'vega', N = [], E = [], labels = [];
+    const COLS = [['basis', 0], ['basis', 0], ['basis', 0], ['basis', 0], ['derived', [0, 1]], ['derived', [1, 2]], ['derived', [2, 3]], ['derived', [0, 3]], ['label', 0], ['leak', 0]];
+    COLS.forEach((c, i) => {
+      const a = i / COLS.length * 6.283 + 0.3, gone = st >= 3 && (c[0] === 'derived' || c[0] === 'leak'), R = gone ? 470 : 320;
+      const role = st >= 1 ? c[0] : 'raw';
+      N.push({ x: Math.sin(a) * R, y: (i % 2 ? 26 : -26), z: Math.cos(a) * R, size: role === 'basis' ? 4.4 : role === 'label' ? 4 : role === 'raw' ? 3.2 : 2.6, color: role === 'label' ? 'cy' : 'fg', glow: role === 'label' || (role === 'leak' && st >= 2) ? 'cy' : 'acc', ring: role === 'leak' && st === 2 ? 'cy' : null, alpha: gone ? 0 : role === 'derived' ? 0.55 : 1, pick: false, lag: i * 0.02,
+        label: st === 0 ? '' : gone ? '' : role === 'basis' ? 'basis' : role === 'derived' ? 'derived' : role === 'label' ? 'label' : st >= 2 ? 'leaks the label' : '' });
+    });
+    COLS.forEach((c, i) => { if (c[0] === 'derived' && st >= 1 && st < 3) c[1].forEach(b => E.push({ a: b, b: i, alpha: 0.4, dash: [3, 4], pulse: false })); });
+    if (st === 2) E.push({ a: 9, b: 8, alpha: 0.75, color: 'cy', w: 1.4, pulse: false });
+    const PART = (p) => p < 0.7 ? 0 : p < 0.85 ? 1 : 2, PC = [[-150, 0, 0], [130, 50, -140], [130, -50, 150]];
+    this.base.forEach(rw => {
+      let x = rw.x * 95, y = rw.y * 60, z = rw.z * 80, size = 1.9, color = 'fg', glow = 'acc', ring = null, alpha = 0.85;
+      if (st >= 1) { y = rw.y * 7 + rw.x * 18; }
+      if (st === 2) { x += rw.seg ? 70 : -70; if (rw.out) { const L = Math.hypot(x, y, z) || 1; x = x / L * 235; y = y / L * 60 + 40; z = z / L * 235; ring = 'cy'; size = 2.4; } if (rw.seg) glow = 'cy'; }
+      if (st >= 3) { const L = Math.hypot(x, z); if (L > 140) { x *= 140 / L; z *= 140 / L; } x *= 0.62; y *= 0.8; z *= 0.62; const c = PC[PART(rw.part)]; x += c[0]; y += c[1]; z += c[2]; if (PART(rw.part) === 2) glow = 'cy'; }
+      if (st === 4) { const c = PC[PART(rw.part)]; x = c[0] + (x - c[0]) * 0.55; y = c[1] + (y - c[1]) * 0.55; z = c[2] + (z - c[2]) * 0.55; if (vega) { x = x * 0.8 - 150; y *= 0.8; z *= 0.8; } }
+      N.push({ x, y, z, size, color, glow, ring, alpha, pick: false, lag: rw.lag });
+    });
+    const bi = N.length;
+    N.push({ x: 290, y: 150, z: 60, size: 5, label: '/blueprint', labelPos: 'above', glow: 'acc', alpha: st === 4 && vega ? 1 : 0, pick: false });
+    N.push({ x: 330, y: -10, z: 220, size: 5, label: 'vega-forge', glow: 'acc', alpha: st === 4 && vega ? 1 : 0, pick: false });
+    if (st === 4 && vega) { E.push({ a: bi, b: bi + 1, alpha: 0.6, w: 1.3 }); [10, 40, 80, 120, 150].forEach(k => E.push({ a: 10 + (k % 150), b: bi, alpha: 0.18, dash: [2, 5] })); }
+    if (st >= 3) { const v = st === 4 && vega, L = (c, dy) => v ? [c[0] * 0.8 - 150, c[1] * 0.8 + dy, c[2] * 0.8] : [c[0], c[1] + dy, c[2]]; const a1 = L(PC[0], -95), a2 = L(PC[1], -70), a3 = L(PC[2], -70); labels.push({ x: a1[0], y: a1[1], z: a1[2], text: 'TRAIN', color: 'mut' }, { x: a2[0], y: a2[1], z: a2[2], text: 'VALID', color: 'mut' }, { x: a3[0], y: a3[1], z: a3[2], text: 'TEST', color: 'cy' }); }
+    if (st === 4 && !vega) labels.push({ x: 0, y: 150, z: 0, text: '+ MANIFEST · + REPRODUCTION SCRIPT', color: 'acc' });
+    if (st >= 1 && st < 3) labels.push({ x: 0, y: -120, z: 0, text: st === 1 ? 'INTRINSIC DIMENSION < COLUMN COUNT' : 'TWO SEGMENTS · TEN OUTLIERS', color: 'dim' });
+    el.setData({ nodes: N, edges: E, labels, morph: this._bk0 ? 1500 : 0, radius: 380, zoom: el.d && el.d.zoom || 0.54, shift: 0, autoRotate: this.camOn ? false : 0.05, yaw: 0.5, pitch: -0.35, showLabels: true, pulse: st === 4 && vega ? { tokens: 2, period: 0.8 } : null });
+    this.setupCamera();
+    this._bk0 = true;
+  }
+  // each output view draws in once, the first time it comes on screen (not under reduced motion)
+  revealViews() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !window.IntersectionObserver) return;
+    const vs = document.querySelectorAll('[data-view]'); if (!vs.length) { this.trv = setTimeout(() => this.revealViews(), 200); return; }
+    this.vio = new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { this.vio.unobserve(e.target); this.animView(e.target); } }), { threshold: 0.18 });
+    vs.forEach(v => this.vio.observe(v));
+  }
+  animView(v) {
+    if (!v || !v.animate) return;
+    v.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    v.querySelectorAll('[data-draw]').forEach((el, i) => { let L = 300; try { L = el.getTotalLength ? el.getTotalLength() : 300; } catch (e) {} el.animate([{ strokeDasharray: L + ' ' + L, strokeDashoffset: L }, { strokeDasharray: L + ' ' + L, strokeDashoffset: 0 }], { duration: 900, delay: 120 + i * 30, easing: 'cubic-bezier(.3,.7,.2,1)', fill: 'backwards' }); });
+    v.querySelectorAll('[data-grow]').forEach((el, i) => el.animate([{ transform: 'scaleY(0)', transformOrigin: '50% 100%', opacity: 0 }, { transform: 'none', transformOrigin: '50% 100%', opacity: 1 }], { duration: 650, delay: 100 + i * 50, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' }));
+  }
+  // a link between outputs (a finding's candidate → its recipe step, a recipe step → its source): highlight it and glide there
+  goView(t, s, hl) {
+    const n = { hl: hl || null }; if (t === 2 && s === 0) n.rc = matchMedia('(prefers-reduced-motion: reduce)').matches ? 7 : 0; this.setState(n);
+    const el = document.querySelector('[data-view="' + [['geo', 'cols', 'rules'], ['find', 'sess'], ['rec', 'man', 'parts']][t][s] + '"]'); if (!el) return;
+    scrollTo({ top: el.getBoundingClientRect().top + scrollY - innerHeight * 0.16, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
+  outVals() {
+    const s = this.state, bump = (c, w, h, base) => { let d = ''; for (let x = 0; x <= 200; x += 4) { const y = base - h * Math.exp(-Math.pow((x - c) / w, 2)); d += (x ? 'L' : 'M') + x + ',' + y.toFixed(1); } return d; };
+    const skew = (c, w, h) => { let d = ''; for (let x = 0; x <= 200; x += 4) { const u = (x - c) / (x < c ? w * 0.5 : w * 1.8); const y = 54 - h * Math.exp(-u * u); d += (x ? 'L' : 'M') + x + ',' + y.toFixed(1); } return d; };
+    let miss = ''; for (let i = 0; i < 25; i++) { const x = i * 8, gap = [5, 6, 11, 17, 18, 19].indexOf(i) >= 0, y = gap ? 54 : 18 + (i * 37 % 13); miss += 'M' + (x + 1) + ',54L' + (x + 1) + ',' + y + 'L' + (x + 6) + ',' + y + 'L' + (x + 6) + ',54'; }
+    const COLS = [
+      { id: 'x₁', role: 'BASIS', why: 'no other column derives it', part: 'feature', x: 60, y: 135 }, { id: 'x₂', role: 'BASIS', why: 'no other column derives it', part: 'feature', x: 140, y: 135 },
+      { id: 'x₃', role: 'BASIS', why: 'no other column derives it', part: 'feature', x: 220, y: 135 }, { id: 'x₄', role: 'BASIS', why: 'no other column derives it', part: 'feature', x: 300, y: 135 },
+      { id: 'x₅', role: 'DERIVED', why: 'a rule over x₁, x₂', part: '—', x: 100, y: 48, from: [0, 1] }, { id: 'x₆', role: 'DERIVED', why: 'a rule over x₂, x₃', part: '—', x: 180, y: 48, from: [1, 2] },
+      { id: 'x₇', role: 'DERIVED', why: 'a rule over x₃, x₄', part: '—', x: 260, y: 48, from: [2, 3] }, { id: 'x₈', role: 'DERIVED', why: 'a rule over x₁, x₄', part: '—', x: 90, y: 222, from: [0, 3] },
+      { id: 'x₉', role: 'LABEL', why: 'proposed as the target', part: 'label', x: 300, y: 222 }, { id: 'x₁₀', role: 'LEAKAGE', why: 'carries the label in disguise', part: 'leakage set', x: 200, y: 222, leak: true }
+    ];
+    const g = s.gSel, gc = COLS[g], rel = (i) => i === g || (gc.from && gc.from.indexOf(i) >= 0) || (COLS[i].from && COLS[i].from.indexOf(g) >= 0) || (gc.leak && i === 8) || (g === 8 && COLS[i].leak);
+    const gEdges = []; COLS.forEach((c, i) => { if (c.from) c.from.forEach(b => { const on = i === g || b === g; gEdges.push({ x1: COLS[b].x, y1: COLS[b].y, x2: c.x, y2: c.y, c: on ? 'var(--cy)' : 'var(--acc)', w: on ? 1.6 : 1, d: '3 4', o: on ? 0.95 : 0.35 }); }); });
+    gEdges.push({ x1: 200, y1: 222, x2: 300, y2: 222, c: 'var(--cy)', w: g === 9 || g === 8 ? 1.6 : 1, d: '2 3', o: g === 9 || g === 8 ? 0.95 : 0.45 });
+    const roleC = (r) => r === 'BASIS' ? 'var(--acc)' : r === 'LABEL' ? 'var(--cy)' : r === 'LEAKAGE' ? 'var(--cy)' : 'var(--mut)';
+    const gNodes = COLS.map((c, i) => { const on = i === g, r = rel(i); return { id: c.id, x: c.x, y: c.y, ty: c.y < 100 ? c.y - 16 : c.y + 26, r: c.role === 'BASIS' ? 9 : 7, halo: on ? 22 : 15, hc: c.role === 'LABEL' || c.leak ? 'var(--cy)' : 'var(--acc)', ho: on ? 0.28 : r ? 0.14 : 0.05, fill: c.role === 'BASIS' ? 'var(--fg)' : c.role === 'LABEL' ? 'var(--cy)' : 'var(--bg)', sc: roleC(c.role), sd: c.role === 'DERIVED' ? '3 2' : c.leak ? '2 2' : 'none', tc: on || r ? 'var(--fg)' : 'var(--dim)', pick: () => { if (this.state.gSel !== i) this.setState({ gSel: i }); } }; });
+    const H = [86, 70, 52, 38, 26, 9, 7, 5, 4, 3];
+    const FINDS = [
+      { id: 'F1', kind: 'FINDING · MISSINGNESS', title: 'Values in x₃ are not missing at random.', so: 'Dropping the incomplete rows would bias the sample.', cand: 'impute x₃ + indicator', path: miss, path2: '', step: 3 },
+      { id: 'F2', kind: 'FINDING · OUTLIERS', title: 'A few extreme rows in x₂.', so: 'They would dominate the loss.', cand: 'clip x₂', path: skew(50, 22, 44), path2: 'M168,52L168,46M178,52L178,48M190,52L190,44', step: 4 },
+      { id: 'F3', kind: 'FINDING · LEAKAGE', title: 'x₁₀ separates the label almost perfectly.', so: 'A model would learn the answer, not the task.', cand: 'drop x₁₀', path: bump(55, 18, 42, 54), path2: bump(150, 18, 42, 54), step: 2 },
+      { id: 'F4', kind: 'FINDING · DRIFT', title: 'x₄ shifts between train and valid.', so: 'Validation would flatter the model.', cand: 'stratified split', path: bump(85, 28, 40, 54), path2: bump(118, 28, 36, 54), step: 5 },
+      { id: 'O5', kind: 'OBSERVATION · NOT A FINDING', title: 'x₁ is skewed.', so: 'Changes no downstream decision — kept out of the recipe.', cand: '', path: skew(40, 18, 40), path2: '', step: -1 }
+    ];
+    const REC = [
+      { op: 'keep x₁ … x₄', what: 'the basis', prov: 'GEOMETRY · BASIS', to: [0, 0, null], key: 'G' },
+      { op: 'drop x₅ … x₈', what: 'derivable from the basis', prov: 'GEOMETRY · DERIVED', to: [0, 0, null], key: 'G' },
+      { op: 'drop x₁₀', what: 'leakage set', prov: 'FINDING F3', to: [1, 0, 'F3'], key: 'F3' },
+      { op: 'impute x₃ + indicator', what: 'missing not at random', prov: 'FINDING F1', to: [1, 0, 'F1'], key: 'F1' },
+      { op: 'clip x₂', what: 'extreme rows', prov: 'FINDING F2', to: [1, 0, 'F2'], key: 'F2' },
+      { op: 'split train / valid / test', what: 'stratified, no row in two parts', prov: 'FINDING F4', to: [1, 0, 'F4'], key: 'F4' }
+    ];
+    return {
+      gEdges, gNodes, ...Object.fromEntries(gNodes.map((n, i) => ['gL' + i + 'c', n.tc])), gSelK: gc.role + ' · ' + gc.id, gSelC: roleC(gc.role), gSelT: gc.from ? gc.id + ' = rule(' + gc.from.map(b => COLS[b].id).join(', ') + ')' : gc.leak ? gc.id + ' → leakage set' : gc.role === 'LABEL' ? gc.id + ' → label' : gc.id + ' ∈ basis', gSelD: gc.why[0].toUpperCase() + gc.why.slice(1) + '.',
+      spec: H.map((h, i) => ({ x: 4 + i * 24, y: 96 - h, h, c: i < 5 ? 'var(--acc)' : 'var(--dim)', o: i < 5 ? 0.9 : 0.4 })),
+      colRows: COLS.map(c => ({ id: c.id, role: c.role, why: c.why, part: c.part, rc: roleC(c.role), bs: c.role === 'DERIVED' || c.leak ? 'dashed' : 'solid', pc: c.part === 'label' || c.leak ? 'var(--cy)' : c.part === '—' ? 'var(--dim)' : 'var(--fg)' })),
+      ruleBlocks: [
+        { k: 'T-BOX · CLASSES', code: 'Column\n  ├ BasisColumn\n  ├ DerivedColumn\n  ├ Label\n  └ LeakageColumn', note: 'The vocabulary the geometry is stated in.' },
+        { k: 'A-BOX · A SAMPLE', code: 'x₁ : BasisColumn\nx₅ : DerivedColumn\nx₅ derivedFrom x₁, x₂\nx₉ : Label\nx₁₀ : LeakageColumn', note: 'Your actual columns, typed.' },
+        { k: 'RULES · SWRL / HORN', code: 'derivedFrom(?c, ?b) ∧ BasisColumn(?b)\n  → DerivedColumn(?c)\n\nLeakageColumn(?c)\n  → excludedFrom(?c, features)', note: 'Run by the engines, so the partition is checked — not asserted.' }
+      ],
+      finds: FINDS.map(f => { const on = s.hl === f.id, obs = f.step < 0; return Object.assign({}, f, { hasCand: !obs, op: obs ? 0.55 : 1, bc: on ? 'var(--cy)' : 'var(--line)', sh: on ? '0 0 0 1px rgba(111,224,220,.35), 0 18px 50px -24px rgba(111,224,220,.5)' : 'none', kc: obs ? 'var(--dim)' : 'var(--acc)', lc: obs ? 'var(--dim)' : 'var(--acc)', go: () => this.goView(2, 0, f.id) }); }),
+      turns: [
+        { n: 'TURN 01', q: 'Which columns carry the most signal for the label?', code: '▸ fit the importance model on train\n▸ rank columns · x₁₀ excluded (leakage set)', a: 'The basis columns, ranked.' },
+        { n: 'TURN 02', q: 'Does missingness in x₃ depend on the label?', code: '▸ group by label · compare missing rates\n▸ test the difference, check assumptions', a: 'Yes — not missing at random. Recorded as F1.' },
+        { n: 'TURN 03', q: 'Is x₄ stable between train and valid?', code: '▸ compare the two distributions\n▸ drift test', a: 'No — it drifts. Recorded as F4.' }
+      ],
+      recRows: REC.map((r, i) => { const on = s.hl && s.hl === r.key, dn = s.rc > i + 1, cu = s.rc === i + 1; return { mark: dn ? '✓' : cu ? '▸' : String(i + 1).padStart(2, '0'), mc: dn ? 'var(--cy)' : cu ? 'var(--acc)' : 'var(--dim)', n: String(i + 1).padStart(2, '0'), op: r.op, what: r.what, prov: r.prov + '  ←', pc: r.key === 'G' ? 'var(--acc)' : 'var(--cy)', bg: on ? 'var(--hi)' : 'transparent', sh: on ? 'inset 2px 0 0 var(--cy)' : 'none', cur: 'pointer', go: () => this.goView(r.to[0], r.to[1], r.to[2]) }; }),
+      manTxt: 'recipe:\n  keep    x₁ x₂ x₃ x₄      # geometry · basis\n  drop    x₅ x₆ x₇ x₈      # geometry · derived\n  drop    x₁₀              # finding F3\n  impute  x₃ + indicator   # finding F1\n  clip    x₂               # finding F2\n  split   stratified       # finding F4\nparts:   train · valid · test\ninput:   the raw file, fingerprinted',
+      scrTxt: '# example outline\nread the raw file\ncheck it against the manifest\napply each recipe step, in order\nwrite train / valid / test\nverify the result',
+      partBars: [{ k: 'TRAIN', d: 'fits the network', f: 7, bg: 'var(--hi)', tc: 'var(--fg)' }, { k: 'VALID', d: 'chooses and tunes', f: 1.5, bg: 'transparent', tc: 'var(--fg)' }, { k: 'TEST', d: 'kept for one final look', f: 1.5, bg: 'transparent', tc: 'var(--cy)' }],
+      checks: [{ k: 'Deterministic', v: 'Same raw file, same recipe, same parts.' }, { k: 'Basis only', v: 'No derived or leaking column survives.' }, { k: 'Every step traced', v: 'Each recipe step names its decision.' }, { k: 'Split hygiene', v: 'The parts are kept apart.' }]
+    };
+  }
+  deepVals() {
+    const s = this.state, mono = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
+    const D = [['x₅', [0, 1], 'x₅ = rule(x₁, x₂)'], ['x₆', [1, 2], 'x₆ = rule(x₂, x₃)'], ['x₇', [2, 3], 'x₇ = rule(x₃, x₄)'], ['x₈', [0, 3], 'x₈ = rule(x₁, x₄)']];
+    const cur = D[s.dv];
+    const PARTS = [['FEATURES', 'The basis columns x₁ … x₄ go in as features.'], ['LABEL', 'x₉ is proposed as the label — what the network will predict.'], ['LEAKAGE SET', 'x₁₀ carries the label in disguise: it is set aside, so it can never reach training.']];
+    const ONTO = [['T-BOX', 'The classes: basis column, derived column, label, leakage set.'], ['A-BOX', 'A sample of the actual columns, typed against those classes.'], ['RULES', 'SWRL / Horn rules: derivations and partitions the engines can run and check.']];
+    const ANAT = [['OBSERVATION', 'Something measured in the data — missingness, an outlier pattern, drift between splits.'], ['DOES IT CHANGE A DECISION?', 'If not, it stays an observation and goes no further.'], ['SO WHAT', 'The concrete consequence, written down with the finding.'], ['TRANSFORMATION CANDIDATE', 'Where warranted: what the shaper should do about it.'], ['HANDED ON', 'Into the analysis layer — and from there to /dataset-shaper.']];
+    const SESS = [
+      { who: 'YOU', text: 'Is the missingness in x₃ related to the label?', al: 'flex-end', kc: 'var(--acc)', bc: 'var(--acc)', bg: 'var(--hi)', font: '14.5px "Helvetica Neue",Helvetica,Arial,sans-serif' },
+      { who: 'DATA-LENS · EXECUTING', text: '▸ code runs against the dataset', al: 'flex-start', kc: 'var(--dim)', bc: 'var(--line)', bg: 'transparent', font: '13px ' + mono },
+      { who: 'DATA-LENS', text: 'The answer — computed, not recalled.', al: 'flex-start', kc: 'var(--cy)', bc: 'var(--cy)', bg: 'transparent', font: '14.5px "Helvetica Neue",Helvetica,Arial,sans-serif' },
+      { who: 'RECORDED', text: 'turn 01 · code + answer · reproducible', al: 'flex-start', kc: 'var(--dim)', bc: 'var(--line)', bg: 'transparent', font: '12.5px ' + mono }
+    ];
+    const REC = [['keep basis x₁ … x₄', 'GEOMETRY · BASIS'], ['drop x₅ … x₈', 'GEOMETRY · DERIVED'], ['drop x₁₀', 'GEOMETRY · LEAKAGE SET'], ['impute x₃', 'FINDING · MISSINGNESS'], ['clip x₂', 'FINDING · OUTLIERS'], ['scale x₁ … x₄', 'FINDING · DISTRIBUTIONS'], ['split train / valid / test', 'SPLIT HYGIENE']];
+    const OUT = [['train / valid / test', 'the shaped parts'], ['manifest', 'what was done, and why'], ['reproduce.py', 'rebuilds the parts from the raw file'], ['shape layer', 'added to the model HTML']];
+    const done = s.rc >= 8;
+    return {
+      basis: ['x₁', 'x₂', 'x₃', 'x₄'].map((b, i) => { const on = cur[1].indexOf(i) >= 0; return { id: b, bc: on ? 'var(--cy)' : 'var(--acc)', bg: on ? 'var(--hi)' : 'transparent', sh: on ? '0 0 18px -4px rgba(111,224,220,.55)' : 'none' }; }),
+      derived: D.map((d, i) => { const on = i === s.dv; return { id: d[0], pressed: on ? 'true' : 'false', bc: on ? 'var(--cy)' : 'var(--line)', tc: on ? 'var(--fg)' : 'var(--mut)', bg: on ? 'var(--hi)' : 'transparent', pick: () => { this._dvUser = true; if (this.state.dv !== i) this.setState({ dv: i }); } }; }),
+      ruleTxt: cur[2],
+      parts: PARTS.map((q, i) => ({ label: q[0], pressed: i === s.part ? 'true' : 'false', bc: i === s.part ? 'var(--acc)' : 'var(--line)', bg: i === s.part ? 'var(--hi)' : 'transparent', tc: i === s.part ? 'var(--fg)' : 'var(--dim)', pick: () => this.setState({ part: i }) })),
+      partTxt: PARTS[s.part][1],
+      onto: ONTO.map((o, i) => { const on = i === s.ot; return { k: o[0], v: o[1], bc: on ? 'var(--acc)' : 'var(--line)', bg: on ? 'var(--hi)' : 'transparent', tc: on ? 'var(--acc)' : 'var(--dim)' }; }),
+      anat: ANAT.map((a, i) => { const on = i < s.an, cur2 = i === s.an - 1; return { n: String(i + 1), k: a[0], v: a[1], op: on ? 1 : 0.3, bc: on ? (i === 4 ? 'var(--cy)' : 'var(--acc)') : 'var(--line)', sh: cur2 ? '0 0 14px rgba(156,200,255,.5)' : 'none' }; }),
+      sess: SESS.slice(0, s.ss), sessTag: s.ss >= 4 ? 'TURN 01 · RECORDED' : s.ss >= 2 ? 'EXECUTING…' : 'LISTENING',
+      recipe: REC.map((r, i) => { const d = s.rc > i + 1, c = s.rc === i + 1; return { op: r[0], why: r[1], mark: d ? '✓' : c ? '▸' : String(i + 1).padStart(2, '0'), mc: d ? 'var(--cy)' : c ? 'var(--acc)' : 'var(--dim)', bg: c ? 'var(--hi)' : 'transparent' }; }),
+      outs: OUT.map((o, i) => { const on = s.rc >= 8; return { k: o[0], v: o[1], bc: on ? 'var(--acc)' : 'var(--line)', op: on ? 1 : 0.25, tf: on ? 'none' : 'translateY(6px)' }; }),
+      detC: done ? 'var(--cy)' : 'var(--line)', detI: done ? '✓' : '…', detT: done ? 'Verified, and deterministic: the same raw file and recipe give the same parts, every run.' : 'Running the recipe…',
+      replayRecipe: () => this.setState({ rc: 0 })
+    };
+  }
+  renderVals() {
+    const st = this.state, sel = st.sel, vega = st.mode === 'vega', H = HAND[st.mode];
+    const S = STEPS.map((s, i) => i === 4 ? Object.assign({}, s, H, { num: '04 · THE HAND-OFF', hud: 'AFTER · ' + (vega ? 'INSIDE VEGA' : 'ON ITS OWN') }) : s);
+    const cur = S[sel];
+    return {
+      cols: st.narrow ? 'minmax(0,1fr)' : 'minmax(0,7fr) minmax(0,5fr)', gap: st.narrow ? '18px' : '40px',
+      stickTop: st.narrow ? '8px' : '20px', figH: st.narrow ? '46vh' : 'calc(100vh - 40px)',
+      listPad: st.narrow ? '0 0 20vh' : '18vh 0 34vh', stepGap: st.narrow ? '22px' : '26vh',
+      hudTop: cur.hud, hudName: cur.name, legend: cur.legend,
+      fhOp: st.stop <= 5 ? '1' : '0',
+      layers: [['GEOMETRY', 1], ['ANALYSIS', 2], ['SHAPE', 3]].map(([n, k]) => { const on = sel >= k; return { name: n, w: on ? '34px' : '14px', bg: on ? 'var(--acc)' : 'var(--line)', tc: on ? 'var(--fg)' : 'var(--dim)', sh: on && sel === k ? '0 0 10px var(--acc)' : 'none' }; }),
+      ticks: [0, 1, 2, 3, 4].map(i => ({ c: i <= sel ? 'var(--acc)' : 'var(--line)', g: i === sel ? '0 0 8px var(--acc)' : 'none' })),
+      steps: S.map((s, i) => { const on = i === sel; return { i: String(i), stop: String(i + 1), rail: ['A table nobody', 'Find the shape', 'Name only what', 'Apply only what', vega ? 'The ground the' : 'A dataset you'][i], num: s.num, cmd: s.cmd, lead: s.lead, text: s.text, hasList: !!s.list, list: s.list || [], hasRule: !!s.rule, rule: s.rule || '', hasIO: !!s.takes, takes: s.takes || '', produces: s.produces || '', hasNote: !!s.note, note: s.note || '', o1: i === 1, o2: i === 2, o3: i === 3, oWhat: OUTW[i - 1] || '', oFile: i === 3 ? 'your-data.domain.html  +  parts/  manifest  script' : 'your-data.domain.html',
+        op: on ? 1 : 0.42, tf: on ? 'none' : 'scale(.985)', bc: on ? 'var(--acc)' : 'var(--line)', pick: () => this.goStep(i) }; }),
+      modeLine: vega ? 'As Vega\u2019s first three stages: the shaped data and its three layers are what /blueprint and vega-forge read next.' : 'On its own: stop after any stage and keep what it produced — no network required.',
+      modeAlone: () => this.setState({ mode: 'alone' }), modeVega: () => this.setState({ mode: 'vega' }),
+      pAlone: vega ? 'false' : 'true', pVega: vega ? 'true' : 'false',
+      bAlone: vega ? 'transparent' : 'var(--hi)', cAlone: vega ? 'var(--dim)' : 'var(--fg)', bVega: vega ? 'var(--hi)' : 'transparent', cVega: vega ? 'var(--fg)' : 'var(--dim)',
+      ...this.deepVals(), ...this.outVals(),
+      runs: RUNS.map((r, i) => ({ cmd: r.cmd.replace('+ ', ''), keep: RUNS_K[i], arrow: i < 2, pick: () => this.goView(i, 0) })),
+      closeRef: this.setClose,
+      indexOpen: st.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES
+    };
+  }
+}
+</script>
+</body>
+</html>

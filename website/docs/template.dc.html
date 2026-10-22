@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.8);--code:#07111A;--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+html[data-theme="day"]{--bg:#F4F6F9;--bg2:#E6EEF2;--fg:#0B1B2B;--mut:#3A4D61;--dim:#4C5F73;--acc:#1D58B8;--cy:#0A6663;--line:rgba(11,27,43,.16);--panel:rgba(255,255,255,.85);--code:#FFFFFF;--hi:rgba(29,88,184,.07);--glass:rgba(244,246,249,.95);color-scheme:light}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:3px;border-radius:2px}
+summary::-webkit-details-marker{display:none}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+</helmet>
+<x-import component-from-global-scope="vega-ground" from="../assets/vega-ground.js" level="quiet" seed="83" hint-size="100%,100%" style="position:fixed;inset:0;z-index:0;pointer-events:none"></x-import>
+<div style="position:relative;z-index:1;min-height:100vh;color:var(--fg)">
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px clamp(20px,4vw,48px)">
+    <a href="../site/index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg);min-width:0">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;flex:0 0 auto;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px;min-width:0;white-space:nowrap;overflow:hidden"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span style="color:var(--dim)">DOCS</span><span style="color:var(--dim)">/</span><span style="text-transform:uppercase">{{ p.title }}</span></span>
+    </a>
+    <nav aria-label="Site" style="display:flex;align-items:center;gap:18px;flex:0 0 auto">
+      <button type="button" onClick="{{ toggleTheme }}" aria-label="{{ themeAria }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px;display:flex;align-items:center;gap:8px" style-hover="color:var(--fg)"><span aria-hidden="true" style="width:9px;height:9px;border-radius:50%;border:1px solid currentColor;background:linear-gradient(90deg, currentColor 50%, transparent 50%)"></span>{{ themeLabel }}</button>
+      <span aria-hidden="true" style="width:1px;height:18px;background:var(--line)"></span>
+      <button type="button" onClick="{{ openIndex }}" aria-haspopup="dialog" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px;display:flex;align-items:center;gap:10px" style-hover="color:var(--fg)"><span aria-hidden="true" style="display:flex;flex-direction:column;gap:3px"><span style="width:12px;height:1px;background:currentColor"></span><span style="width:12px;height:1px;background:currentColor"></span><span style="width:8px;height:1px;background:currentColor"></span></span>INDEX</button>
+    </nav>
+  </header>
+
+  <div style="max-width:1200px;margin:0 auto;padding:16px clamp(20px,4vw,48px) 0;display:flex;flex-wrap:wrap;gap:32px 64px;align-items:flex-start">
+
+    <nav aria-label="Stages" style="flex:0 0 230px;max-width:100%;position:sticky;top:20px">
+      <details ref="{{ navRef }}" style="display:block">
+        <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">THE STAGES<span aria-hidden="true">＋</span></summary>
+        <ol style="list-style:none;margin:0;padding:8px 0 0;display:flex;flex-direction:column">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="11">
+            <li style="display:flex;flex-direction:column">
+              <sc-if value="{{ n.groupStart }}" hint-placeholder-val="{{ false }}"><span style="margin:14px 0 6px;font:500 10px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">{{ n.groupUp }}</span></sc-if>
+              <sc-if value="{{ n.linked }}" hint-placeholder-val="{{ false }}">
+                <a href="{{ n.href }}" aria-current="{{ n.aria }}" style="display:flex;gap:10px;align-items:baseline;padding:7px 10px;margin:0 -10px;border-radius:4px;background:{{ n.bg }};color:{{ n.tc }};font:13.5px/1.4 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace" style-hover="color:var(--fg)"><span style="font-size:11px;color:var(--dim)">{{ n.num }}</span>{{ n.id }}</a>
+              </sc-if>
+              <sc-if value="{{ n.plain }}" hint-placeholder-val="{{ true }}">
+                <span style="display:flex;gap:10px;align-items:baseline;padding:7px 0;color:var(--dim);font:13.5px/1.4 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace"><span style="font-size:11px">{{ n.num }}</span>{{ n.id }}</span>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ol>
+        <p style="margin:16px 0 0;font-size:12px;line-height:1.5;color:var(--dim)">Stages in blue have a page; every stage is described on <a href="../site/chain.dc.html">the chain</a>.</p>
+      </details>
+    </nav>
+
+    <main style="flex:1 1 520px;min-width:0;max-width:780px;padding-bottom:40px">
+      <sc-if value="{{ isTemplate }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:0 0 28px;padding:12px 16px;border:1px dashed var(--line);border-radius:4px;font:12.5px/1.6 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--mut)">TEMPLATE — a stage page is an entry in docs/stages.js plus one line: &lt;dc-import name="template" stage="…"&gt;.</p>
+      </sc-if>
+
+      <header style="display:flex;flex-direction:column;gap:16px;padding-bottom:36px;border-bottom:1px solid var(--line)">
+        <span style="font:500 11px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">{{ eyebrow }}</span>
+        <h1 style="margin:0;font:300 clamp(34px,5vw,54px)/1.05 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:-.02em;word-break:break-word">{{ p.title }}</h1>
+        <p style="margin:0;font-weight:300;font-size:clamp(22px,2.6vw,28px);line-height:1.3;font-family:'Newsreader',Georgia,serif">{{ p.tagline }}</p>
+        <div style="display:flex;align-items:stretch;align-self:flex-start;max-width:100%;border:1px solid var(--line);border-radius:4px;background:var(--code);overflow:hidden">
+          <code style="padding:10px 14px;font:14px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg);overflow-x:auto;white-space:nowrap">{{ p.cmd }}</code>
+          <button type="button" onClick="{{ copyCmd }}" aria-label="Copy the command" style="appearance:none;border:0;border-left:1px solid var(--line);background:transparent;color:{{ cmdCopyC }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;padding:0 14px;cursor:pointer;min-width:78px" style-hover="color:var(--fg)">{{ cmdCopyT }}</button>
+        </div>
+      </header>
+
+      <section aria-labelledby="d-role" style="padding:32px 0 8px;display:flex;flex-direction:column;gap:10px">
+        <h2 id="d-role" style="margin:0;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">ROLE</h2>
+        <p style="margin:0;font-size:18px;line-height:1.6;text-wrap:pretty">{{ p.role }}</p>
+      </section>
+
+      <aside aria-label="The rule it never bends" style="margin:28px 0 8px;padding:28px 28px 30px;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:grid;grid-template-columns:28px minmax(0,1fr);gap:14px 16px">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" style="display:block;margin-top:2px"><polygon fill="var(--cy)" points="12,1 12.9,12 12,23 11.1,12"></polygon><polygon fill="var(--cy)" points="2,12 12,11.2 22,12 12,12.8"></polygon><circle cx="12" cy="12" r="2.4" fill="var(--cy)"></circle></svg>
+        <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+          <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--cy)">THE RULE IT NEVER BENDS</span>
+          <p style="margin:0;font-weight:300;font-size:clamp(20px,2.4vw,25px);line-height:1.38;text-wrap:pretty;font-family:'Newsreader',Georgia,serif">{{ p.ruleLead }}</p>
+          <p style="margin:0;font-size:15px;line-height:1.65;color:var(--mut);text-wrap:pretty">{{ p.ruleBody }}</p>
+        </div>
+      </aside>
+
+      <sc-if value="{{ isSeal }}" hint-placeholder-val="{{ false }}">
+        <figure ref="{{ sealRef }}" aria-label="How the test is opened: sealed, opened once, predictions stored, every number with an interval beside a baseline, a verdict." style="margin:28px 0 0;padding:24px 22px 22px;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">THE ONE LOOK</span>
+            <button type="button" onClick="{{ replaySeal }}" style="appearance:none;border:0;background:transparent;color:var(--acc);font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;padding:6px 0;cursor:pointer" style-hover="color:var(--fg)">REPLAY</button>
+          </div>
+          <div style="position:relative;height:2px;background:var(--line);border-radius:2px;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:{{ sealPct }};background:linear-gradient(90deg, var(--acc), var(--cy));transition:width .8s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 10px var(--acc)"></span></div>
+          <ol style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,118px),1fr));gap:14px">
+            <sc-for list="{{ seal }}" as="s" hint-placeholder-count="5">
+              <li style="display:flex;flex-direction:column;gap:10px;opacity:{{ s.op }};transform:{{ s.tf }};transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1)">
+                <span aria-hidden="true" style="width:34px;height:34px;border-radius:50%;border:1px solid {{ s.bc }};display:flex;align-items:center;justify-content:center;font:13px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:{{ s.bc }};box-shadow:{{ s.glow }};transition:box-shadow .6s,border-color .6s,color .6s">{{ s.icon }}</span>
+                <span style="font:500 10.5px/1.4 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--fg)">{{ s.title }}</span>
+                <span style="font-size:13.5px;line-height:1.5;color:var(--mut)">{{ s.text }}</span>
+              </li>
+            </sc-for>
+          </ol>
+        </figure>
+      </sc-if>
+
+      <section aria-labelledby="d-sits" style="padding:36px 0 8px;display:flex;flex-direction:column;gap:14px">
+        <h2 id="d-sits" style="margin:0;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">WHERE IT SITS</h2>
+        <div style="position:relative;height:clamp(260px,34vw,320px);border-radius:8px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(ellipse at 50% 55%, var(--hi), transparent 70%)">
+          <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="Where this stage sits in the chain." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+          <div aria-hidden="true" style="position:absolute;left:16px;right:16px;bottom:12px;display:flex;justify-content:space-between;gap:10px;font:500 10.5px/1.4 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--dim);pointer-events:none">
+            <span>{{ prevLbl }}</span><span style="color:var(--acc)">{{ p.title }}</span><span>{{ nextLbl }}</span>
+          </div>
+        </div>
+        <p style="margin:0;font-size:16px;line-height:1.6;color:var(--mut)">{{ p.sits }}</p>
+      </section>
+
+      <section aria-labelledby="d-takes" style="padding:36px 0 8px;display:flex;flex-direction:column;gap:10px">
+        <h2 id="d-takes" style="margin:0;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">WHAT IT TAKES</h2>
+        <p style="margin:0;font-size:16px;line-height:1.65;text-wrap:pretty">{{ p.takes }}</p>
+      </section>
+
+      <section aria-labelledby="d-flags" style="padding:36px 0 8px;display:flex;flex-direction:column;gap:14px">
+        <h2 id="d-flags" style="margin:0;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">KEY FLAGS</h2>
+        <dl style="margin:0;display:flex;flex-direction:column;border-top:1px solid var(--line)">
+          <sc-for list="{{ p.flags }}" as="fl" hint-placeholder-count="3">
+            <div style="border-bottom:1px solid var(--line);padding:14px 0;display:flex;flex-direction:column;gap:6px">
+              <dt style="font:14px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc);word-break:break-word">{{ fl.f }}</dt>
+              <dd style="margin:0;font-size:15px;line-height:1.6;color:var(--mut)">{{ fl.d }}</dd>
+            </div>
+          </sc-for>
+        </dl>
+        <div style="margin-top:8px;border:1px solid var(--line);border-radius:4px;background:var(--code);overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 8px 8px 16px;border-bottom:1px solid var(--line)">
+            <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">IN YOUR AGENTIC BACKEND</span>
+            <button type="button" onClick="{{ copyRun }}" aria-label="Copy the commands" style="appearance:none;border:0;background:transparent;color:{{ runCopyC }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;padding:8px;cursor:pointer" style-hover="color:var(--fg)">{{ runCopyT }}</button>
+          </div>
+          <pre style="margin:0;padding:14px 16px;overflow-x:auto;font:13.5px/1.75 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)"><code>{{ runText }}</code></pre>
+        </div>
+      </section>
+
+      <section aria-labelledby="d-prod" style="padding:36px 0 8px;display:flex;flex-direction:column;gap:14px">
+        <h2 id="d-prod" style="margin:0;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">WHAT IT PRODUCES</h2>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column">
+          <sc-for list="{{ p.produces }}" as="it" hint-placeholder-count="5">
+            <li style="display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;padding:9px 0;font-size:15.5px;line-height:1.55"><span aria-hidden="true" style="width:5px;height:5px;margin-top:9px;border-radius:50%;background:var(--acc)"></span><span>{{ it }}</span></li>
+          </sc-for>
+        </ul>
+      </section>
+
+      <section aria-labelledby="d-done" style="padding:36px 0 8px;display:flex;flex-direction:column;gap:14px">
+        <h2 id="d-done" style="margin:0;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">DONE WHEN</h2>
+        <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)">
+          <sc-for list="{{ done }}" as="dn" hint-placeholder-count="5">
+            <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:15.5px;line-height:1.55"><span style="color:var(--cy);font:13px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace">✓</span><span>{{ dn }}</span></li>
+          </sc-for>
+        </ol>
+      </section>
+
+      <nav aria-label="Neighbouring stages" style="margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <a href="../site/chain.dc.html" style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);padding:10px 0" style-hover="color:var(--fg)">← THE CHAIN</a>
+        <a href="../site/install.dc.html" style="display:inline-flex;align-items:center;gap:12px;padding:14px 22px;border:1px solid var(--line);border-radius:999px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">INSTALL <span aria-hidden="true" style="color:var(--acc)">→</span></a>
+      </nav>
+    </main>
+  </div>
+
+  <footer style="display:flex;justify-content:center;padding:24px 0 34px">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="pg" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ pg.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ pg.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ pg.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ pg.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;stage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;_template&quot;,&quot;vega-eval&quot;,&quot;vega-show&quot;],&quot;default&quot;:&quot;_template&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const PAGES = [
+  { num: '00', label: 'Threshold', href: '../site/index.dc.html' },
+  { num: '01', label: 'The chain', href: '../site/chain.dc.html' },
+  { num: '02', label: 'The data lane', href: '../site/data.dc.html' },
+  { num: '03', label: 'The rules', href: '../site/promise.dc.html' },
+  { num: '04', label: 'The proof', href: '../site/proof.dc.html' },
+  { num: '05', label: 'Coverage & the showcase', href: '../site/coverage.dc.html' },
+  { num: '06', label: 'Install', href: '../site/install.dc.html' },
+  { num: '07', label: 'Docs — vega-eval', href: 'vega-eval.dc.html', id: 'vega-eval' },
+  { num: '08', label: 'Docs — vega-show', href: 'vega-show.dc.html', id: 'vega-show' }
+];
+const pad = (n) => (n < 10 ? '0' : '') + n;
+const EMPTY = { title: '', tagline: '', cmd: '', role: '', ruleLead: '', ruleBody: '', sits: '', takes: '', flags: [], produces: [], done: [] };
+
+class Component extends DCLogic {
+  state = { indexOpen: false, theme: 'night', copied: '', ready: !!window.VEGA_DOCS, sStep: 0, sV: 0 };
+  closeRef = { current: null }; navRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  setNav = (el) => { this.navRef.current = el; };
+  componentDidMount() {
+    let t = null;
+    try { t = localStorage.getItem('vega-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'night';
+    this.applyTheme(t);
+    if (!window.VEGA_DOCS) {
+      const s = document.createElement('script'); s.src = 'stages.js';
+      s.onload = () => this.setState({ ready: true }); document.head.appendChild(s);
+    }
+    if (this.navRef.current && matchMedia('(min-width: 900px)').matches) this.navRef.current.open = true;
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 't' || e.key === 'T') this.toggleTheme();
+      else if (/^[0-6]$/.test(e.key)) location.href = PAGES[+e.key].href;
+    };
+    addEventListener('keydown', this.onKey);
+    this.syncMini();
+  }
+  syncMini() {
+    const el = document.querySelector('vega-constellation'), D = window.VEGA_DOCS;
+    if (!el || !el.setData || !D) { clearTimeout(this.tm); this.tm = setTimeout(() => this.syncMini(), 150); return; }
+    const id = this.props.stage || '_template', idx = D.order.findIndex(o => o.id === id);
+    if (el !== this.cm) {
+      this.cm = el;
+      const N = [{ x: 0, y: 30, z: 0, size: 5, kind: 'core', label: '/vega', labelPos: 'above', glow: 'acc', delay: 0 }];
+      D.order.slice(1).forEach((s, i) => { const a = i * 0.64 - 0.5, r = 260 + (i % 2) * 40; N.push({ x: Math.sin(a) * r, y: -190 + i * 42, z: Math.cos(a) * r, size: 3.4, label: s.id, glow: s.group === 'Telling it' ? 'cy' : 'acc', delay: 200 + i * 70 }); });
+      const E = [];
+      for (let i = 1; i <= 10; i++) E.push({ a: 0, b: i, dash: [2, 6], alpha: 0.12, w: 0.8, pulse: false });
+      for (let i = 1; i < 8; i++) E.push({ a: i, b: i + 1, alpha: 0.45, w: 1.1 });
+      E.push({ a: 8, b: 9, dash: [5, 6], alpha: 0.4 }); E.push({ a: 9, b: 10, dash: [5, 6], alpha: 0.4 });
+      E.push({ a: 8, b: 10, alpha: 0.45, mid: [(N[8].x + N[10].x) / 2 * 1.35, (N[8].y + N[10].y) / 2 + 70, (N[8].z + N[10].z) / 2 * 1.35] });
+      el.setData({ nodes: N, edges: E, radius: 330, zoom: 0.46, autoRotate: 0.04, yaw: 0.3, pitch: -0.3, pulse: { tokens: 1, period: 1.1 } });
+    }
+    if (idx >= 0) el.setSelected(idx, true);
+  }
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); clearTimeout(this.ct); clearInterval(this.sT); this.sIO && this.sIO.disconnect(); }
+  sealRef = { current: null };
+  setSeal = (el) => { this.sealRef.current = el; if (el && !this.sIO) { if (matchMedia('(prefers-reduced-motion: reduce)').matches) { this.setState({ sStep: 5 }); return; } this.sIO = { disconnect: () => clearInterval(this.sPoll) }; this.sPoll = setInterval(() => { const el2 = this.sealRef.current; if (!el2) return; const r = el2.getBoundingClientRect(); if (r.top < innerHeight * 0.75 && r.bottom > 0) { clearInterval(this.sPoll); this.sPlayed = true; this.playSeal(); } }, 250); } };
+  playSeal = () => {
+    clearInterval(this.sT); this.setState({ sStep: 0, sV: 0 });
+    let k = 0; this.sT = setInterval(() => { k++; if (k <= 5) this.setState({ sStep: k }); else this.setState(s => ({ sV: (s.sV + 1) % 4 })); }, 1000);
+  };
+  componentDidUpdate() {
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    this._wasOpen = open;
+  }
+  applyTheme(t) {
+    document.documentElement.dataset.theme = t;
+    try { localStorage.setItem('vega-theme', t); } catch (e) {}
+    this.setState({ theme: t });
+  }
+  toggleTheme = () => this.applyTheme(this.state.theme === 'day' ? 'night' : 'day');
+  copy = (key, text) => {
+    const ok = () => { this.setState({ copied: key }); clearTimeout(this.ct); this.ct = setTimeout(() => this.setState({ copied: '' }), 1600); };
+    const fb = () => { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); ok(); } catch (e) {} ta.remove(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fb); else fb();
+  };
+  renderVals() {
+    const st = this.state; const day = st.theme === 'day';
+    const D = window.VEGA_DOCS;
+    const id = this.props.stage || '_template';
+    const p = (D && D.pages[id]) || EMPTY;
+    const order = D ? D.order : [];
+    const idx = order.findIndex(o => o.id === id);
+    const me = order[idx];
+    if (p.title && typeof document !== 'undefined') document.title = 'Vega docs — ' + p.title;
+    let lastG = null;
+    const nav = order.map((o, i) => {
+      const linked = !!(D && D.pages[o.id]) && o.id !== '_template'; const cur = o.id === id;
+      const gs = o.group !== lastG; lastG = o.group;
+      return { id: o.id, num: pad(i), groupStart: gs, groupUp: o.group.toUpperCase(), linked, plain: !linked, href: o.id + '.dc.html', aria: cur ? 'page' : 'false', bg: cur ? 'var(--hi)' : 'transparent', tc: cur ? 'var(--fg)' : 'var(--acc)' };
+    });
+    const run = [p.cmd].concat((p.flags || []).map(f => p.cmd + ' ' + f.f)).join('\n');
+    return {
+      isSeal: p.scene === 'seal', sealRef: this.setSeal, replaySeal: this.playSeal, sealPct: (st.sStep / 5 * 100) + '%',
+      seal: [
+        { icon: '⊠', title: 'SEALED', text: 'The test part, sealed in code.' },
+        { icon: '1', title: 'OPENED ONCE', text: 'The seal is stamped; the exposure recorded.' },
+        { icon: '≡', title: 'PREDICTIONS STORED', text: 'Every metric is recomputed from them.' },
+        { icon: '±', title: 'INTERVAL + BASELINE', text: 'Each number with its interval, beside each baseline.' },
+        { icon: '✦', title: 'VERDICT', text: st.sStep >= 5 ? ['Earned.', 'Not earned.', 'Beaten by a baseline.', 'Not assessable.'][st.sV] + ' One of four, never softened.' : 'One of four, never softened.' }
+      ].map((x, i) => { const on = st.sStep > i; const cur = st.sStep === i + 1; return Object.assign(x, { op: on ? 1 : 0.28, tf: on ? 'none' : 'translateY(8px)', bc: on ? (i === 4 ? 'var(--cy)' : 'var(--acc)') : 'var(--line)', glow: cur || (i === 4 && on) ? '0 0 18px rgba(156,200,255,.45)' : 'none' }); }),
+      prevLbl: idx > 0 ? '← ' + order[idx - 1].id : '', nextLbl: idx >= 0 && idx < order.length - 1 ? order[idx + 1].id + ' →' : '',
+      p, nav, navRef: this.setNav, isTemplate: id === '_template',
+      eyebrow: me ? (idx === 0 ? 'ORCHESTRATOR' : 'STAGE ' + pad(idx) + ' / ' + pad(order.length - 1)) + ' · ' + me.group.toUpperCase() : 'STAGE NN / 10 · LANE',
+      hasPrev: idx > 0, prevId: idx > 0 ? order[idx - 1].id : '',
+      hasNext: idx >= 0 && idx < order.length - 1, nextId: idx >= 0 && idx < order.length - 1 ? order[idx + 1].id : '',
+      done: p.done || [],
+      runText: run,
+      copyCmd: () => this.copy('cmd', p.cmd), cmdCopyT: st.copied === 'cmd' ? 'COPIED' : 'COPY', cmdCopyC: st.copied === 'cmd' ? 'var(--cy)' : 'var(--acc)',
+      copyRun: () => this.copy('run', run), runCopyT: st.copied === 'run' ? 'COPIED' : 'COPY', runCopyC: st.copied === 'run' ? 'var(--cy)' : 'var(--acc)',
+      closeRef: this.setClose,
+      themeLabel: day ? 'DAY' : 'NIGHT', themeAria: day ? 'Switch to the night theme' : 'Switch to the day theme', toggleTheme: this.toggleTheme,
+      indexOpen: st.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES.map(x => ({ num: x.num, label: x.label, href: x.href, note: x.id === id ? 'HERE' : '' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

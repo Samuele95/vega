@@ -1,0 +1,220 @@
+{
+ "schema": "dataset-shaper/recipe@1",
+ "input": {
+  "path": "dataset-shaper/fixtures/graph-keypair.csv",
+  "digest": "sha256:23b0d9aab32f5471cd07d268ab73a0edf2fcbeeaf29ab216fa6d8e8542f53ce1",
+  "rows": 600,
+  "columns": 8,
+  "layers_read": []
+ },
+ "seed": 7,
+ "goal": "custom",
+ "target": "overloaded",
+ "outputs": {
+  "dir": "shaped/",
+  "format": "parquet",
+  "files": [],
+  "recipe": "shaped/recipe.json",
+  "manifest": "shaped/manifest.json",
+  "lineage": "shaped/lineage.json",
+  "reproduce": "shaped/reproduce_graph-keypair.py"
+ },
+ "steps": [
+  {
+   "id": "S1",
+   "op": "retype",
+   "columns": [
+    "zone"
+   ],
+   "params": {
+    "to": "nominal"
+   },
+   "source": "geometry:typing/zone",
+   "rationale": "the zone code names a region; it has no order",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "one-hot below, not scaling"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S2",
+   "op": "drop_identity",
+   "columns": [
+    "bus_key",
+    "feeder_to"
+   ],
+   "params": {},
+   "source": "geometry:typing/bus_key",
+   "rationale": "bus_key is unique per row and feeder_to names another row's key: identifiers, not features; the graph step reads both from the input at the rows' raw positions",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "-2",
+    "downstream": {
+     "graph": "the keys still relate rows in S6"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S3",
+   "op": "select_partition",
+   "columns": [
+    "overloaded"
+   ],
+   "params": {
+    "label": "overloaded",
+    "task": "binary"
+   },
+   "source": "geometry:partitions/overloaded",
+   "rationale": "the question the grid asks: will this bus overload",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "the label leaves the feature set"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S4",
+   "op": "split",
+   "columns": [],
+   "params": {
+    "kind": "stratified",
+    "by": "overloaded",
+    "test": 0.2,
+    "valid": 0.1
+   },
+   "source": "shaper:default",
+   "rationale": "no time column; stratify so the overloaded buses are in every part",
+   "alternatives": [
+    {
+     "op": "split",
+     "params": {
+      "kind": "group",
+      "by": "zone"
+     },
+     "when": "if a whole zone must be unseen at test time"
+    }
+   ],
+   "consequences": {
+    "rows": "600 -> 420 / 60 / 120",
+    "columns": "none",
+    "downstream": {
+     "graph": "every edge records both ends' parts"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S5",
+   "op": "encode",
+   "columns": [
+    "zone"
+   ],
+   "params": {
+    "strategy": "one-hot"
+   },
+   "source": "shaper:default",
+   "rationale": "six zones: one-hot is exact at this cardinality",
+   "alternatives": [
+    {
+     "op": "encode",
+     "params": {
+      "strategy": "ordinal"
+     },
+     "when": "if the network embeds the zone instead"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+6 / -1",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S6",
+   "op": "scale",
+   "columns": [],
+   "params": {
+    "kind": "standard",
+    "columns": [
+     "load_mw",
+     "gen_mw",
+     "voltage_pu",
+     "line_cap_mw"
+    ]
+   },
+   "source": "shaper:default",
+   "rationale": "comparable scales for a message-passing network",
+   "alternatives": [
+    {
+     "op": "scale",
+     "params": {
+      "kind": "robust"
+     },
+     "when": "if the load's tail is judged genuine"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "leakage": "fitted on train alone"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S7",
+   "op": "graph_edges",
+   "columns": [
+    "bus_key",
+    "feeder_to"
+   ],
+   "params": {
+    "method": "key_pair",
+    "columns": [
+     "bus_key",
+     "feeder_to"
+    ],
+    "symmetric": true,
+    "self_loops": false,
+    "weight": null
+   },
+   "source": "analysis:F4/T1",
+   "rationale": "F4 — a bus's overload depends on the load its feeder carries: rows are related through feeder_to -> bus_key, and the relation runs both ways for the flow",
+   "alternatives": [
+    {
+     "op": "graph_edges",
+     "params": {
+      "method": "knn",
+      "k": 6,
+      "features": "basis"
+     },
+     "when": "if the feeder topology were unknown and similarity had to stand in for it"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "graph": "the edges part: one row per direction of every feeder link",
+     "model_family": "enables the graph families; the protocol is /vega-forge's decision"
+    }
+   },
+   "reversible": true
+  }
+ ]
+}

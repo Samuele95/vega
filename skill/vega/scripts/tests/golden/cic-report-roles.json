@@ -1,0 +1,26 @@
+{
+  "schema": "vega/golden-report-roles@1",
+  "about": "G00 (D6 §11.5, BUILD-PLAN R2): the vega-show report roles bound to the labels of the real CIC-IDS2017 report ($CIDS_ROOT/docs/main.aux, compiled from main.tex). golden/cic_authoring.py writes docs/label-roles.json (vega/label-roles@1) from it, with each label's number, page and title read from that .aux and its digest pinned. A role whose object the report does not carry is absent, never guessed: the report has no chapter on the bundle and no figure of its layout (chapter.pack, pack.layout), its data-lens findings are spread over three subsections with no one object to bind (chapter.lens), and its one pipeline figure is the capture's, not the chain's (intro.lane).",
+  "report": {"tex": "docs/main.tex", "pdf": "docs/main.pdf", "aux": "docs/main.aux"},
+  "roles": {
+    "chapter.forge-data": "sec:data",
+    "chapter.shape": "sec:method:shaping",
+    "shape.lineage": "fig:shaping",
+    "chapter.blueprint": "sec:method:architecture",
+    "blueprint.modules": "fig:architecture",
+    "chapter.net": "sec:method:network",
+    "net.blocks": "fig:network",
+    "net.decisions": "tab:network",
+    "net.forward": "eq:mlp",
+    "net.loss": "eq:loss",
+    "net.update": "eq:schedule",
+    "chapter.train": "sec:method:training",
+    "train.ladder": "fig:ladder",
+    "train.curves": "fig:dynamics",
+    "chapter.eval": "sec:exp:test",
+    "eval.metrics": "tab:test",
+    "eval.calibration": "fig:reliability",
+    "pack.slice": "fig:serving",
+    "conclusion": "sec:conclusion"
+  }
+}

@@ -1,0 +1,2932 @@
+{
+  "schema": "vega/catalog@1",
+  "source": "vega-forge/references/family-catalog.md §1-§4",
+  "note": "Machine copy of the family catalog. compile_spec.py resolves every `catalog:` key against this file; tests/test_catalog_sync.py fails when this file and the prose diverge. Keys are `<section>/<row>`: tasks/<kind>, families/<name>, blocks/<type>, defaults/<decision>. Beyond §1-§4: `metric_direction` mirrors family-catalog.md §6, `fork_order` §5, `admission` §7, and `inspection` is the machine copy of references/inspect-contract.md §3-§4 (views, targets, links, limits).",
+  "task_map": {
+    "binary classification": "binary",
+    "multiclass classification": "multiclass",
+    "multilabel classification": "multilabel",
+    "regression": "regression",
+    "ordinal regression": "ordinal",
+    "none": "unsupervised",
+    "": "unsupervised"
+  },
+  "goal_map": {
+    "predict": null,
+    "reconstruct": "unsupervised",
+    "anomaly": "anomaly"
+  },
+  "sequence_map": {
+    "binary": "sequence-classification",
+    "multiclass": "sequence-classification",
+    "multilabel": "sequence-classification",
+    "regression": "sequence-regression",
+    "ordinal": "sequence-regression"
+  },
+  "graph_level": {
+    "note": "a graph sample adds no task kind: at level node the task rows apply unchanged (every node is a row with the partition's label); at level graph these kinds keep head, loss and metrics but require sample_shape graph with a graph_id and a graph_pool block before the head (compiler rule W2)",
+    "tasks": [
+      "binary",
+      "multiclass",
+      "regression"
+    ],
+    "requires": {
+      "sample_shape": "graph",
+      "graph_id": true,
+      "block": "graph_pool"
+    }
+  },
+  "sample_shapes": [
+    "row",
+    "window",
+    "graph"
+  ],
+  "tasks": {
+    "binary": {
+      "when": "one label with two classes",
+      "head": {
+        "out": "1",
+        "activation": "none"
+      },
+      "default_loss": "bce_with_logits",
+      "loss_notes": "+ pos_weight when the minority share < 0.3 (analysis:F<n> on imbalance)",
+      "losses_allowed": [
+        "bce_with_logits",
+        "focal"
+      ],
+      "primary": "pr_auc",
+      "primary_alt": {
+        "metric": "roc_auc",
+        "when": "not imbalanced"
+      },
+      "secondary": [
+        "roc_auc",
+        "f1",
+        "balanced_accuracy",
+        "mcc",
+        "log_loss",
+        "brier",
+        "ece"
+      ]
+    },
+    "multiclass": {
+      "when": "one label, k > 2 classes",
+      "head": {
+        "out": "k",
+        "activation": "none"
+      },
+      "default_loss": "cross_entropy",
+      "loss_notes": "+ class weights or label smoothing 0.05 when imbalanced",
+      "losses_allowed": [
+        "cross_entropy",
+        "focal"
+      ],
+      "primary": "f1_macro",
+      "secondary": [
+        "accuracy",
+        "balanced_accuracy",
+        "log_loss",
+        "top_k",
+        "f1_per_class"
+      ]
+    },
+    "multilabel": {
+      "when": "several binary labels, carried as one shaped column of delimited class names",
+      "label": {
+        "form": "one shaped column holding a delimited set of class names per row (\"a|c\"); the empty string is the empty set",
+        "label_format": {
+          "kind": "delimited",
+          "sep": "|"
+        }
+      },
+      "head": {
+        "out": "k",
+        "activation": "none"
+      },
+      "default_loss": "bce_with_logits",
+      "loss_notes": "per label",
+      "losses_allowed": [
+        "bce_with_logits",
+        "focal"
+      ],
+      "primary": "f1_micro",
+      "secondary": [
+        "f1_macro",
+        "pr_auc",
+        "pr_auc_macro",
+        "hamming",
+        "subset_accuracy"
+      ],
+      "breakdown": "pr_auc per label (the per-label list); pr_auc_macro is its scalar"
+    },
+    "regression": {
+      "when": "a continuous label",
+      "head": {
+        "out": "1",
+        "activation": "none"
+      },
+      "default_loss": "mse",
+      "loss_notes": "huber when the analysis found outliers in the label, else mse",
+      "losses_allowed": [
+        "mse",
+        "mae",
+        "huber",
+        "quantile"
+      ],
+      "primary": "rmse",
+      "secondary": [
+        "mae",
+        "r2",
+        "mape",
+        "residual_quantiles"
+      ]
+    },
+    "ordinal": {
+      "when": "ordered classes",
+      "head": {
+        "out": "k-1",
+        "activation": "none",
+        "form": "rank-consistent"
+      },
+      "default_loss": "cumulative_link",
+      "loss_notes": "cumulative logits from a rank-consistent head: one shared score and k-1 ordered thresholds, so P(y > j) = sigma(z_j) decreases in j and every class probability is non-negative",
+      "losses_allowed": [
+        "cumulative_link"
+      ],
+      "primary": "mae_ordinal",
+      "secondary": [
+        "accuracy",
+        "qwk"
+      ]
+    },
+    "unsupervised": {
+      "when": "no partition chosen, or --goal reconstruct",
+      "head": {
+        "out": "recon_dim",
+        "activation": "none"
+      },
+      "recon_dim": "n_numeric + the sum of the cardinalities of the embedded nominals (a one-hot nominal is numeric columns): the numeric columns are reconstructed as values, each embedded nominal as logits over its categories",
+      "default_loss": "reconstruction",
+      "loss_notes": "the backend's mixed loss: mse on numeric columns + cross_entropy on embedded nominals",
+      "losses_allowed": [
+        "reconstruction",
+        "vae"
+      ],
+      "primary": "reconstruction_error",
+      "secondary": [
+        "per_feature_error"
+      ]
+    },
+    "anomaly": {
+      "when": "a rare label the user declares an anomaly, or no label with --goal anomaly",
+      "head": {
+        "out": "recon_dim|z",
+        "activation": "none"
+      },
+      "recon_dim": "as unsupervised, under the reconstruction and vae losses; z under svdd",
+      "default_loss": "reconstruction",
+      "loss_notes": "reconstruction, or svdd for the one-class hypersphere (the centre is a buffer of the model, saved with the weights)",
+      "losses_allowed": [
+        "reconstruction",
+        "vae",
+        "svdd"
+      ],
+      "primary": "pr_auc",
+      "primary_alt": {
+        "metric": "anomaly_score_mean",
+        "when": "no label exists"
+      },
+      "secondary": [
+        "precision_at_k",
+        "roc_auc"
+      ]
+    },
+    "sequence-classification": {
+      "when": "analysis:context.time exists, the shaper's split is time, windows are declared",
+      "base": "binary|multiclass|multilabel",
+      "head": {
+        "out": "as the base task",
+        "activation": "none"
+      },
+      "default_loss": "as the base task",
+      "losses_allowed": [
+        "bce_with_logits",
+        "cross_entropy",
+        "focal"
+      ],
+      "primary": "as the base task",
+      "secondary": [
+        "per_horizon_error"
+      ],
+      "requires": {
+        "sample_shape": "window",
+        "split": "time"
+      },
+      "base_field": "task.base_kind"
+    },
+    "sequence-regression": {
+      "when": "analysis:context.time exists, the shaper's split is time, windows are declared",
+      "base": "regression|ordinal",
+      "head": {
+        "out": "as the base task",
+        "activation": "none"
+      },
+      "default_loss": "as the base task",
+      "losses_allowed": [
+        "mse",
+        "mae",
+        "huber",
+        "quantile",
+        "cumulative_link"
+      ],
+      "primary": "as the base task",
+      "secondary": [
+        "per_horizon_error"
+      ],
+      "requires": {
+        "sample_shape": "window",
+        "split": "time"
+      },
+      "base_field": "task.base_kind"
+    },
+    "forecast": {
+      "when": "a horizon is declared on a windowed sample with a time split",
+      "base": "regression",
+      "head": {
+        "out": "horizon",
+        "activation": "none"
+      },
+      "default_loss": "mse",
+      "losses_allowed": [
+        "mse",
+        "mae",
+        "quantile"
+      ],
+      "primary": "mase",
+      "secondary": [
+        "smape",
+        "per_horizon_error"
+      ],
+      "requires": {
+        "sample_shape": "window",
+        "split": "time",
+        "horizon": true
+      },
+      "base_field": null
+    }
+  },
+  "task_fields": {
+    "source": "netspec-contract.md §1 (task)",
+    "base_kind": {
+      "required_when": [
+        "sequence-classification",
+        "sequence-regression"
+      ],
+      "values": "a key of sequence_map whose value is task.kind",
+      "note": "the effective kind every reader of the base uses (head, loss, metrics, readout, serving reading); forecast's base is regression"
+    },
+    "classes": {
+      "required_when": [
+        "binary",
+        "multiclass",
+        "multilabel",
+        "ordinal"
+      ],
+      "note": "ordered for ordinal; the label names for multilabel"
+    },
+    "label_format": {
+      "required_when": [
+        "multilabel"
+      ],
+      "kinds": [
+        "index",
+        "names",
+        "delimited"
+      ],
+      "default": "names when the label column holds strings, else index; multilabel is delimited with sep '|'"
+    },
+    "positive": {
+      "required_when": [
+        "binary",
+        "anomaly with a label"
+      ],
+      "default": "the second of task.classes",
+      "note": "the class that means positive (binary) or anomalous (anomaly); for a binary task it must be task.classes[1] (T1e refuses classes[0]: list the positive class second)"
+    },
+    "anomaly_rate": {
+      "required_when": [],
+      "applies_to": [
+        "anomaly"
+      ],
+      "values": "a number in (0, 1), with its own source in anomaly_rate_source (user: or analysis:)",
+      "note": "optional: the expected share of anomalous rows; /vega-eval reads it for an unlabelled anomaly task (precision_at_k's k, the threshold's valid quantile); a labelled task takes the train part's positive share instead"
+    }
+  },
+  "selection_rule": "metrics.selection.monitor is always valid.<primary>; early_stopping.monitor defaults to the same (a loss-monitored early stop is an alternative to offer, not the default, because the loss and the metric can disagree under class weighting)",
+  "families": {
+    "mlp-plain": {
+      "when": "tabular rows, input_dim <= ~200, analysis:importance learnable, no time context",
+      "composition": "[embedding?] -> concat -> (dense -> activation -> dropout) x depth -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "dense",
+        "activation",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "sizing": "defaults/sizing",
+        "activation": "gelu",
+        "dropout": 0.1
+      },
+      "alternatives": [
+        "mlp-residual when depth >= 3",
+        "linear as the sanity ablation"
+      ],
+      "sample_shape": "row"
+    },
+    "mlp-residual": {
+      "when": "as mlp-plain with depth >= 3, or blueprint:posture says neural on a non-linear importance",
+      "composition": "[embedding?] -> concat -> dense(width) -> residual(inner: dense -> batchnorm|layernorm -> activation -> dropout) x depth -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "dense",
+        "residual",
+        "batchnorm",
+        "layernorm",
+        "activation",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "sizing": "defaults/sizing",
+        "normalisation": "batchnorm when batch >= 32 else layernorm",
+        "dropout": 0.2
+      },
+      "alternatives": [
+        "mlp-plain",
+        "ft-transformer when nominals dominate"
+      ],
+      "sample_shape": "row"
+    },
+    "ft-transformer": {
+      "when": "wide tabular (input_dim > ~50) or many high-cardinality nominals; the user accepts the cost",
+      "composition": "feature_tokenizer(d) -> transformer_encoder(d, L) -> pool(cls) -> head",
+      "block_types": [
+        "feature_tokenizer",
+        "transformer_encoder",
+        "pool",
+        "head"
+      ],
+      "defaults": {
+        "sizing": "defaults/sizing",
+        "heads": 4,
+        "dropout": 0.1,
+        "optimizer": "adamw",
+        "lr": 0.0001
+      },
+      "alternatives": [
+        "mlp-residual (10x cheaper)"
+      ],
+      "sample_shape": "row",
+      "heavy": true,
+      "nominals": "the feature_tokenizer reads the nominal columns itself (one token per nominal from its own table); an embedding before it is refused (compiler rule G2)"
+    },
+    "cnn1d": {
+      "when": "sample.shape = window, local temporal patterns (short windows, regular sampling per analysis:context.time)",
+      "composition": "[embedding -> concat]? -> (conv1d -> activation -> pool1d) x depth -> flatten -> dense -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "conv1d",
+        "activation",
+        "pool1d",
+        "flatten",
+        "dense",
+        "head"
+      ],
+      "defaults": {
+        "kernel": 5,
+        "channels": "defaults/sizing",
+        "activation": "gelu"
+      },
+      "alternatives": [
+        "gru for longer dependencies"
+      ],
+      "sample_shape": "window"
+    },
+    "gru": {
+      "when": "windows with long dependencies, irregular patterns, forecast",
+      "composition": "[embedding -> concat]? -> gru(hidden, num_layers, return: last) -> head; return: all -> pool(mean) or attention(pool) are defaults/recurrent_return's alternatives (the steps pooled, or self-attended then pooled)",
+      "block_types": [
+        "embedding",
+        "concat",
+        "gru",
+        "attention",
+        "pool",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "dropout": 0.1
+      },
+      "alternatives": [
+        "cnn1d",
+        "transformer-seq"
+      ],
+      "sample_shape": "window"
+    },
+    "lstm": {
+      "when": "windows with long dependencies, irregular patterns, forecast",
+      "composition": "[embedding -> concat]? -> lstm(hidden, num_layers, return: last) -> head; return: all -> pool(mean) or attention(pool) are defaults/recurrent_return's alternatives (the steps pooled, or self-attended then pooled)",
+      "block_types": [
+        "embedding",
+        "concat",
+        "lstm",
+        "attention",
+        "pool",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "dropout": 0.1
+      },
+      "alternatives": [
+        "cnn1d",
+        "transformer-seq"
+      ],
+      "sample_shape": "window"
+    },
+    "transformer-seq": {
+      "when": "long windows, many series, budget allows",
+      "composition": "[embedding -> concat]? -> dense(d) -> positional -> transformer_encoder(d, L) -> pool(mean) -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "dense",
+        "positional",
+        "transformer_encoder",
+        "pool",
+        "head"
+      ],
+      "defaults": {
+        "sizing": "defaults/sizing"
+      },
+      "alternatives": [
+        "gru"
+      ],
+      "sample_shape": "window",
+      "heavy": true
+    },
+    "autoencoder": {
+      "when": "unsupervised / anomaly; reconstruction as the objective",
+      "composition": "[embedding?] -> concat -> sequential(dense x depth) -> dense(z) -> decoder(widths reversed) -> head(recon_dim, none)",
+      "block_types": [
+        "embedding",
+        "concat",
+        "sequential",
+        "dense",
+        "decoder",
+        "head",
+        "activation",
+        "dropout"
+      ],
+      "defaults": {
+        "z": "dims_95 from geometry:space",
+        "widths": "symmetric"
+      },
+      "alternatives": [
+        "vae when a generative reading is wanted",
+        "deep-svdd for one-class"
+      ],
+      "sample_shape": "row"
+    },
+    "vae": {
+      "when": "as autoencoder with a latent prior",
+      "composition": "[embedding?] -> concat -> sequential(dense x depth) -> dense(2z) -> reparameterize(z) -> decoder -> head(recon_dim, none)",
+      "block_types": [
+        "embedding",
+        "concat",
+        "sequential",
+        "dense",
+        "reparameterize",
+        "decoder",
+        "head"
+      ],
+      "defaults": {
+        "beta": 1,
+        "z": "dims_95 from geometry:space"
+      },
+      "loss": "vae",
+      "alternatives": [
+        "autoencoder"
+      ],
+      "sample_shape": "row"
+    },
+    "deep-svdd": {
+      "when": "one-class anomaly with a hypersphere objective",
+      "composition": "[embedding?] -> concat -> sequential(dense x depth) -> head(z, none, bias: false)",
+      "block_types": [
+        "embedding",
+        "concat",
+        "sequential",
+        "dense",
+        "head",
+        "activation"
+      ],
+      "defaults": {
+        "z": 16,
+        "head_bias": false
+      },
+      "loss": "svdd",
+      "alternatives": [
+        "autoencoder"
+      ],
+      "sample_shape": "row"
+    },
+    "linear": {
+      "when": "the sanity floor every supervised campaign includes as an ablation, on every sample shape",
+      "composition": "row: [embedding?] -> concat -> head; window: [embedding?] -> concat -> flatten -> head; graph, level node: [embedding?] -> concat -> head (structure-blind: each node's own features); graph, level graph: [embedding?] -> concat -> graph_pool(mean) -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "flatten",
+        "graph_pool",
+        "head"
+      ],
+      "defaults": {
+        "dropout": 0
+      },
+      "alternatives": [],
+      "sample_shape": "row",
+      "floor_shapes": [
+        "row",
+        "window",
+        "graph"
+      ]
+    },
+    "pca-floor": {
+      "when": "the floor for unsupervised / anomaly: a linear autoencoder, PCA by another name",
+      "composition": "[embedding?] -> concat -> dense(z, none) -> head(recon_dim, none)",
+      "block_types": [
+        "embedding",
+        "concat",
+        "dense",
+        "head"
+      ],
+      "defaults": {
+        "z": "dims_95 from geometry:space"
+      },
+      "alternatives": [],
+      "sample_shape": "row"
+    },
+    "rnn": {
+      "when": "a sequence task (sample.shape = window); the ablation floor for the recurrent families - what gru / lstm must beat",
+      "composition": "[embedding -> concat]? -> rnn(hidden, num_layers, return: last) -> dropout -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "rnn",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "nonlinearity": "tanh",
+        "return": "defaults/recurrent_return"
+      },
+      "alternatives": [
+        "gru",
+        "lstm"
+      ],
+      "sample_shape": "window",
+      "ablation_floor_for": [
+        "gru",
+        "lstm",
+        "bi-lstm",
+        "bi-gru",
+        "lstm-attention",
+        "gru-attention"
+      ]
+    },
+    "bi-lstm": {
+      "when": "classification of complete windows where the whole window, its future included, is legitimately visible at inference; never forecast, never serving.mode stream (compiler rule W3: ERROR)",
+      "composition": "[embedding -> concat]? -> lstm(hidden, num_layers, bidirectional: true, return: last) -> dropout -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "lstm",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "dropout": 0.1,
+        "bidirectional": "defaults/bidirectional",
+        "return": "defaults/recurrent_return"
+      },
+      "alternatives": [
+        "lstm (unidirectional)"
+      ],
+      "sample_shape": "window",
+      "base_family": "lstm",
+      "bidirectional": true,
+      "forbidden_on": {
+        "tasks": [
+          "forecast"
+        ],
+        "serving_modes": [
+          "stream"
+        ]
+      }
+    },
+    "bi-gru": {
+      "when": "classification of complete windows where the whole window, its future included, is legitimately visible at inference; never forecast, never serving.mode stream (compiler rule W3: ERROR)",
+      "composition": "[embedding -> concat]? -> gru(hidden, num_layers, bidirectional: true, return: last) -> dropout -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "gru",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "dropout": 0.1,
+        "bidirectional": "defaults/bidirectional",
+        "return": "defaults/recurrent_return"
+      },
+      "alternatives": [
+        "gru (unidirectional)"
+      ],
+      "sample_shape": "window",
+      "base_family": "gru",
+      "bidirectional": true,
+      "forbidden_on": {
+        "tasks": [
+          "forecast"
+        ],
+        "serving_modes": [
+          "stream"
+        ]
+      }
+    },
+    "lstm-attention": {
+      "when": "long windows where the informative step is not the last one",
+      "composition": "[embedding -> concat]? -> lstm(hidden, num_layers, return: all) -> attention_pool(hidden) -> dropout -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "lstm",
+        "attention_pool",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "dropout": 0.1,
+        "return": "all",
+        "readout": "attention_pool (defaults/recurrent_return)"
+      },
+      "alternatives": [
+        "lstm (return: last)"
+      ],
+      "sample_shape": "window",
+      "base_family": "lstm"
+    },
+    "gru-attention": {
+      "when": "long windows where the informative step is not the last one",
+      "composition": "[embedding -> concat]? -> gru(hidden, num_layers, return: all) -> attention_pool(hidden) -> dropout -> head",
+      "block_types": [
+        "embedding",
+        "concat",
+        "gru",
+        "attention_pool",
+        "dropout",
+        "head"
+      ],
+      "defaults": {
+        "hidden": "defaults/sizing",
+        "num_layers": 1,
+        "dropout": 0.1,
+        "return": "all",
+        "readout": "attention_pool (defaults/recurrent_return)"
+      },
+      "alternatives": [
+        "gru (return: last)"
+      ],
+      "sample_shape": "window",
+      "base_family": "gru"
+    },
+    "gcn": {
+      "when": "an edges part exists (manifest.outputs.files.edges, from the shaper's graph_edges step) and the analysis found the rows related (a relations / segments / spatial finding) - the family blueprint:posture names, or the vega:default graph family when the posture says graph",
+      "composition": "[edge_dropout]? -> [embedding -> concat]? -> [gcn_conv -> activation -> dropout] x depth -> head at level node; ... -> graph_pool(mean) -> head at level graph",
+      "block_types": [
+        "edge_dropout",
+        "embedding",
+        "concat",
+        "gcn_conv",
+        "activation",
+        "dropout",
+        "graph_pool",
+        "head"
+      ],
+      "defaults": {
+        "depth": "defaults/graph_depth",
+        "hidden": "defaults/sizing",
+        "dropout": 0.5,
+        "normalize": "sym",
+        "self_loops": true,
+        "protocol": "defaults/graph_protocol"
+      },
+      "alternatives": [
+        "graphsage (inductive, neighbour sampling - when the graph is large)",
+        "gat"
+      ],
+      "sample_shape": "graph",
+      "graph_default": true
+    },
+    "graphsage": {
+      "when": "the inductive protocol on a large graph (neighbour sampling instead of the full adjacency), or heterophilous neighbourhoods where the root's own features must survive the aggregation",
+      "composition": "[edge_dropout]? -> [embedding -> concat]? -> [sage_conv -> activation -> dropout] x depth -> head (+ graph_pool(mean) before the head at level graph)",
+      "block_types": [
+        "edge_dropout",
+        "embedding",
+        "concat",
+        "sage_conv",
+        "activation",
+        "dropout",
+        "graph_pool",
+        "head"
+      ],
+      "defaults": {
+        "depth": "defaults/graph_depth",
+        "hidden": "defaults/sizing",
+        "aggregator": "mean",
+        "root_weight": true,
+        "neighbours": [
+          25,
+          10
+        ],
+        "protocol": "defaults/graph_protocol"
+      },
+      "alternatives": [
+        "gcn",
+        "gin"
+      ],
+      "sample_shape": "graph"
+    },
+    "gat": {
+      "when": "neighbour importance varies - some edges matter, most do not",
+      "composition": "[edge_dropout]? -> [embedding -> concat]? -> [gat_conv(heads: 8, concat: true) -> activation -> dropout] x (depth - 1) -> gat_conv(heads: 1, concat: false) -> head (+ graph_pool(mean) before the head at level graph)",
+      "block_types": [
+        "edge_dropout",
+        "embedding",
+        "concat",
+        "gat_conv",
+        "activation",
+        "dropout",
+        "graph_pool",
+        "head"
+      ],
+      "defaults": {
+        "depth": "defaults/graph_depth",
+        "hidden": "defaults/sizing",
+        "heads": [
+          8,
+          1
+        ],
+        "attn_dropout": 0.6,
+        "negative_slope": 0.2,
+        "protocol": "defaults/graph_protocol"
+      },
+      "alternatives": [
+        "gcn"
+      ],
+      "sample_shape": "graph"
+    },
+    "gin": {
+      "when": "level graph - the most discriminative aggregation for graph-level tasks (injective sum)",
+      "composition": "[edge_dropout]? -> [embedding -> concat]? -> [gin_conv -> activation -> dropout] x depth -> graph_pool(sum) -> head",
+      "block_types": [
+        "edge_dropout",
+        "embedding",
+        "concat",
+        "gin_conv",
+        "activation",
+        "dropout",
+        "graph_pool",
+        "head"
+      ],
+      "defaults": {
+        "depth": 3,
+        "hidden": "defaults/sizing",
+        "eps": 0,
+        "train_eps": false,
+        "mlp_layers": 2,
+        "readout": "sum",
+        "protocol": "defaults/graph_protocol"
+      },
+      "alternatives": [
+        "gcn + graph_pool"
+      ],
+      "sample_shape": "graph",
+      "level": "graph"
+    }
+  },
+  "family_forces": {
+    "serving.mode": {
+      "online": "a stated latency makes ft-transformer and transformer-seq a FORK: quoting the latency (source blueprint:serving)",
+      "stream": "requires a windowed sample, so only the sequence families apply"
+    },
+    "posture": "blueprint:posture names a family or a family class (linear / tree / neural / none yet); tree or none-yet is overruled only with a user: source or a vega:default quoting the posture's forces",
+    "edges_part": "a graph family (sample_shape graph) requires manifest.outputs.files.edges, a declared sample.protocol and graph_pool iff level == graph (compiler rule W2); a non-graph family on a graph shape is a WARN (the edges are ignored, said so)",
+    "bidirectional": "a bidirectional recurrent block on a forecast task or a stream serving mode is an ERROR (compiler rule W3): it reads the window's future",
+    "fork": "the architecture fork names graph families only when an edges part exists and the recurrent variants (rnn, bi-*, *-attention) only when the sample shape is window"
+  },
+  "admission": {
+    "source": "family-catalog.md §7",
+    "note": "the closed definition of complete coverage: one cell is (family, sample shape, graph level, effective task), plus the named variants; a task written kind/base is a sequence-* kind over that base; anomaly is run with and without a label",
+    "rows": [
+      {
+        "families": [
+          "mlp-plain",
+          "mlp-residual",
+          "ft-transformer",
+          "linear"
+        ],
+        "shape": "row",
+        "level": null,
+        "tasks": [
+          "binary",
+          "multiclass",
+          "multilabel",
+          "regression",
+          "ordinal"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "autoencoder",
+          "vae",
+          "pca-floor"
+        ],
+        "shape": "row",
+        "level": null,
+        "tasks": [
+          "unsupervised",
+          "anomaly/labelled",
+          "anomaly/unlabelled"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "deep-svdd"
+        ],
+        "shape": "row",
+        "level": null,
+        "tasks": [
+          "anomaly/labelled",
+          "anomaly/unlabelled"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "cnn1d",
+          "gru",
+          "lstm",
+          "transformer-seq",
+          "rnn",
+          "lstm-attention",
+          "gru-attention"
+        ],
+        "shape": "window",
+        "level": null,
+        "tasks": [
+          "sequence-classification/binary",
+          "sequence-classification/multiclass",
+          "sequence-classification/multilabel",
+          "sequence-regression/regression",
+          "sequence-regression/ordinal",
+          "forecast"
+        ],
+        "variants": [
+          {
+            "family": "gru",
+            "task": "sequence-classification/binary",
+            "variant": "stride 2"
+          }
+        ]
+      },
+      {
+        "families": [
+          "bi-lstm",
+          "bi-gru"
+        ],
+        "shape": "window",
+        "level": null,
+        "tasks": [
+          "sequence-classification/binary",
+          "sequence-classification/multiclass",
+          "sequence-classification/multilabel",
+          "sequence-regression/regression",
+          "sequence-regression/ordinal"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "linear"
+        ],
+        "shape": "window",
+        "level": null,
+        "tasks": [
+          "sequence-classification/binary",
+          "sequence-classification/multiclass",
+          "sequence-classification/multilabel",
+          "sequence-regression/regression",
+          "sequence-regression/ordinal",
+          "forecast"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "gcn",
+          "graphsage",
+          "gat"
+        ],
+        "shape": "graph",
+        "level": "node",
+        "tasks": [
+          "binary",
+          "multiclass",
+          "multilabel",
+          "regression",
+          "ordinal"
+        ],
+        "variants": [
+          {
+            "family": "gcn",
+            "task": "multiclass",
+            "variant": "transductive"
+          },
+          {
+            "family": "graphsage",
+            "task": "multiclass",
+            "variant": "sampled"
+          }
+        ]
+      },
+      {
+        "families": [
+          "gcn",
+          "graphsage",
+          "gat",
+          "gin"
+        ],
+        "shape": "graph",
+        "level": "graph",
+        "tasks": [
+          "binary",
+          "multiclass",
+          "regression"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "linear"
+        ],
+        "shape": "graph",
+        "level": "node",
+        "tasks": [
+          "binary",
+          "multiclass",
+          "multilabel",
+          "regression",
+          "ordinal"
+        ],
+        "variants": []
+      },
+      {
+        "families": [
+          "linear"
+        ],
+        "shape": "graph",
+        "level": "graph",
+        "tasks": [
+          "binary",
+          "multiclass",
+          "regression"
+        ],
+        "variants": []
+      }
+    ],
+    "cells": 127,
+    "not_admitted": [
+      "a reconstruction family (autoencoder, vae, pca-floor, deep-svdd) on window or graph",
+      "a graph family on unsupervised or anomaly",
+      "gin at level node",
+      "bi-lstm or bi-gru on forecast or under serving.mode stream (W3)",
+      "any window family on a split that is not time (W1)"
+    ]
+  },
+  "blocks": {
+    "dense": {
+      "params": {
+        "units": "int",
+        "activation": "none|relu|gelu|silu|tanh|sigmoid|leaky_relu",
+        "bias": "bool"
+      },
+      "required": [
+        "units"
+      ],
+      "shape_rule": "(..., in) -> (..., units)",
+      "notes": "activation may be a separate activation block instead"
+    },
+    "embedding": {
+      "params": {
+        "columns": "list[str]",
+        "dim": "int",
+        "dims": "dict[str,int]"
+      },
+      "required": [
+        "columns"
+      ],
+      "shape_rule": "nominal ids -> (..., sum(dim))",
+      "notes": "cardinality from data_contract.features[].cardinality"
+    },
+    "concat": {
+      "params": {},
+      "required": [],
+      "shape_rule": "joins the numeric features and every embedding output",
+      "structural": true,
+      "notes": "required after embedding; alternatives: [] with the rationale 'structural'"
+    },
+    "batchnorm": {
+      "params": {
+        "eps": "float",
+        "momentum": "float"
+      },
+      "required": [],
+      "shape_rule": "shape-preserving",
+      "notes": "needs batch >= 8; the compiler warns below 32"
+    },
+    "layernorm": {
+      "params": {
+        "eps": "float"
+      },
+      "required": [],
+      "shape_rule": "shape-preserving"
+    },
+    "dropout": {
+      "params": {
+        "p": "float"
+      },
+      "required": [
+        "p"
+      ],
+      "shape_rule": "shape-preserving",
+      "notes": "inactive at eval; the layer shows where it sits"
+    },
+    "activation": {
+      "params": {
+        "name": "none|relu|gelu|silu|tanh|sigmoid|leaky_relu"
+      },
+      "required": [
+        "name"
+      ],
+      "shape_rule": "shape-preserving"
+    },
+    "residual": {
+      "params": {
+        "repeat": "int",
+        "inner": "list[block]",
+        "projection": "auto|none"
+      },
+      "required": [
+        "inner"
+      ],
+      "shape_rule": "x + f(x); projection: auto inserts a dense when widths differ",
+      "composite": true,
+      "notes": "the compiler checks inner keeps the width or the projection is present"
+    },
+    "sequential": {
+      "params": {
+        "inner": "list[block]"
+      },
+      "required": [
+        "inner"
+      ],
+      "shape_rule": "the chain of its inner blocks' rules",
+      "composite": true
+    },
+    "parallel": {
+      "params": {
+        "inner": "list[block]",
+        "merge": "concat|sum"
+      },
+      "required": [
+        "inner"
+      ],
+      "shape_rule": "every branch sees the input; concat sums the widths, sum requires equal widths",
+      "composite": true
+    },
+    "conv1d": {
+      "params": {
+        "channels": "int",
+        "kernel": "int",
+        "stride": "int",
+        "padding": "int|str"
+      },
+      "required": [
+        "channels",
+        "kernel"
+      ],
+      "shape_rule": "(B, C, L) -> (B, C', L')",
+      "window_only": true
+    },
+    "pool1d": {
+      "params": {
+        "kind": "max|avg",
+        "size": "int"
+      },
+      "required": [
+        "kind"
+      ],
+      "shape_rule": "(B, C, L) -> (B, C, L')",
+      "window_only": true
+    },
+    "rnn": {
+      "params": {
+        "hidden": "int",
+        "num_layers": "int",
+        "nonlinearity": "tanh|relu",
+        "bidirectional": "bool",
+        "dropout": "float",
+        "return": "last|all|mean|max"
+      },
+      "required": [
+        "hidden"
+      ],
+      "shape_rule": "(N, L, F) -> (N, H*dirs) for last/mean/max, (N, L, H*dirs) for all",
+      "defaults": {
+        "num_layers": 1,
+        "nonlinearity": "tanh",
+        "bidirectional": false,
+        "return": "last"
+      },
+      "notes": "plain Elman RNN (torch.nn.RNN); gradients vanish on long L, which is why gru / lstm are the default recurrent blocks and rnn is the ablation floor; return: mean and max are pooled over the steps inside the block",
+      "window_only": true,
+      "bidirectional_rule": "W3"
+    },
+    "gru": {
+      "params": {
+        "hidden": "int",
+        "layers": "int",
+        "num_layers": "int (default 1; `layers` is the same param under its old name)",
+        "bidirectional": "bool",
+        "dropout": "float",
+        "return": "last|all|mean|max"
+      },
+      "required": [
+        "hidden"
+      ],
+      "shape_rule": "(B, L, F) -> (B, hidden*dirs) for last/mean/max, (B, L, hidden*dirs) for all",
+      "window_only": true,
+      "defaults": {
+        "num_layers": 1,
+        "bidirectional": false,
+        "return": "last"
+      },
+      "notes": "return replaces any implicit 'last step' behaviour; a spec without it means last. bidirectional: true is subject to W3 (never forecast, never stream); return: mean and max are pooled over the steps inside the block",
+      "bidirectional_rule": "W3"
+    },
+    "lstm": {
+      "params": {
+        "hidden": "int",
+        "layers": "int",
+        "num_layers": "int (default 1; `layers` is the same param under its old name)",
+        "bidirectional": "bool",
+        "dropout": "float",
+        "return": "last|all|mean|max"
+      },
+      "required": [
+        "hidden"
+      ],
+      "shape_rule": "(B, L, F) -> (B, hidden*dirs) for last/mean/max, (B, L, hidden*dirs) for all",
+      "window_only": true,
+      "defaults": {
+        "num_layers": 1,
+        "bidirectional": false,
+        "return": "last"
+      },
+      "notes": "return replaces any implicit 'last step' behaviour; a spec without it means last. bidirectional: true is subject to W3 (never forecast, never stream); return: mean and max are pooled over the steps inside the block",
+      "bidirectional_rule": "W3"
+    },
+    "attention": {
+      "params": {
+        "heads": "int",
+        "dim": "int",
+        "pool": "bool"
+      },
+      "required": [
+        "heads",
+        "dim"
+      ],
+      "shape_rule": "(B, L, d) -> (B, d) when pool: true, else (B, L, d)"
+    },
+    "attention_pool": {
+      "params": {
+        "hidden": "int"
+      },
+      "required": [
+        "hidden"
+      ],
+      "shape_rule": "(N, L, H) -> (N, H)",
+      "notes": "one learned query attends over the L steps - a pooling readout, the one the *-attention families use after return: all; alpha = softmax_t(q . tanh(W h_t + b)), y = sum_t alpha_t h_t; attention mixes the steps among themselves, attention_pool only weighs them",
+      "window_only": true
+    },
+    "transformer_encoder": {
+      "params": {
+        "d": "int",
+        "heads": "int",
+        "layers": "int",
+        "ff": "int",
+        "dropout": "float"
+      },
+      "required": [
+        "d",
+        "heads",
+        "layers"
+      ],
+      "shape_rule": "(B, L, d) -> (B, L, d)"
+    },
+    "feature_tokenizer": {
+      "params": {
+        "d": "int"
+      },
+      "required": [
+        "d"
+      ],
+      "shape_rule": "rows -> (B, n_numeric + n_nominal + 1, d) with a [cls] token",
+      "notes": "FT-Transformer entry; one token per numeric column (x_j * w_j + b_j) and one per nominal column from its own table, so the tokenizer reads the nominals itself and no embedding block precedes it (compiler rule G2)"
+    },
+    "positional": {
+      "params": {
+        "kind": "sinusoidal|learned"
+      },
+      "required": [
+        "kind"
+      ],
+      "shape_rule": "shape-preserving"
+    },
+    "flatten": {
+      "params": {},
+      "required": [],
+      "shape_rule": "(B, ...) -> (B, prod(...))"
+    },
+    "reshape": {
+      "params": {
+        "shape": "list[int]"
+      },
+      "required": [
+        "shape"
+      ],
+      "shape_rule": "(B, n) -> (B, *shape) with prod(shape) = n"
+    },
+    "pool": {
+      "params": {
+        "kind": "mean|max|cls"
+      },
+      "required": [
+        "kind"
+      ],
+      "shape_rule": "(B, L, d) -> (B, d)",
+      "notes": "sequence outputs"
+    },
+    "head": {
+      "params": {
+        "out": "int",
+        "activation": "none|relu|gelu|silu|tanh|sigmoid|leaky_relu",
+        "bias": "bool"
+      },
+      "required": [
+        "out"
+      ],
+      "shape_rule": "(..., in) -> (..., out)",
+      "defaults": {
+        "activation": "none",
+        "bias": true
+      },
+      "notes": "exactly one per spec unless multilabel heads are declared; `out` and the activation are forced by the task row, so the catalog marks the head structural and `alternatives: []` is legal with the rationale saying what forces it; `bias` (default true) is false in deep-svdd, where a bias lets the hypersphere collapse; on an ordinal task the backend builds the rank-consistent cumulative head: one shared score and out = k-1 ordered thresholds",
+      "structural": true
+    },
+    "decoder": {
+      "params": {
+        "widths": "list[int]",
+        "out": "int (default input_dim)",
+        "activation": "str"
+      },
+      "required": [],
+      "shape_rule": "(B, z) -> (B, out), out defaulting to input_dim",
+      "notes": "autoencoders; widths default to the encoder's dense widths reversed; the reconstruction head (recon_dim) follows it"
+    },
+    "reparameterize": {
+      "params": {
+        "z": "int"
+      },
+      "required": [
+        "z"
+      ],
+      "shape_rule": "(B, 2z) -> (B, z) with the KL term",
+      "notes": "vae"
+    },
+    "gcn_conv": {
+      "params": {
+        "out": "int",
+        "normalize": "sym|rw",
+        "self_loops": "bool",
+        "bias": "bool"
+      },
+      "required": [
+        "out"
+      ],
+      "shape_rule": "(N, F) + (E) -> (N, out)",
+      "defaults": {
+        "normalize": "sym",
+        "self_loops": true,
+        "bias": true
+      },
+      "notes": "D^-1/2 (A+I) D^-1/2 X W (sym) or D^-1 (A+I) X W (rw); an edge weight (the edges part's weight column) multiplies the messages and enters the degree; takes the node features plus the edge index; graph shape only",
+      "graph_only": true
+    },
+    "sage_conv": {
+      "params": {
+        "out": "int",
+        "aggregator": "mean|max|sum",
+        "root_weight": "bool",
+        "normalize": "bool"
+      },
+      "required": [
+        "out"
+      ],
+      "shape_rule": "(N, F) + (E) -> (N, out)",
+      "defaults": {
+        "aggregator": "mean",
+        "root_weight": true,
+        "normalize": false
+      },
+      "notes": "W1 x_i + W2 agg_{j in N(i)} x_j, the root kept apart from its neighbours; an edge weight multiplies the messages; the block neighbour sampling applies to (sample.neighbours[k] for the k-th conv); takes the node features plus the edge index; graph shape only",
+      "graph_only": true
+    },
+    "gat_conv": {
+      "params": {
+        "out": "int",
+        "heads": "int",
+        "concat": "bool",
+        "attn_dropout": "float",
+        "negative_slope": "float"
+      },
+      "required": [
+        "out",
+        "heads"
+      ],
+      "shape_rule": "(N, F) + (E) -> (N, out*heads) when concat, else (N, out) (heads averaged)",
+      "defaults": {
+        "concat": true,
+        "attn_dropout": 0.0,
+        "negative_slope": 0.2
+      },
+      "notes": "attention coefficients per edge (LeakyReLU, softmax over N(i)); an edge weight multiplies alpha_ij after the softmax, without renormalising; attn_dropout drops coefficients, not features; takes the node features plus the edge index; graph shape only",
+      "graph_only": true
+    },
+    "gin_conv": {
+      "params": {
+        "out": "int",
+        "eps": "float",
+        "train_eps": "bool",
+        "mlp_layers": "int"
+      },
+      "required": [
+        "out"
+      ],
+      "shape_rule": "(N, F) + (E) -> (N, out)",
+      "defaults": {
+        "eps": 0,
+        "train_eps": false,
+        "mlp_layers": 2
+      },
+      "notes": "MLP((1+eps) x_i + sum_{j in N(i)} x_j) - the injective sum aggregation; an edge weight multiplies the messages; takes the node features plus the edge index; graph shape only",
+      "graph_only": true
+    },
+    "graph_pool": {
+      "params": {
+        "readout": "mean|max|sum"
+      },
+      "required": [
+        "readout"
+      ],
+      "shape_rule": "(N, F) + graph_index -> (G, F)",
+      "notes": "groups nodes by sample.graph_id into G graphs (the batch's graph_index); allowed only at level graph, and required there (W2)",
+      "graph_only": true,
+      "graph_level_only": true
+    },
+    "edge_dropout": {
+      "params": {
+        "p": "float"
+      },
+      "required": [
+        "p"
+      ],
+      "shape_rule": "(E) -> (E'); node features untouched",
+      "notes": "drops edges, not features; training only (identity at eval); the kept edges replace the graph for every later block of the same forward pass",
+      "graph_only": true,
+      "training_only": true
+    },
+    "custom": {
+      "params": {
+        "code_ref": "str",
+        "out_shape": "list[int]"
+      },
+      "required": [
+        "code_ref",
+        "out_shape"
+      ],
+      "shape_rule": "the declared out_shape, checked by the smoke pass",
+      "notes": "user: source only; marked unverified in the layer; code_ref names a module under the campaign root (custom/<id>.py) that the emitter copies into <model>/custom/<stem>.py, where the builder resolves it",
+      "source_must_be": "user:"
+    }
+  },
+  "blocks_coverage_note": "the catalog names every block type of the grammar; which of them a backend implements is that backend's coverage.json (`blocks`, with `planned` for the ones it lists as not built yet). compile_spec.py's B2 refuses a block the named backend does not list, and names it planned when the backend's `planned.blocks` carries it",
+  "activations": [
+    "none",
+    "relu",
+    "gelu",
+    "silu",
+    "tanh",
+    "sigmoid",
+    "leaky_relu"
+  ],
+  "defaults": {
+    "sizing": {
+      "default": "width clip(2*input_dim, 32, 256) rounded to a power of two, raised one step when the analysis found non-linear importance; depth 2 below 1000 training rows, 3 below 100000, 4 above; transformers d = clip(width/2, 32, 128), L = depth-1; RNN hidden = width/2; CNN channels width/4 -> width/2; bottleneck z = dims_95 from geometry:space",
+      "because": "parameters scale with the rows the chain has and the input width, not with fashion",
+      "alternative": "x2 / /2 width and +-1 depth as capacity rungs",
+      "structural": false,
+      "rule": {
+        "width": "clip(2*input_dim, 32, 256)",
+        "depth": [
+          [
+            1000,
+            2
+          ],
+          [
+            100000,
+            3
+          ],
+          null,
+          4
+        ]
+      }
+    },
+    "optimizer": {
+      "default": "adamw lr 1e-3, wd 1e-4, betas (0.9, 0.999) - tabular; lr 1e-4 for transformers; sgd momentum 0.9 lr 1e-2 only as an ablation",
+      "because": "robust across widths without tuning; decoupled decay",
+      "alternative": "sgd for generalisation ablations; any optimizer the backend's coverage.json lists by name",
+      "structural": false,
+      "value": {
+        "name": "adamw",
+        "params": {
+          "lr": 0.001,
+          "weight_decay": 0.0001,
+          "betas": [
+            0.9,
+            0.999
+          ]
+        }
+      }
+    },
+    "schedule": {
+      "default": "cosine with warmup_epochs = 3 when max_epochs >= 30; plateau (factor 0.5, patience 5) otherwise",
+      "because": "warmup steadies AdamW's first steps; cosine needs a known horizon",
+      "alternative": "onecycle when a max lr was found by a range test; none as an ablation",
+      "structural": false,
+      "value": {
+        "name": "cosine",
+        "params": {
+          "warmup_epochs": 3
+        }
+      }
+    },
+    "batch_size": {
+      "default": "clip(rows_train / 8, 16, 512) rounded to a power of two",
+      "because": "~8 optimizer steps per epoch at minimum, so an epoch means something",
+      "alternative": "x2 / /2 ablations; the smoke panel shows memory per batch",
+      "structural": false,
+      "rule": {
+        "expr": "clip(rows_train/8, 16, 512)",
+        "round": "pow2"
+      }
+    },
+    "max_epochs": {
+      "default": "200 with early stopping; budget.wall_clock_min from the user or 20",
+      "because": "early stopping ends it; the budget bounds a run that never converges",
+      "alternative": null,
+      "structural": false,
+      "value": {
+        "max_epochs": 200,
+        "budget_min": 20
+      }
+    },
+    "early_stopping": {
+      "default": "monitor valid.<primary>, patience 10 (max_epochs / 20, >= 5), min_delta 1e-3, restore best",
+      "because": "the primary metric is what selection uses",
+      "alternative": "patience 20 on noisy valid metrics; monitor valid.loss",
+      "structural": false,
+      "value": {
+        "patience": 10,
+        "min_delta": 0.001,
+        "restore_best": true
+      }
+    },
+    "init": {
+      "default": "kaiming_uniform for relu-family, xavier_uniform for tanh/sigmoid, zeros bias; embeddings N(0, 0.1)",
+      "because": "keeps activations' variance at depth",
+      "alternative": "orthogonal for RNNs",
+      "structural": false,
+      "value": {
+        "scheme": "kaiming_uniform",
+        "bias": "zeros"
+      }
+    },
+    "dropout": {
+      "default": "0.1 (mlp-plain), 0.2 (mlp-residual), 0.1 (transformers), 0.1 after a recurrent readout (rnn, bi-*, *-attention); 0 in the linear ablation",
+      "because": "the widths above vs the training rows the chain has",
+      "alternative": "0.3-0.5 when train >> valid (an analysis:F<n> on size, or a training diagnostic)",
+      "structural": false,
+      "per_family": {
+        "mlp-plain": 0.1,
+        "mlp-residual": 0.2,
+        "ft-transformer": 0.1,
+        "transformer-seq": 0.1,
+        "rnn": 0.1,
+        "bi-lstm": 0.1,
+        "bi-gru": 0.1,
+        "lstm-attention": 0.1,
+        "gru-attention": 0.1,
+        "linear": 0
+      }
+    },
+    "normalisation": {
+      "default": "batchnorm in MLP blocks when batch >= 32, else layernorm; layernorm in transformers and RNN outputs",
+      "because": "batch statistics are unreliable on small batches",
+      "alternative": "none as an ablation",
+      "structural": false
+    },
+    "weight_decay": {
+      "default": "1e-4 (AdamW)",
+      "because": "mild shrinkage; the analysis's overfitting finding raises it",
+      "alternative": "1e-3, 0",
+      "structural": false,
+      "value": 0.0001
+    },
+    "grad_clip": {
+      "default": "global norm 1.0",
+      "because": "a cheap guard against the NaN epoch; the pre-clip norm is recorded in the epoch record's grad_norm",
+      "alternative": "none",
+      "structural": false,
+      "value": 1.0
+    },
+    "label_smoothing": {
+      "default": "0.05 for imbalanced multiclass",
+      "because": null,
+      "alternative": "0",
+      "structural": false,
+      "value": 0.05
+    },
+    "precision": {
+      "default": "fp32; bf16 autocast only with --device cuda and the user's word",
+      "because": "numerics are inspectable in fp32",
+      "alternative": "bf16",
+      "structural": false,
+      "value": "fp32",
+      "runtime": true
+    },
+    "seed": {
+      "default": "7 (the chain's), and the data loader order seeded too",
+      "because": "determinism across runs",
+      "alternative": null,
+      "structural": false,
+      "value": 7,
+      "runtime": true
+    },
+    "imbalance": {
+      "default": "pos_weight / class weights = inverse frequency clipped to 10",
+      "because": "keeps the gradient of the minority alive without exploding it",
+      "alternative": "focal loss; resampling is the shaper's business, not the trainer's",
+      "structural": false,
+      "clip": 10
+    },
+    "device": {
+      "default": "device: auto (cuda -> mps -> cpu), num_workers: 0, precision: fp32",
+      "because": "a run must be reproducible where it is read, and a worker pool changes batch order unless seeded",
+      "alternative": "--device, num_workers > 0 for large parquet parts",
+      "structural": false,
+      "value": {
+        "device": "auto",
+        "num_workers": 0
+      },
+      "runtime": true
+    },
+    "embedding_dim": {
+      "default": "min(50, round(1.6 * cardinality^0.56)), rounded to an even number",
+      "because": "sub-linear in the cardinality, capped so a rare nominal does not dominate the input width",
+      "alternative": "/2 when train >> valid; a one-hot encode in the shaper when cardinality <= 8",
+      "structural": false,
+      "rule": {
+        "expr": "min(50, round(1.6 * cardinality ** 0.56))",
+        "round": "even"
+      }
+    },
+    "graph_protocol": {
+      "default": "inductive: the reference graph is the train nodes and the edges among them; a valid node is a query that receives messages from reference nodes only (never from another query), and the test nodes and every edge touching one enter through the seal at /vega-eval, as queries the same way",
+      "because": "keeps the test seal's meaning - no test row is seen, as a feature or as a neighbour, before /vega-eval",
+      "alternative": "transductive (user: source only, exposure.kind features in the layer) when the deployment graph is fixed and the unlabeled nodes are legitimately present at training time",
+      "structural": false,
+      "value": "inductive",
+      "alternative_source_must_be": "user:"
+    },
+    "graph_depth": {
+      "default": "2 conv blocks",
+      "because": "over-smoothing beyond 2-3 hops on homophilous graphs - every node's representation converges to the same one",
+      "alternative": "3 with residual connections (residual around each conv)",
+      "structural": false,
+      "value": 2
+    },
+    "recurrent_return": {
+      "default": "last for classification and regression; all -> attention_pool when the windows are long (the *-attention families)",
+      "because": "the last state summarises a short window; over a long one the informative step is anywhere, and a learned readout finds it",
+      "alternative": "mean (pooled inside the block)",
+      "structural": false,
+      "value": "last"
+    },
+    "bidirectional": {
+      "default": "false",
+      "because": "forecast and stream serving forbid the future - a bidirectional block reads it (W3)",
+      "alternative": "true for classification of complete windows (the bi-* families)",
+      "structural": false,
+      "value": false,
+      "forbidden_on": {
+        "tasks": [
+          "forecast"
+        ],
+        "serving_modes": [
+          "stream"
+        ]
+      }
+    },
+    "window_context": {
+      "default": "previous-part: an anchor's length-1 context rows may come from the previous part of the same series (train before valid, valid before test), so every valid and test row is scored",
+      "because": "every valid and test row gets a prediction; the context rows are inputs the deployment also has",
+      "alternative": "none: drop the first length-1 rows of each series in each part and count them unscored",
+      "structural": false,
+      "value": "previous-part",
+      "values": [
+        "previous-part",
+        "none"
+      ]
+    },
+    "window_series": {
+      "default": "the lag step's group_by, else the split's by, else null",
+      "because": "a window that crosses two series mixes two processes",
+      "alternative": "null with a user: source",
+      "structural": false,
+      "rule": [
+        "shape:manifest/steps/<lag step>.group_by",
+        "shape:manifest/split.by",
+        null
+      ],
+      "unattended_warn": "windows may cross series — no series key in the shaping record"
+    },
+    "autoregressive": {
+      "default": "true for forecast (the target's rows up to the anchor are one more input channel), false otherwise",
+      "because": "a forecast without the target's own past discards the strongest predictor",
+      "alternative": "false (an exogenous-only forecast)",
+      "structural": false,
+      "value": {
+        "forecast": true,
+        "otherwise": false
+      },
+      "forbidden_on": {
+        "tasks": [
+          "sequence-classification",
+          "sequence-regression"
+        ]
+      }
+    },
+    "graph_batching": {
+      "default": "graphs at level graph; else full when the training view has at most 200 000 nodes and 5 000 000 edges; else sampled with neighbours [25, 10] (graphsage's)",
+      "because": "full-batch gradients are exact and cheapest while the graph fits",
+      "alternative": "sampled (memory), full (exactness)",
+      "structural": false,
+      "rule": {
+        "level_graph": "graphs",
+        "full_when": {
+          "max_nodes": 200000,
+          "max_edges": 5000000
+        },
+        "otherwise": {
+          "batching": "sampled",
+          "neighbours": [
+            25,
+            10
+          ]
+        }
+      },
+      "values": [
+        "full",
+        "sampled",
+        "graphs"
+      ]
+    }
+  },
+  "structural_catalog_rows": [
+    "blocks/concat",
+    "blocks/head"
+  ],
+  "runtime_default_rows": [
+    "defaults/device",
+    "defaults/precision",
+    "defaults/seed"
+  ],
+  "decision_families": {
+    "architecture": [
+      "family",
+      "blocks"
+    ],
+    "objective": [
+      "loss",
+      "metrics"
+    ],
+    "optimization": [
+      "optimizer",
+      "schedule",
+      "training",
+      "init"
+    ],
+    "regularization": [
+      "regularization",
+      "early_stopping"
+    ]
+  },
+  "fork_order": [
+    {
+      "family": "architecture",
+      "choices": [
+        "family",
+        "blocks"
+      ],
+      "unattended": "defaults applied and marked `default applied (unattended)`",
+      "points": [
+        {
+          "id": "context",
+          "asks": "data_contract.sample.context: previous-part or none",
+          "when": "sample.shape window",
+          "default": "defaults/window_context",
+          "unattended": "the default, applied and marked",
+          "defaults_to_test": true
+        },
+        {
+          "id": "autoregressive",
+          "asks": "data_contract.sample.autoregressive",
+          "when": "task.kind forecast",
+          "default": "defaults/autoregressive",
+          "unattended": "the default, applied and marked",
+          "defaults_to_test": true
+        },
+        {
+          "id": "series_by",
+          "asks": "data_contract.sample.series_by",
+          "when": "sample.shape window and the shaping record names no series key (no lag group_by, no split by)",
+          "default": "defaults/window_series",
+          "unattended": "null, with WARN: windows may cross series — no series key in the shaping record",
+          "defaults_to_test": true
+        },
+        {
+          "id": "protocol",
+          "asks": "data_contract.sample.protocol: inductive or transductive",
+          "when": "sample.shape graph",
+          "default": "defaults/graph_protocol",
+          "unattended": "always inductive: never asked unattended, because transductive needs a user: turn (W2)",
+          "defaults_to_test": false
+        }
+      ]
+    },
+    {
+      "family": "objective",
+      "choices": [
+        "loss",
+        "metrics"
+      ],
+      "unattended": "defaults applied and marked `default applied (unattended)`",
+      "points": []
+    },
+    {
+      "family": "optimization",
+      "choices": [
+        "optimizer",
+        "schedule",
+        "training",
+        "init"
+      ],
+      "unattended": "defaults applied and marked `default applied (unattended)`",
+      "points": [
+        {
+          "id": "batching",
+          "asks": "data_contract.sample.batching (and neighbours when sampled)",
+          "when": "sample.shape graph",
+          "default": "defaults/graph_batching",
+          "unattended": "the default, applied and marked",
+          "defaults_to_test": true
+        }
+      ]
+    },
+    {
+      "family": "regularization",
+      "choices": [
+        "regularization",
+        "early_stopping"
+      ],
+      "unattended": "defaults applied and marked `default applied (unattended)`",
+      "points": []
+    }
+  ],
+  "metric_direction": {
+    "roc_auc": "max",
+    "pr_auc": "max",
+    "pr_auc_macro": "max",
+    "accuracy": "max",
+    "balanced_accuracy": "max",
+    "precision": "max",
+    "recall": "max",
+    "f1": "max",
+    "f1_macro": "max",
+    "f1_micro": "max",
+    "f1_weighted": "max",
+    "f1_per_class": "max",
+    "mcc": "max",
+    "specificity": "max",
+    "top_k": "max",
+    "subset_accuracy": "max",
+    "r2": "max",
+    "spearman": "max",
+    "qwk": "max",
+    "precision_at_k": "max",
+    "recall_at_k": "max",
+    "loss": "min",
+    "log_loss": "min",
+    "brier": "min",
+    "ece": "min",
+    "hamming": "min",
+    "rmse": "min",
+    "mae": "min",
+    "median_ae": "min",
+    "mape": "min",
+    "mae_ordinal": "min",
+    "reconstruction_error": "min",
+    "per_feature_error": "min",
+    "smape": "min",
+    "mase": "min",
+    "per_horizon_error": "min",
+    "anomaly_score_mean": "min",
+    "residual_quantiles": "none"
+  },
+  "metric_direction_note": "family-catalog.md §6: the direction in which a metric is better, for every metric the backends implement plus the training loss; a per-unit metric (f1_per_class, per_feature_error, per_horizon_error) is read element-wise; none marks a descriptive reading that has no better direction and is never a selection metric",
+  "sources": {
+    "closed_set": [
+      "blueprint:",
+      "shape:",
+      "geometry:",
+      "analysis:",
+      "user:",
+      "vega:default"
+    ],
+    "patterns": {
+      "blueprint": "^blueprint:(posture|artifacts|bets/[A-Za-z0-9_.\\-]+|ports/[A-Za-z0-9_.\\-]+|modules/[A-Za-z0-9_.\\-]+|boundaries/[A-Za-z0-9_.\\-]+|[A-Za-z0-9_.\\-]+)$",
+      "shape": "^shape:(manifest/[A-Za-z0-9_./\\-]+|S\\d+)$",
+      "geometry": "^geometry:(partitions/[^\\s]+|typing/[^\\s]+|space)$",
+      "analysis": "^analysis:(F\\d+|modules/[A-Za-z0-9_.\\-]+|importance|context\\.time|context\\.spatial)$",
+      "user": "^user:(stance/.+|.+)$",
+      "default": "^vega:default$"
+    }
+  },
+  "graph_protocols": {
+    "inductive": {
+      "default": true,
+      "meaning": "the training graph is the train (and valid) nodes and the edges among them only; the test nodes and every edge touching one enter through the seal at /vega-eval",
+      "catalog": "defaults/graph_protocol"
+    },
+    "transductive": {
+      "default": false,
+      "meaning": "the test nodes' features and their edges are in the graph during training while their labels stay sealed",
+      "source_must_be": "user:",
+      "exposure": {
+        "kind": "features",
+        "rows": "test"
+      }
+    }
+  },
+  "inspection": {
+    "source": "references/inspect-contract.md",
+    "schemas": {
+      "network": "vega/network-view@2",
+      "explanation": "vega/explanation@2",
+      "attribution_table": "vega/attribution-table@1",
+      "inspection": "vega/inspection@1"
+    },
+    "schema_files": {
+      "network": "references/schemas/network-view-2.schema.json",
+      "explanation": "references/schemas/explanation-2.schema.json"
+    },
+    "synthetic": [
+      "input",
+      "output",
+      "residual_add",
+      "parallel_merge",
+      "encoder_layer"
+    ],
+    "view_kinds": [
+      "units",
+      "table",
+      "join",
+      "affine",
+      "pointwise",
+      "group",
+      "conv",
+      "pool",
+      "recurrent",
+      "attention",
+      "tokens",
+      "reshape",
+      "latent",
+      "graph",
+      "edges",
+      "opaque",
+      "io",
+      "merge"
+    ],
+    "calls": [
+      "emb",
+      "concat",
+      "tokens",
+      "tensor",
+      "graph",
+      "gdrop",
+      "gpool",
+      "inner",
+      "io"
+    ],
+    "edge_kinds": [
+      "data",
+      "skip",
+      "embed",
+      "branch",
+      "merge",
+      "edges",
+      "readout"
+    ],
+    "tensor_roles": [
+      "weight",
+      "bias",
+      "table",
+      "buffer"
+    ],
+    "output_kinds": [
+      "classes",
+      "score",
+      "labels",
+      "value",
+      "quantiles",
+      "thresholds",
+      "reconstruction",
+      "embedding",
+      "horizon"
+    ],
+    "views": {
+      "dense": {
+        "view": "units",
+        "call": "tensor",
+        "formula": "z = W·x + b ; a = act(z)",
+        "payload": [
+          "weight",
+          "bias",
+          "row_norms",
+          "col_norms",
+          "activation"
+        ],
+        "probe": [
+          "pre",
+          "post",
+          "grad_pre"
+        ],
+        "exact": [
+          "pre",
+          "post",
+          "grad_pre"
+        ],
+        "recompute": "W·in + b = pre"
+      },
+      "embedding": {
+        "view": "table",
+        "call": "emb",
+        "formula": "e_c = E_c[id_c]",
+        "payload": [
+          "tables"
+        ],
+        "probe": [
+          "id",
+          "vector",
+          "grad",
+          "attribution"
+        ],
+        "exact": [],
+        "recompute": "table[id] = vector"
+      },
+      "concat": {
+        "view": "join",
+        "call": "concat",
+        "formula": "h = [x_num ; e_1 ; … ; e_m]",
+        "payload": [
+          "parts"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "[parts] = out"
+      },
+      "batchnorm": {
+        "view": "affine",
+        "call": "tensor",
+        "formula": "y = γ·(x − μ)/√(σ² + ε) + β",
+        "payload": [
+          "gamma",
+          "beta",
+          "running_mean",
+          "running_var",
+          "eps",
+          "scale",
+          "shift"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "scale·in + shift = out"
+      },
+      "layernorm": {
+        "view": "affine",
+        "call": "tensor",
+        "formula": "y = γ·(x − mean x)/√(var x + ε) + β",
+        "payload": [
+          "gamma",
+          "beta",
+          "eps"
+        ],
+        "probe": [
+          "mean",
+          "std"
+        ],
+        "exact": [],
+        "recompute": "the formula over the sample = out"
+      },
+      "dropout": {
+        "view": "pointwise",
+        "call": "tensor",
+        "formula": "y = x (inactive at inference)",
+        "payload": [
+          "p",
+          "active_at_inference"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "in = out"
+      },
+      "activation": {
+        "view": "pointwise",
+        "call": "tensor",
+        "formula": "a = act(z)",
+        "payload": [
+          "name"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "act(in) = out"
+      },
+      "residual": {
+        "view": "group",
+        "call": "tensor",
+        "formula": "x ← P·x + f(x)",
+        "payload": [
+          "repeats"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": null
+      },
+      "sequential": {
+        "view": "group",
+        "call": "tensor",
+        "formula": "f_n ∘ … ∘ f_1",
+        "payload": [
+          "children"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": null
+      },
+      "parallel": {
+        "view": "group",
+        "call": "tensor",
+        "formula": "[f_1(x) ; … ; f_n(x)] | Σ_i f_i(x)",
+        "payload": [
+          "branches",
+          "merge"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": null
+      },
+      "conv1d": {
+        "view": "conv",
+        "call": "tensor",
+        "formula": "y[t,o] = b[o] + Σ_c Σ_k W[o,c,k]·x[t·s+k−p, c]",
+        "payload": [
+          "kernel",
+          "bias",
+          "channel_norms",
+          "tap_norms",
+          "pair_norms",
+          "stride",
+          "padding",
+          "dilation"
+        ],
+        "probe": [
+          "maps"
+        ],
+        "exact": [],
+        "recompute": "conv(in) = out"
+      },
+      "pool1d": {
+        "view": "pool",
+        "call": "tensor",
+        "formula": "y[t,c] = max|mean_{m} x[t·m+m', c]",
+        "payload": [
+          "kind",
+          "size"
+        ],
+        "probe": [
+          "winners"
+        ],
+        "exact": [],
+        "recompute": "the pooling formula over in = out"
+      },
+      "rnn": {
+        "view": "recurrent",
+        "call": "tensor",
+        "formula": "h_t = tanh(W_ih·x_t + b_ih + W_hh·h_{t−1} + b_hh)",
+        "payload": [
+          "cell",
+          "hidden",
+          "layers",
+          "directions",
+          "gates",
+          "return",
+          "per_layer"
+        ],
+        "probe": [
+          "unroll"
+        ],
+        "exact": [
+          "hidden"
+        ],
+        "recompute": "the step-by-step unroll = the module's sequence output"
+      },
+      "gru": {
+        "view": "recurrent",
+        "call": "tensor",
+        "formula": "r,z = σ(…) ; n = tanh(W_in·x+b_in + r⊙(W_hn·h+b_hn)) ; h_t = (1−z)⊙n + z⊙h_{t−1}",
+        "payload": [
+          "cell",
+          "hidden",
+          "layers",
+          "directions",
+          "gates",
+          "return",
+          "per_layer"
+        ],
+        "probe": [
+          "unroll"
+        ],
+        "exact": [
+          "hidden"
+        ],
+        "recompute": "the step-by-step unroll = the module's sequence output"
+      },
+      "lstm": {
+        "view": "recurrent",
+        "call": "tensor",
+        "formula": "i,f,o = σ(…) ; g = tanh(…) ; c_t = f⊙c_{t−1} + i⊙g ; h_t = o⊙tanh(c_t)",
+        "payload": [
+          "cell",
+          "hidden",
+          "layers",
+          "directions",
+          "gates",
+          "return",
+          "per_layer"
+        ],
+        "probe": [
+          "unroll"
+        ],
+        "exact": [
+          "hidden"
+        ],
+        "recompute": "the step-by-step unroll = the module's sequence output"
+      },
+      "attention": {
+        "view": "attention",
+        "call": "tensor",
+        "formula": "A_h = softmax(Q_h K_hᵀ/√d_h) ; y = W_o·[A_1 V_1 ; … ; A_H V_H]",
+        "payload": [
+          "heads",
+          "dim",
+          "head_dim",
+          "in_proj",
+          "out_proj",
+          "per_head",
+          "pool"
+        ],
+        "probe": [
+          "weights"
+        ],
+        "exact": [
+          "alpha"
+        ],
+        "recompute": "the recomputed attention over in = out"
+      },
+      "attention_pool": {
+        "view": "attention",
+        "call": "tensor",
+        "formula": "α = softmax_t(q·tanh(W h_t + b)) ; y = Σ_t α_t h_t",
+        "payload": [
+          "score",
+          "query"
+        ],
+        "probe": [
+          "weights"
+        ],
+        "exact": [
+          "alpha"
+        ],
+        "recompute": "Σ_t α_t h_t = out"
+      },
+      "transformer_encoder": {
+        "view": "group",
+        "call": "tensor",
+        "formula": "x ← x + MHA(LN₁ x) ; x ← x + FF(LN₂ x)",
+        "payload": [
+          "layers",
+          "d",
+          "heads",
+          "ff",
+          "norm_first"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": null
+      },
+      "feature_tokenizer": {
+        "view": "tokens",
+        "call": "tokens",
+        "formula": "T_j = x_j·W_j + b_j ; tokens = [cls ; T_1 … T_n]",
+        "payload": [
+          "weight",
+          "bias",
+          "cls",
+          "tables",
+          "token_norms",
+          "cls_norm"
+        ],
+        "probe": [
+          "tokens"
+        ],
+        "exact": [],
+        "recompute": "the token formula over in = out"
+      },
+      "positional": {
+        "view": "tokens",
+        "call": "tensor",
+        "formula": "x_t ← x_t + P_t",
+        "payload": [
+          "kind",
+          "pe",
+          "learned"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "in + pe = out"
+      },
+      "flatten": {
+        "view": "reshape",
+        "call": "tensor",
+        "formula": "(L,d) → (L·d)",
+        "payload": [],
+        "probe": [],
+        "exact": [],
+        "recompute": "reshape(in) = out"
+      },
+      "reshape": {
+        "view": "reshape",
+        "call": "tensor",
+        "formula": "(n) → shape",
+        "payload": [
+          "shape"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "reshape(in) = out"
+      },
+      "pool": {
+        "view": "pool",
+        "call": "tensor",
+        "formula": "mean_t x_t | max_t x_t | x_0",
+        "payload": [
+          "kind"
+        ],
+        "probe": [
+          "winners",
+          "cls"
+        ],
+        "exact": [],
+        "recompute": "the pooling formula over in = out"
+      },
+      "head": {
+        "view": "units",
+        "call": "tensor",
+        "formula": "z = W·x + b ; ordinal: z_j = w·x + θ_j with θ_0 ≥ θ_1 ≥ …",
+        "payload": [
+          "weight",
+          "bias",
+          "row_norms",
+          "col_norms",
+          "activation",
+          "thresholds"
+        ],
+        "probe": [
+          "pre",
+          "post",
+          "grad_pre"
+        ],
+        "exact": [
+          "pre",
+          "post",
+          "grad_pre"
+        ],
+        "recompute": "W·in + b = pre"
+      },
+      "decoder": {
+        "view": "group",
+        "call": "tensor",
+        "formula": "x̂ = W_k·act(… act(W_1 z + b_1) …) + b_k",
+        "payload": [
+          "children"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": null
+      },
+      "reparameterize": {
+        "view": "latent",
+        "call": "tensor",
+        "formula": "z = μ at inference ; KL = −½ Σ (1 + log σ² − μ² − σ²)",
+        "payload": [
+          "z"
+        ],
+        "probe": [
+          "mu",
+          "sigma",
+          "kl"
+        ],
+        "exact": [],
+        "recompute": "mu = out"
+      },
+      "gcn_conv": {
+        "view": "graph",
+        "call": "graph",
+        "formula": "h'_i = Σ_{j∈N(i)∪{i}} Â_ij·W h_j + b",
+        "payload": [
+          "weight",
+          "bias",
+          "normalize",
+          "self_loops"
+        ],
+        "probe": [
+          "messages"
+        ],
+        "exact": [],
+        "recompute": "Σ_j coef·W h_j + b at the target = out"
+      },
+      "sage_conv": {
+        "view": "graph",
+        "call": "graph",
+        "formula": "h'_i = W_r h_i + W_n·agg_{j∈N(i)} h_j",
+        "payload": [
+          "root",
+          "neigh",
+          "bias",
+          "aggregator",
+          "normalize"
+        ],
+        "probe": [
+          "messages"
+        ],
+        "exact": [],
+        "recompute": "root + aggregate at the target = out"
+      },
+      "gat_conv": {
+        "view": "graph",
+        "call": "graph",
+        "formula": "α_ij = softmax_j(LeakyReLU(a_srcᵀ W h_j + a_dstᵀ W h_i)) ; h'_i = ‖_h Σ_j α^h_ij W^h h_j",
+        "payload": [
+          "weight",
+          "bias",
+          "att_src",
+          "att_dst",
+          "heads",
+          "concat",
+          "negative_slope"
+        ],
+        "probe": [
+          "messages"
+        ],
+        "exact": [
+          "alpha",
+          "edge_index"
+        ],
+        "recompute": "the heads of Σ_j α·W h_j at the target = out"
+      },
+      "gin_conv": {
+        "view": "graph",
+        "call": "graph",
+        "formula": "h'_i = MLP((1+ε)·h_i + Σ_{j∈N(i)} h_j)",
+        "payload": [
+          "mlp",
+          "eps",
+          "train_eps"
+        ],
+        "probe": [
+          "messages",
+          "pre_mlp"
+        ],
+        "exact": [],
+        "recompute": "mlp(pre_mlp) at the target = out"
+      },
+      "graph_pool": {
+        "view": "pool",
+        "call": "gpool",
+        "formula": "g = mean|max|sum_{i∈G} h_i",
+        "payload": [
+          "readout"
+        ],
+        "probe": [
+          "node_share"
+        ],
+        "exact": [],
+        "recompute": "the readout over the graph's nodes = out"
+      },
+      "edge_dropout": {
+        "view": "edges",
+        "call": "gdrop",
+        "formula": "E' = E (inactive at inference)",
+        "payload": [
+          "p",
+          "active_at_inference"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": "edges in = edges out"
+      },
+      "custom": {
+        "view": "opaque",
+        "call": "tensor",
+        "formula": "declared by user code (opaque)",
+        "payload": [
+          "class",
+          "parameters",
+          "declared_out_shape",
+          "verified"
+        ],
+        "probe": [],
+        "exact": [],
+        "recompute": null
+      },
+      "input": {
+        "view": "io",
+        "call": "io",
+        "formula": "x = the shaped inputs (numeric, nominal ids, edges)",
+        "payload": [
+          "columns",
+          "stream"
+        ],
+        "probe": [
+          "values"
+        ],
+        "exact": [],
+        "recompute": null
+      },
+      "output": {
+        "view": "io",
+        "call": "io",
+        "formula": "ŷ = link(z)",
+        "payload": [
+          "link",
+          "outputs"
+        ],
+        "probe": [
+          "readout"
+        ],
+        "exact": [],
+        "recompute": null
+      },
+      "residual_add": {
+        "view": "merge",
+        "call": "inner",
+        "formula": "y = P·x + f(x)",
+        "payload": [],
+        "probe": [
+          "skip_norm",
+          "branch_norm"
+        ],
+        "exact": [],
+        "recompute": "P·x + f(x) = out"
+      },
+      "parallel_merge": {
+        "view": "merge",
+        "call": "inner",
+        "formula": "[b_1 ; … ; b_n] | Σ_i b_i",
+        "payload": [
+          "merge"
+        ],
+        "probe": [
+          "branch_norms"
+        ],
+        "exact": [],
+        "recompute": "concat or sum of the branches = out"
+      },
+      "encoder_layer": {
+        "view": "attention",
+        "call": "inner",
+        "formula": "x ← x + MHA(LN₁ x) ; x ← x + FF(LN₂ x)",
+        "payload": [
+          "self_attn",
+          "ff",
+          "norm1",
+          "norm2",
+          "norm_first",
+          "activation"
+        ],
+        "probe": [
+          "weights",
+          "cls_row",
+          "stream_norms"
+        ],
+        "exact": [
+          "alpha"
+        ],
+        "recompute": "x + MHA(LN₁ x), then + FF(LN₂ ·) = out"
+      }
+    },
+    "readings": [
+      "binary",
+      "multiclass",
+      "multilabel",
+      "ordinal",
+      "regression",
+      "quantile",
+      "forecast",
+      "reconstruction",
+      "anomaly-reconstruction",
+      "anomaly-svdd"
+    ],
+    "links": {
+      "softmax": {
+        "readings": {
+          "multiclass": "argmax"
+        },
+        "formula": "p_i = exp(z_i) / Σ_j exp(z_j)"
+      },
+      "sigmoid": {
+        "readings": {
+          "binary": "threshold"
+        },
+        "formula": "p = σ(z)"
+      },
+      "sigmoid_each": {
+        "readings": {
+          "multilabel": "per_label_threshold"
+        },
+        "formula": "p_k = σ(z_k), each label on its own"
+      },
+      "identity": {
+        "readings": {
+          "regression": "none",
+          "quantile": "none"
+        },
+        "formula": "ŷ = z"
+      },
+      "cumulative": {
+        "readings": {
+          "ordinal": "cumulative_count"
+        },
+        "formula": "P(y > j) = σ(z_j) ; p_0 = 1 − σ(z_0), p_j = σ(z_{j−1}) − σ(z_j), p_{K−1} = σ(z_{K−2})"
+      },
+      "reconstruction": {
+        "readings": {
+          "reconstruction": "none",
+          "anomaly-reconstruction": "threshold"
+        },
+        "formula": "e(x) = mean_f (x̂_f − x_f)² + mean_c CE_c"
+      },
+      "distance": {
+        "readings": {
+          "anomaly-svdd": "threshold"
+        },
+        "formula": "s = ‖f(x) − c‖²"
+      },
+      "horizon": {
+        "readings": {
+          "forecast": "none"
+        },
+        "formula": "ŷ_{t+h} = z_h, h = 1…H (quantile loss: z_{h,q}, horizon-major)"
+      }
+    },
+    "decision_rules": [
+      "argmax",
+      "threshold",
+      "per_label_threshold",
+      "cumulative_count",
+      "none"
+    ],
+    "manifest_decision": {
+      "argmax": "argmax",
+      "threshold": "threshold",
+      "per_label_threshold": "per-label-threshold",
+      "cumulative_count": "cumulative",
+      "none": "none"
+    },
+    "target_kinds": {
+      "logit": {
+        "selector": "class",
+        "scalar": "z_c",
+        "unit": "logit"
+      },
+      "binary_logit": {
+        "selector": "class",
+        "scalar": "sign·z, sign +1 for the positive class and −1 for the other",
+        "unit": "logit"
+      },
+      "label_logit": {
+        "selector": "label",
+        "scalar": "z_j",
+        "unit": "logit"
+      },
+      "value": {
+        "selector": null,
+        "scalar": "ŷ",
+        "unit": "target"
+      },
+      "quantile": {
+        "selector": "quantile",
+        "scalar": "ŷ_q",
+        "unit": "target"
+      },
+      "expected_rank": {
+        "selector": null,
+        "scalar": "Σ_j σ(z_j)",
+        "unit": "rank"
+      },
+      "threshold_logit": {
+        "selector": "threshold",
+        "scalar": "z_j",
+        "unit": "logit"
+      },
+      "reconstruction_error": {
+        "selector": null,
+        "scalar": "e(x) = mean_f (x̂_f − x_f)² + mean_c CE_c",
+        "unit": "error"
+      },
+      "feature_error": {
+        "selector": "feature",
+        "scalar": "e_f(x)",
+        "unit": "error"
+      },
+      "svdd_distance": {
+        "selector": null,
+        "scalar": "‖f(x) − c‖²",
+        "unit": "distance"
+      },
+      "forecast_step": {
+        "selector": "step",
+        "scalar": "ŷ_{t+h}",
+        "unit": "target"
+      }
+    },
+    "selectors": [
+      "class",
+      "label",
+      "threshold",
+      "quantile",
+      "feature",
+      "step",
+      "kind"
+    ],
+    "targets": {
+      "binary": {
+        "link": "sigmoid",
+        "decision_rule": "threshold",
+        "default": "binary_logit",
+        "default_pick": "the class predicted at the threshold",
+        "selectable": [
+          "binary_logit"
+        ]
+      },
+      "multiclass": {
+        "link": "softmax",
+        "decision_rule": "argmax",
+        "default": "logit",
+        "default_pick": "the argmax class",
+        "selectable": [
+          "logit"
+        ]
+      },
+      "multilabel": {
+        "link": "sigmoid_each",
+        "decision_rule": "per_label_threshold",
+        "default": "label_logit",
+        "default_pick": "the label of the largest σ",
+        "selectable": [
+          "label_logit"
+        ]
+      },
+      "regression": {
+        "link": "identity",
+        "decision_rule": "none",
+        "default": "value",
+        "default_pick": "the value",
+        "selectable": [
+          "value"
+        ],
+        "by_loss": {
+          "quantile": {
+            "link": "identity",
+            "decision_rule": "none",
+            "default": "quantile",
+            "default_pick": "the quantile nearest 0.5",
+            "selectable": [
+              "value",
+              "quantile"
+            ]
+          }
+        }
+      },
+      "ordinal": {
+        "link": "cumulative",
+        "decision_rule": "cumulative_count",
+        "default": "expected_rank",
+        "default_pick": "the expected rank",
+        "selectable": [
+          "expected_rank",
+          "threshold_logit"
+        ]
+      },
+      "unsupervised": {
+        "link": "reconstruction",
+        "decision_rule": "none",
+        "default": "reconstruction_error",
+        "default_pick": "the row error",
+        "selectable": [
+          "reconstruction_error",
+          "feature_error"
+        ]
+      },
+      "anomaly": {
+        "link": "reconstruction",
+        "decision_rule": "threshold",
+        "default": "reconstruction_error",
+        "default_pick": "the row error",
+        "selectable": [
+          "reconstruction_error",
+          "feature_error"
+        ],
+        "by_loss": {
+          "svdd": {
+            "link": "distance",
+            "decision_rule": "threshold",
+            "default": "svdd_distance",
+            "default_pick": "the distance to the centre",
+            "selectable": [
+              "svdd_distance"
+            ]
+          }
+        }
+      },
+      "sequence-classification": {
+        "as_base": [
+          "binary",
+          "multiclass",
+          "multilabel"
+        ]
+      },
+      "sequence-regression": {
+        "as_base": [
+          "regression",
+          "ordinal"
+        ]
+      },
+      "forecast": {
+        "link": "horizon",
+        "decision_rule": "none",
+        "default": "forecast_step",
+        "default_pick": "step 1",
+        "selectable": [
+          "forecast_step"
+        ]
+      }
+    },
+    "detail": [
+      "full",
+      "summary",
+      "exact"
+    ],
+    "methods": [
+      "grad_x_input",
+      "integrated_gradients"
+    ],
+    "weights_modes": [
+      "full",
+      "summary"
+    ],
+    "weights_default": "full",
+    "numbers": {
+      "significant_digits": 9,
+      "rule": "num(v) = float(f'{float(v):.9g}'), which round-trips float32 exactly; NaN and infinities are refused"
+    },
+    "tensor_id_pattern": "^[A-Za-z0-9_.@:-]{1,128}$",
+    "limits": {
+      "inline_tensor_max": 262144,
+      "inline_total_max": 1048576,
+      "json_list_max": 1024,
+      "vector_max": 4096,
+      "heat_max": 64,
+      "graph_nodes_max": 256,
+      "explain_float_budget": 262144,
+      "explain_exact_float_budget": 4194304,
+      "explain_rows_max": 4096,
+      "explain_edges_max": 65536,
+      "ig_steps_default": 32,
+      "ig_steps_max": 128,
+      "ig_batch_max": 65536
+    },
+    "endpoints": [
+      [
+        "GET",
+        "/v1/network"
+      ],
+      [
+        "GET",
+        "/v1/network/tensor/{tensor_id}"
+      ],
+      [
+        "POST",
+        "/v1/explain"
+      ]
+    ],
+    "model_routes": [
+      [
+        "POST",
+        "/v1/explain"
+      ]
+    ],
+    "capability": "inspection"
+  }
+}

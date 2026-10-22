@@ -1,0 +1,156 @@
+/* bundle-layer.css — /vega-pack's `bundle` tab.
+   Scoped entirely under .layer-bundle so the layer cannot restyle the document it is written
+   into. Colours come from the platform's custom properties where they exist and fall back to
+   their own values, so the layer reads correctly in a model that defines none. */
+
+.layer-bundle {
+  --bn-fg: var(--fg, #16181d);
+  --bn-dim: var(--fg-dim, #5d6470);
+  --bn-line: var(--line, #dfe3ea);
+  --bn-panel: var(--panel, #f7f8fa);
+  --bn-accent: var(--accent, #2f6fdb);
+  --bn-good: #1c7a4a;
+  --bn-bad: #b03030;
+  --bn-warn: #8a6100;
+  --bn-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--bn-fg);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .layer-bundle {
+    --bn-fg: var(--fg, #e6e8ec);
+    --bn-dim: var(--fg-dim, #99a0ac);
+    --bn-line: var(--line, #333842);
+    --bn-panel: var(--panel, #1b1e24);
+    --bn-accent: var(--accent, #7aa7f0);
+    --bn-good: #4fbe86;
+    --bn-bad: #ec7a7a;
+    --bn-warn: #d6a740;
+  }
+}
+
+.layer-bundle :where(h3, h4, p, table, ul, ol, pre) { margin: 0 0 .6rem; }
+.layer-bundle h3 { font-size: 1.05rem; }
+.layer-bundle h4 { font-size: .9rem; letter-spacing: .02em; text-transform: uppercase;
+                   color: var(--bn-dim); }
+.layer-bundle section { margin-bottom: 1rem; }
+
+/* ---- the verdict: the first screenful, and the reason the page exists. Three states, and the
+   beaten one is not a milder shade of the unearned one — it is the stronger claim. */
+.layer-bundle .bn-verdict {
+  padding: .9rem 1.1rem; margin-bottom: 1.1rem; border-radius: 4px;
+  border: 1px solid var(--bn-line); border-left: 4px solid var(--bn-warn);
+  background: var(--bn-panel);
+}
+.layer-bundle .bn-verdict.bn-v-earned { border-left-color: var(--bn-good); }
+.layer-bundle .bn-verdict.bn-v-beaten { border-left-color: var(--bn-bad); }
+.layer-bundle .bn-flagline { font-size: 1.02rem; }
+.layer-bundle .bn-flag { font-weight: 680; letter-spacing: .01em; color: var(--bn-warn); }
+.layer-bundle .bn-flag[data-verdict="earned"] { color: var(--bn-good); }
+.layer-bundle .bn-flag[data-verdict="beaten"] { color: var(--bn-bad); }
+.layer-bundle .bn-verdict-text { max-width: 68ch; }
+.layer-bundle .bn-abstract { max-width: 72ch; white-space: pre-wrap; color: var(--bn-dim); }
+.layer-bundle .bn-exposures { color: var(--bn-dim); font-size: .88rem; }
+
+.layer-bundle .bn-stances {
+  margin: .6rem 0 .2rem; padding: .5rem .7rem; border-radius: 3px;
+  border: 1px dashed var(--bn-line);
+}
+.layer-bundle .bn-stance-lead { margin: 0 0 .3rem; font-weight: 600; }
+.layer-bundle .bn-stance-list { list-style: none; padding: 0; margin: 0; }
+.layer-bundle .bn-stance-list li { padding: .18rem 0 .18rem .8rem;
+                                   border-left: 2px solid var(--bn-accent); margin: .2rem 0; }
+
+.layer-bundle .bn-figure { margin: .6rem 0; max-width: 360px; }
+.layer-bundle .bn-figure svg { display: block; width: 100%; height: auto; }
+.layer-bundle .bn-figure figcaption { font-size: .76rem; color: var(--bn-dim); }
+
+/* ---- the manifest summary strip */
+.layer-bundle .bn-summary {
+  display: flex; flex-wrap: wrap; gap: .35rem 1.25rem; align-items: baseline;
+  padding: .6rem .8rem; margin: 0 0 .7rem;
+  border: 1px solid var(--bn-line); border-left: 3px solid var(--bn-accent);
+  border-radius: 4px; background: var(--bn-panel);
+}
+.layer-bundle .bn-summary .bn-pair { display: flex; flex-direction: column; gap: .1rem; }
+.layer-bundle .bn-summary dt { font-size: .72rem; text-transform: uppercase;
+                               letter-spacing: .04em; color: var(--bn-dim); }
+.layer-bundle .bn-summary dd { margin: 0; font-family: var(--bn-mono); }
+
+/* ---- tables */
+.layer-bundle table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.layer-bundle th, .layer-bundle td {
+  text-align: left; padding: .3rem .55rem; border-bottom: 1px solid var(--bn-line);
+  vertical-align: baseline;
+}
+.layer-bundle td.bn-num, .layer-bundle th.bn-num {
+  text-align: right; font-family: var(--bn-mono); font-variant-numeric: tabular-nums;
+}
+.layer-bundle .bn-code, .layer-bundle .bn-digest { font-family: var(--bn-mono);
+                                                   font-size: .84em; }
+.layer-bundle .bn-digest { color: var(--bn-dim); word-break: break-all; }
+.layer-bundle .bn-note { color: var(--bn-dim); font-size: .86rem; max-width: 72ch; }
+.layer-bundle .bn-none { color: var(--bn-dim); }
+.layer-bundle .bn-vals { font-family: var(--bn-mono); font-size: .82em; color: var(--bn-dim); }
+.layer-bundle td.bn-note { font-size: .82rem; }
+
+.layer-bundle th[aria-sort] { cursor: pointer; user-select: none; }
+.layer-bundle th[aria-sort]:focus-visible { outline: 2px solid var(--bn-accent);
+                                            outline-offset: -2px; }
+.layer-bundle th[aria-sort="ascending"]::after { content: " ▲"; color: var(--bn-dim); }
+.layer-bundle th[aria-sort="descending"]::after { content: " ▼"; color: var(--bn-dim); }
+
+/* ---- a status word is a word, never a colour alone */
+.layer-bundle .bn-status { font-weight: 650; font-family: var(--bn-mono); }
+.layer-bundle .bn-status.bn-ok { color: var(--bn-good); }
+.layer-bundle .bn-status.bn-notok { color: var(--bn-bad); }
+.layer-bundle .bn-warn { color: var(--bn-warn); }
+.layer-bundle tr.bn-warn-row td, .layer-bundle tr.bn-warn-row th { color: var(--bn-warn); }
+.layer-bundle .bn-sev { font-family: var(--bn-mono); font-size: .82em; }
+.layer-bundle .bn-sev-structural, .layer-bundle .bn-sev-divergence { color: var(--bn-bad);
+                                                                     font-weight: 650; }
+.layer-bundle .bn-sev-architectural { color: var(--bn-warn); }
+
+/* ---- panels */
+.layer-bundle .bn-panel {
+  border: 1px solid var(--bn-line); border-radius: 4px; padding: .7rem .9rem;
+  margin-bottom: 1rem; background: var(--bn-panel);
+}
+.layer-bundle .bn-panel.bn-synthetic { border-left: 3px solid var(--bn-warn); }
+.layer-bundle .bn-rt-head { font-size: .95rem; }
+.layer-bundle .bn-tolerance code.bn-rule { background: color-mix(in srgb, var(--bn-accent) 10%,
+                                                                 transparent);
+                                           padding: 0 .25rem; border-radius: 2px; }
+.layer-bundle .bn-shaper { color: var(--bn-fg); }
+
+/* ---- usage */
+.layer-bundle .bn-snippet {
+  font-family: var(--bn-mono); font-size: .82rem; white-space: pre-wrap; word-break: break-word;
+  padding: .5rem .7rem; border: 1px solid var(--bn-line); border-radius: 3px;
+  background: var(--bn-panel);
+}
+.layer-bundle .bn-card-link { color: var(--bn-accent); font-weight: 600; }
+.layer-bundle .bn-card-link:focus-visible { outline: 2px solid var(--bn-accent);
+                                            outline-offset: 2px; }
+
+/* ---- readings and markers */
+.layer-bundle .bn-reading { white-space: pre-wrap; max-width: 72ch; }
+.layer-bundle .bn-markers { list-style: none; padding: 0; font-family: var(--bn-mono);
+                            font-size: .8rem; }
+.layer-bundle .bn-markers li { padding: .12rem 0; }
+.layer-bundle .bn-markers li.bn-m-warn { color: var(--bn-warn); }
+.layer-bundle .bn-markers li.bn-m-error { color: var(--bn-bad); font-weight: 650; }
+
+.layer-bundle details > summary { cursor: pointer; color: var(--bn-dim); font-size: .82rem; }
+.layer-bundle details > summary:focus-visible { outline: 2px solid var(--bn-accent);
+                                                outline-offset: 2px; }
+.layer-bundle details.bn-digests { margin-bottom: 1rem; }
+
+.layer-bundle .bn-empty { color: var(--bn-dim); font-style: italic; padding: 1rem 0; }
+
+@media print {
+  .layer-bundle details { display: block; }
+  .layer-bundle details > *:not(summary) { display: block !important; }
+}

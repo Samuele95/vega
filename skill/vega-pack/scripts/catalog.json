@@ -1,0 +1,1377 @@
+{
+  "schema": "vega/bundle-catalog@1",
+  "source": "references/bundle-contract.md §1–§7",
+  "note": "The machine copy of the bundle's shape: which files it must hold, which modules of the emitted package are its serving slice, which ports go out of scope and why, the round-trip tolerance formula, what each serving mode implies, and - from v2.3 - the reading vocabulary (vega/output@2), the field kinds the answer codec reads, the sample shapes, the monitor kinds, the serving template patterns and what a re-emit may change. pack.py and apply_bundle_layer.py read it; tests/test_catalog_sync.py fails when it and the prose diverge.",
+  "required_files": [
+    "MANIFEST.json",
+    "netspec.json",
+    "schema.json",
+    "predict.py",
+    "requirements.txt",
+    "recipe.json",
+    "fitted.json",
+    "examples/rows.csv",
+    "examples/expected.parquet",
+    "tests/test_roundtrip.py",
+    "README.md"
+  ],
+  "package_slice": {
+    "keep": [
+      "ports.py",
+      "domain.py",
+      "blueprint-map.json",
+      "model/network.py",
+      "model/store.py",
+      "features/preprocess.py",
+      "serving/predict.py",
+      "serving/monitor.py"
+    ],
+    "drop_packages": [
+      "ingestion",
+      "training",
+      "evaluation"
+    ],
+    "out_of_scope": {
+      "DataSource": "the bundle takes rows from its caller; the chain's ingestion adapter reads the shaped parts, which a served model never sees",
+      "Trainer": "the bundle serves a trained network and never fits one",
+      "Evaluator": "the evaluation happened once, under seal, upstream; a bundle that could evaluate could re-expose the test part"
+    }
+  },
+  "include": {
+    "default": "serving",
+    "modes": {
+      "serving": {
+        "keeps": "the serving slice",
+        "entrypoints": [
+          "predict.py"
+        ],
+        "out_of_scope": true,
+        "conformance_bundle_mode": true
+      },
+      "full": {
+        "keeps": "the whole emitted package",
+        "entrypoints": [
+          "predict.py",
+          "train.py",
+          "evaluate.py"
+        ],
+        "out_of_scope": false,
+        "conformance_bundle_mode": false,
+        "seal": "load_part still refuses the test part and load_sealed_part still wants test_seal.json and its token; the door travels with its lock"
+      }
+    }
+  },
+  "records": {
+    "dir": "records",
+    "layers": [
+      "geometry",
+      "analysis",
+      "shape",
+      "architecture",
+      "training",
+      "evaluation"
+    ],
+    "note": "the six layers' data copied out of the model page, verbatim; the card and the notebook read them and nothing in the bundle imports them"
+  },
+  "roundtrip": {
+    "rule": "1e-6 * max(1, max|score|)",
+    "value": 1e-06,
+    "precision": "fp32",
+    "reduced_precision_note": "a checkpoint below fp32 uses the backend's declared inference tolerance instead; the manifest records which rule was applied"
+  },
+  "serving_modes": {
+    "online": {
+      "serve": true,
+      "framework": "fastapi",
+      "entry": "serve/app.py",
+      "endpoint": "POST /predict"
+    },
+    "stream": {
+      "serve": true,
+      "framework": "consumer",
+      "entry": "serve/consumer.py",
+      "endpoint": null
+    },
+    "batch": {
+      "serve": false,
+      "framework": null,
+      "entry": null,
+      "endpoint": "predict.py --input (the CLI is the batch interface)"
+    }
+  },
+  "export_formats": [
+    "onnx",
+    "torchscript"
+  ],
+  "export_parity_atol": 1e-05,
+  "examples": {
+    "default_rows": 50,
+    "kinds": [
+      "test",
+      "synthetic"
+    ],
+    "schema": "vega/examples@2",
+    "json_schema": "references/schemas/examples-2.schema.json",
+    "files": {
+      "demo": {
+        "path": "examples/demo.json",
+        "schema": "vega/demo@2",
+        "json_schema_def": "#/$defs/demo"
+      },
+      "presets": {
+        "path": "examples/presets.json",
+        "schema": "vega/presets@2",
+        "json_schema_def": "#/$defs/presets_file"
+      },
+      "request": {
+        "path": "examples/request.json",
+        "schema": null,
+        "json_schema_def": null
+      }
+    },
+    "stratum_kinds": [
+      "class",
+      "label",
+      "bin",
+      "none",
+      "typical",
+      "flagged",
+      "all"
+    ],
+    "expected_kinds": [
+      "class",
+      "labels",
+      "value",
+      "alarm"
+    ],
+    "preset_groups": [
+      "typical",
+      "edge"
+    ],
+    "preset_kinds": {
+      "typical_correct": {
+        "group": "typical",
+        "facts": [
+          "right",
+          "of"
+        ]
+      },
+      "typical_none_correct": {
+        "group": "typical",
+        "facts": [
+          "right",
+          "of"
+        ]
+      },
+      "typical_bin": {
+        "group": "typical",
+        "facts": [
+          "bin"
+        ]
+      },
+      "typical_score": {
+        "group": "typical",
+        "facts": [
+          "of"
+        ]
+      },
+      "typical_sequence": {
+        "group": "typical",
+        "facts": [
+          "of"
+        ]
+      },
+      "edge_range": {
+        "group": "edge",
+        "facts": [
+          "column",
+          "factor"
+        ]
+      },
+      "edge_infinity": {
+        "group": "edge",
+        "facts": [
+          "columns"
+        ]
+      },
+      "edge_unseen": {
+        "group": "edge",
+        "facts": [
+          "column",
+          "value"
+        ]
+      }
+    },
+    "strings": "the page renders preset.<kind>.name and preset.<kind>.text from facts; no English ships in the payload"
+  },
+  "output_readings": {
+    "schema": "vega/output@2",
+    "source": "references/bundle-contract.md §2.1 (Readings); build plan R-A8, R-A9, R-C1, R-C3, R-C4, R-C6",
+    "record_keys": [
+      "schema",
+      "kind",
+      "reading",
+      "base",
+      "link",
+      "decision",
+      "head_out",
+      "classes",
+      "positive",
+      "threshold",
+      "threshold_source",
+      "threshold_scale",
+      "threshold_per_label",
+      "quantiles",
+      "horizons",
+      "fields",
+      "field_kinds",
+      "compared",
+      "decided",
+      "score_field",
+      "truth"
+    ],
+    "links": [
+      "softmax",
+      "sigmoid",
+      "sigmoid_each",
+      "identity",
+      "cumulative",
+      "reconstruction",
+      "distance",
+      "horizon"
+    ],
+    "decisions": [
+      "threshold",
+      "argmax",
+      "per-label-threshold",
+      "cumulative",
+      "none"
+    ],
+    "decided_sources": [
+      "argmax",
+      "cumulative",
+      "threshold"
+    ],
+    "truth_types": [
+      "class",
+      "number",
+      "labels"
+    ],
+    "conditions": {
+      "loss": "spec.loss.name is one of the listed names",
+      "head_out_gt": "head_out (params.out of the spec's last `head` block) is greater than the number",
+      "head_out_eq": "head_out equals the number",
+      "has": "the dotted spec path is present and not null"
+    },
+    "resolve_rule": "rules are tried in order and the first whose kind matches and whose `when` holds wins; `@base` resolves the base kind through R1-R6 with the same spec (so a regression base with a quantile loss reads as quantile); the base is task.base_kind, else the v22_fallback rules for a v2.2 spec without it; a kind no rule matches is refused: ERROR: task.kind <k> has no serving reading (exit 2)",
+    "resolve": [
+      {
+        "rule": "R1",
+        "kind": "binary",
+        "reading": "binary"
+      },
+      {
+        "rule": "R2",
+        "kind": "multiclass",
+        "reading": "multiclass"
+      },
+      {
+        "rule": "R3",
+        "kind": "multilabel",
+        "reading": "multilabel"
+      },
+      {
+        "rule": "R4",
+        "kind": "ordinal",
+        "reading": "ordinal"
+      },
+      {
+        "rule": "R5",
+        "kind": "regression",
+        "when": {
+          "loss": [
+            "quantile"
+          ],
+          "head_out_gt": 1
+        },
+        "reading": "quantile"
+      },
+      {
+        "rule": "R6",
+        "kind": "regression",
+        "reading": "regression"
+      },
+      {
+        "rule": "R7",
+        "kind": "unsupervised",
+        "reading": "reconstruction"
+      },
+      {
+        "rule": "R8",
+        "kind": "anomaly",
+        "when": {
+          "loss": [
+            "svdd"
+          ]
+        },
+        "reading": "anomaly-svdd"
+      },
+      {
+        "rule": "R9",
+        "kind": "anomaly",
+        "reading": "anomaly-reconstruction"
+      },
+      {
+        "rule": "R10",
+        "kind": "sequence-classification",
+        "reading": "@base",
+        "base": {
+          "from": "task.base_kind",
+          "allowed": [
+            "binary",
+            "multiclass",
+            "multilabel"
+          ],
+          "v22_fallback": [
+            {
+              "when": {
+                "head_out_eq": 1
+              },
+              "base": "binary"
+            },
+            {
+              "when": {
+                "has": "task.label_format"
+              },
+              "base": "multilabel"
+            },
+            {
+              "when": {
+                "loss": [
+                  "bce_with_logits"
+                ]
+              },
+              "base": "multilabel"
+            },
+            {
+              "base": "multiclass"
+            }
+          ]
+        }
+      },
+      {
+        "rule": "R11",
+        "kind": "sequence-regression",
+        "reading": "@base",
+        "base": {
+          "from": "task.base_kind",
+          "allowed": [
+            "regression",
+            "ordinal"
+          ],
+          "v22_fallback": [
+            {
+              "when": {
+                "loss": [
+                  "cumulative_link"
+                ]
+              },
+              "base": "ordinal"
+            },
+            {
+              "base": "regression"
+            }
+          ]
+        }
+      },
+      {
+        "rule": "R12",
+        "kind": "forecast",
+        "reading": "forecast",
+        "base": {
+          "fixed": "regression"
+        }
+      }
+    ],
+    "placeholders": {
+      "<class>": "each name of `classes`, in spec order (binary: [negative, positive])",
+      "<positive>": "the positive class: str(task.positive), else the last class, else \"1\"",
+      "<label>": "each label name of a multilabel task, in spec order",
+      "<cum>": "each cumulative threshold class c_j of an ordinal head, j < K-1",
+      "<q>": "each quantile of loss.params.quantiles, as format(q*100, \"g\") with \".\" replaced by \"p\" (0.1 -> 10, 0.025 -> 2p5)",
+      "<median>": "the <q> token of the quantile nearest 0.5",
+      "<h>": "each horizon step 1..H",
+      "<feature>": "each input feature of the FeatureContract, numeric then nominal",
+      "<j>": "each embedding coordinate 0..head_out-1",
+      "<k>": "the stored score column index, horizon-major for (H, Q) heads; `score_<k>` is the one column `score` when head_out is 1"
+    },
+    "shape_fields": {
+      "graph_id": {
+        "kind": "group",
+        "when": "graph level",
+        "position": "first"
+      },
+      "answered": {
+        "kind": "answered",
+        "when": "window shape",
+        "position": "before warnings"
+      },
+      "warnings": {
+        "kind": "warnings",
+        "when": "always",
+        "position": "last"
+      }
+    },
+    "readings": {
+      "binary": {
+        "link": "sigmoid",
+        "decision": "threshold",
+        "threshold_scale": "probability",
+        "fields": [
+          "label",
+          "p_<class>",
+          "score",
+          "prediction"
+        ],
+        "kinds": {
+          "label": {
+            "kind": "class",
+            "of": null
+          },
+          "p_<class>": {
+            "kind": "probability",
+            "of": "<class>"
+          },
+          "score": {
+            "kind": "raw",
+            "of": "<positive>"
+          },
+          "prediction": {
+            "kind": "decision",
+            "of": null
+          }
+        },
+        "conditional": {},
+        "compared": [
+          [
+            "score",
+            "score"
+          ]
+        ],
+        "decided": [
+          [
+            "prediction",
+            "prediction"
+          ]
+        ],
+        "score_field": [
+          "p_<positive>"
+        ],
+        "truth": "class",
+        "truth_optional": false,
+        "sums_to_one": true,
+        "describe": {
+          "label": "the decided class, by name: the positive class when p_<positive> >= threshold, else the negative class",
+          "p_<class>": "float in [0,1] per class: p_<positive> = sigmoid(score), the other its complement; uncalibrated unless the model card says otherwise",
+          "score": "the head's raw output, a logit: unbounded and not a probability; what the evaluation stored and the round trip compares",
+          "prediction": "0|1: p_<positive> >= threshold, the threshold /vega-eval chose on the valid part (probability scale)"
+        }
+      },
+      "multiclass": {
+        "link": "softmax",
+        "decision": "argmax",
+        "threshold_scale": null,
+        "fields": [
+          "label",
+          "p_<class>",
+          "logit_<class>"
+        ],
+        "kinds": {
+          "label": {
+            "kind": "class",
+            "of": null
+          },
+          "p_<class>": {
+            "kind": "probability",
+            "of": "<class>"
+          },
+          "logit_<class>": {
+            "kind": "raw",
+            "of": "<class>"
+          }
+        },
+        "conditional": {},
+        "compared": [
+          [
+            "logit_<class>",
+            "score_<k>"
+          ]
+        ],
+        "decided": [
+          [
+            "label",
+            "argmax"
+          ]
+        ],
+        "score_field": [],
+        "truth": "class",
+        "truth_optional": false,
+        "sums_to_one": true,
+        "describe": {
+          "label": "the predicted class, by name: the argmax of the head, read through the spec's task.classes",
+          "p_<class>": "float in [0,1] per class, the network's softmax; they sum to one and are uncalibrated unless the model card says otherwise",
+          "logit_<class>": "the head's raw score per class, what the evaluation stored and the round trip compares"
+        }
+      },
+      "multilabel": {
+        "link": "sigmoid_each",
+        "decision": "per-label-threshold",
+        "threshold_scale": "probability",
+        "fields": [
+          "p_<label>",
+          "logit_<label>",
+          "pred_<label>"
+        ],
+        "kinds": {
+          "p_<label>": {
+            "kind": "probability",
+            "of": "<label>"
+          },
+          "logit_<label>": {
+            "kind": "raw",
+            "of": "<label>"
+          },
+          "pred_<label>": {
+            "kind": "flag",
+            "of": "<label>"
+          }
+        },
+        "conditional": {},
+        "compared": [
+          [
+            "logit_<label>",
+            "score_<k>"
+          ]
+        ],
+        "decided": [
+          [
+            "pred_<label>",
+            "threshold"
+          ]
+        ],
+        "score_field": [],
+        "truth": "labels",
+        "truth_optional": false,
+        "sums_to_one": false,
+        "describe": {
+          "p_<label>": "float in [0,1] per label, sigmoid(logit_<label>); labels are independent, so these do not sum to one",
+          "logit_<label>": "the head's raw score per label, what the evaluation stored and the round trip compares",
+          "pred_<label>": "0|1 per label: p_<label> >= that label's threshold (threshold_per_label, else threshold)"
+        }
+      },
+      "ordinal": {
+        "link": "cumulative",
+        "decision": "cumulative",
+        "threshold_scale": null,
+        "decision_rule": "cumulative_count",
+        "fields": [
+          "label",
+          "p_<class>",
+          "cum_<cum>",
+          "logit_cum_<cum>"
+        ],
+        "kinds": {
+          "label": {
+            "kind": "class",
+            "of": null
+          },
+          "p_<class>": {
+            "kind": "probability",
+            "of": "<class>"
+          },
+          "cum_<cum>": {
+            "kind": "cumulative",
+            "of": "<cum>"
+          },
+          "logit_cum_<cum>": {
+            "kind": "raw",
+            "of": "<cum>"
+          }
+        },
+        "conditional": {},
+        "compared": [
+          [
+            "logit_cum_<cum>",
+            "score_<k>"
+          ]
+        ],
+        "decided": [
+          [
+            "label",
+            "cumulative"
+          ]
+        ],
+        "score_field": [],
+        "truth": "class",
+        "truth_optional": false,
+        "sums_to_one": true,
+        "describe": {
+          "label": "the decided class: the count of cumulative probabilities >= 0.5 over the rank-consistent head, read through the spec's ordered task.classes",
+          "p_<class>": "float in [0,1] per class from the cumulative head (differences of adjacent cumulative probabilities, clipped at 0 and renormalised with a warning when the logits are not monotone)",
+          "cum_<cum>": "P(y > <cum>) = sigmoid(logit_cum_<cum>)",
+          "logit_cum_<cum>": "the head's raw cumulative logit, what the evaluation stored and the round trip compares"
+        }
+      },
+      "regression": {
+        "link": "identity",
+        "decision": "none",
+        "threshold_scale": null,
+        "fields": [
+          "value"
+        ],
+        "kinds": {
+          "value": {
+            "kind": "value",
+            "of": null
+          }
+        },
+        "conditional": {},
+        "compared": [
+          [
+            "value",
+            "score"
+          ]
+        ],
+        "decided": [],
+        "score_field": [
+          "value"
+        ],
+        "truth": "number",
+        "truth_optional": false,
+        "sums_to_one": false,
+        "describe": {
+          "value": "float, on the label's own scale"
+        }
+      },
+      "quantile": {
+        "link": "identity",
+        "decision": "none",
+        "threshold_scale": null,
+        "fields": [
+          "value",
+          "q_<q>"
+        ],
+        "kinds": {
+          "value": {
+            "kind": "value",
+            "of": null
+          },
+          "q_<q>": {
+            "kind": "quantile",
+            "of": "<q>"
+          }
+        },
+        "conditional": {
+          "value": "0.5 is one of the quantiles"
+        },
+        "compared": [
+          [
+            "q_<q>",
+            "score_<k>"
+          ]
+        ],
+        "decided": [],
+        "score_field": [
+          "value",
+          "q_<median>"
+        ],
+        "truth": "number",
+        "truth_optional": false,
+        "sums_to_one": false,
+        "describe": {
+          "value": "float, the 0.5 quantile on the label's own scale",
+          "q_<q>": "float per quantile q of the loss, on the label's own scale"
+        }
+      },
+      "forecast": {
+        "link": "horizon",
+        "decision": "none",
+        "threshold_scale": null,
+        "fields": [
+          "value_h<h>",
+          "value_h<h>_q<q>"
+        ],
+        "kinds": {
+          "value_h<h>": {
+            "kind": "horizon",
+            "of": "<h>"
+          },
+          "value_h<h>_q<q>": {
+            "kind": "horizon",
+            "of": "<h>/<q>"
+          }
+        },
+        "conditional": {
+          "value_h<h>": "the loss has no quantiles",
+          "value_h<h>_q<q>": "the loss has quantiles (horizon-major)"
+        },
+        "compared": [
+          [
+            "value_h<h>",
+            "score_<k>"
+          ],
+          [
+            "value_h<h>_q<q>",
+            "score_<k>"
+          ]
+        ],
+        "decided": [],
+        "score_field": [
+          "value_h1",
+          "value_h1_q<median>"
+        ],
+        "truth": "number",
+        "truth_optional": false,
+        "sums_to_one": false,
+        "describe": {
+          "value_h<h>": "float, the forecast h steps after the row, on the target's scale",
+          "value_h<h>_q<q>": "float, quantile q of the forecast h steps after the row"
+        }
+      },
+      "reconstruction": {
+        "link": "reconstruction",
+        "decision": "none",
+        "threshold_scale": null,
+        "fields": [
+          "reconstruction_error",
+          "recon_<feature>",
+          "out_<k>"
+        ],
+        "kinds": {
+          "reconstruction_error": {
+            "kind": "row_score",
+            "of": null
+          },
+          "recon_<feature>": {
+            "kind": "recon",
+            "of": "<feature>"
+          },
+          "out_<k>": {
+            "kind": "recon",
+            "of": "<k>"
+          }
+        },
+        "conditional": {
+          "recon_<feature>": "head_out equals the number of input features",
+          "out_<k>": "head_out differs from the number of input features"
+        },
+        "compared": [
+          [
+            "recon_<feature>",
+            "score_<k>"
+          ],
+          [
+            "out_<k>",
+            "score_<k>"
+          ],
+          [
+            "reconstruction_error",
+            "row_score"
+          ]
+        ],
+        "decided": [],
+        "score_field": [
+          "reconstruction_error"
+        ],
+        "truth": null,
+        "truth_optional": true,
+        "sums_to_one": false,
+        "describe": {
+          "reconstruction_error": "float >= 0 per row: numeric mean squared error plus the mean nominal cross-entropy (the evaluation's row_score)",
+          "recon_<feature>": "float, the network's reconstruction of that input feature (shaped scale)",
+          "out_<k>": "float, head output k when the head is wider than the input features (embedded nominals reconstruct as logits)"
+        }
+      },
+      "anomaly-reconstruction": {
+        "link": "reconstruction",
+        "decision": "threshold",
+        "threshold_scale": "score",
+        "fields": [
+          "score",
+          "prediction",
+          "label",
+          "recon_<feature>",
+          "out_<k>"
+        ],
+        "kinds": {
+          "score": {
+            "kind": "score",
+            "of": null
+          },
+          "prediction": {
+            "kind": "alarm",
+            "of": null
+          },
+          "label": {
+            "kind": "class",
+            "of": null
+          },
+          "recon_<feature>": {
+            "kind": "recon",
+            "of": "<feature>"
+          },
+          "out_<k>": {
+            "kind": "recon",
+            "of": "<k>"
+          }
+        },
+        "conditional": {
+          "label": "task.classes is present (a labelled anomaly task)",
+          "recon_<feature>": "head_out equals the number of input features",
+          "out_<k>": "head_out differs from the number of input features"
+        },
+        "compared": [
+          [
+            "recon_<feature>",
+            "score_<k>"
+          ],
+          [
+            "out_<k>",
+            "score_<k>"
+          ],
+          [
+            "score",
+            "row_score"
+          ]
+        ],
+        "decided": [
+          [
+            "prediction",
+            "prediction"
+          ]
+        ],
+        "score_field": [
+          "score"
+        ],
+        "truth": "class",
+        "truth_optional": true,
+        "sums_to_one": false,
+        "describe": {
+          "score": "float >= 0, the per-row anomaly score (reconstruction error); higher is more anomalous",
+          "prediction": "0|1: score >= threshold (score scale), the threshold /vega-eval chose on the valid part",
+          "label": "the decided class by name (the positive class when prediction is 1), only for a labelled anomaly task",
+          "recon_<feature>": "float, the reconstruction of that input feature (shaped scale)",
+          "out_<k>": "float, head output k when the head is wider than the input features"
+        }
+      },
+      "anomaly-svdd": {
+        "link": "distance",
+        "decision": "threshold",
+        "threshold_scale": "score",
+        "fields": [
+          "score",
+          "prediction",
+          "label",
+          "emb_<j>"
+        ],
+        "kinds": {
+          "score": {
+            "kind": "score",
+            "of": null
+          },
+          "prediction": {
+            "kind": "alarm",
+            "of": null
+          },
+          "label": {
+            "kind": "class",
+            "of": null
+          },
+          "emb_<j>": {
+            "kind": "embedding",
+            "of": "<j>"
+          }
+        },
+        "conditional": {
+          "label": "task.classes is present (a labelled anomaly task)"
+        },
+        "compared": [
+          [
+            "emb_<j>",
+            "score_<k>"
+          ],
+          [
+            "score",
+            "row_score"
+          ]
+        ],
+        "decided": [
+          [
+            "prediction",
+            "prediction"
+          ]
+        ],
+        "score_field": [
+          "score"
+        ],
+        "truth": "class",
+        "truth_optional": true,
+        "sums_to_one": false,
+        "describe": {
+          "score": "float >= 0, the squared distance ||f(x) - c||^2 to the centre the model carries; higher is more anomalous",
+          "prediction": "0|1: score >= threshold (score scale), the threshold /vega-eval chose on the valid part",
+          "label": "the decided class by name (the positive class when prediction is 1), only for a labelled anomaly task",
+          "emb_<j>": "float, coordinate j of the embedding f(x)"
+        }
+      }
+    }
+  },
+  "field_kinds": {
+    "class": {
+      "key": "label",
+      "json": "string",
+      "shown": "always"
+    },
+    "flag": {
+      "key": "labels",
+      "json": "list of the label names whose flag is 1",
+      "shown": "always"
+    },
+    "alarm": {
+      "key": "anomalous",
+      "json": "boolean",
+      "shown": "always"
+    },
+    "probability": {
+      "key": "probabilities",
+      "json": "{of: number}",
+      "shown": "always"
+    },
+    "raw": {
+      "key": "logits",
+      "json": "{of: number}",
+      "shown": "include=logits"
+    },
+    "value": {
+      "key": "value",
+      "json": "number",
+      "shown": "always"
+    },
+    "quantile": {
+      "key": "quantiles",
+      "json": "{\"<q>\": number}",
+      "shown": "always"
+    },
+    "horizon": {
+      "key": "values",
+      "json": "{\"h<h>\": number} or, with quantiles, {\"h<h>\": {\"<q>\": number}}",
+      "shown": "always"
+    },
+    "score": {
+      "key": "score",
+      "json": "number",
+      "shown": "always"
+    },
+    "row_score": {
+      "key": "reconstruction_error",
+      "json": "number",
+      "shown": "always"
+    },
+    "cumulative": {
+      "key": "cumulative",
+      "json": "{of: number}",
+      "shown": "always"
+    },
+    "recon": {
+      "key": "reconstruction",
+      "json": "{of: number}",
+      "shown": "include=reconstruction"
+    },
+    "embedding": {
+      "key": "embedding",
+      "json": "list of numbers in j order",
+      "shown": "include=embedding"
+    },
+    "decision": {
+      "key": null,
+      "json": null,
+      "shown": "csv",
+      "note": "the 0|1 decision of a binary head: `label` carries it in JSON"
+    },
+    "group": {
+      "key": "graph_id",
+      "json": "string",
+      "shown": "always"
+    },
+    "answered": {
+      "key": "answered",
+      "json": "boolean, default true",
+      "shown": "always"
+    },
+    "warnings": {
+      "key": "warnings",
+      "json": "list of strings",
+      "shown": "always"
+    }
+  },
+  "include_values": [
+    "logits",
+    "reconstruction",
+    "embedding"
+  ],
+  "sample_shapes": {
+    "row": {
+      "record": [
+        "shape"
+      ],
+      "examples": "the first n test rows; expected rows 0..n-1",
+      "request": {
+        "rows": "[the first example row]"
+      },
+      "history": "only for a recipe with a lag step: the raw rows preceding the query"
+    },
+    "window": {
+      "record": [
+        "shape",
+        "length",
+        "stride",
+        "horizon",
+        "series_by",
+        "order_by",
+        "context",
+        "autoregressive",
+        "lag_depth",
+        "history_rows",
+        "rule"
+      ],
+      "forecast_only": [
+        "horizon",
+        "autoregressive"
+      ],
+      "contexts": [
+        "previous-part",
+        "none"
+      ],
+      "lag_depth": "max(max(step.params.lags)) over the recipe steps with op lag, else 0",
+      "history_rows": "(length - 1) + lag_depth",
+      "rule": "each row is a window end; answered when length-1 preceding rows of its series exist in history + rows",
+      "examples": "context rows first, then n scored rows; expected rows carry __row__",
+      "request": {
+        "rows": "[the anchor row]",
+        "history": "[its history_rows predecessors]"
+      }
+    },
+    "graph": {
+      "record": [
+        "shape",
+        "level",
+        "protocol",
+        "method",
+        "directed",
+        "self_loops",
+        "graph_id",
+        "reference",
+        "rule"
+      ],
+      "levels": [
+        "node",
+        "graph"
+      ],
+      "protocols_served": [
+        "inductive"
+      ],
+      "protocols_refused": {
+        "transductive": "ERROR: transductive graph protocol: the served answers would depend on the fixed deployment graph; /vega-pack v2.3 serves inductive graphs only (exit 2)"
+      },
+      "reference_schema": "vega/graph-reference@1",
+      "reference_parts": [
+        "train",
+        "valid"
+      ],
+      "files": [
+        "graph/reference-nodes.parquet",
+        "graph/reference-edges.parquet",
+        "graph/graph.json"
+      ],
+      "warn_reference_nodes_above": 1000000,
+      "rule": "messages flow reference -> query only; an answer does not depend on the other rows of the request",
+      "examples": "node level: the first n test rows; graph level: whole test graphs",
+      "request": {
+        "rows": "node level: [the first example row]; graph level: the rows of one graph"
+      }
+    }
+  },
+  "graph_reference": {
+    "schema": "vega/graph-reference@1",
+    "nodes_columns": "ref (int64, dense 0..R-1: train rows then valid rows, each in split order), every FeatureContract column as shaped, and for key_pair the raw key columns; no raw position",
+    "edges_columns": [
+      "src_ref",
+      "dst_ref",
+      "weight"
+    ],
+    "meta_keys": [
+      "schema",
+      "method",
+      "params",
+      "level",
+      "directed",
+      "self_loops",
+      "symmetric",
+      "protocol",
+      "parts",
+      "n_nodes",
+      "n_edges",
+      "feature_columns",
+      "edges_for_columns",
+      "notes"
+    ],
+    "role": "data"
+  },
+  "monitor_kinds": {
+    "psi": {
+      "needs": "column",
+      "readings": null
+    },
+    "rate": {
+      "needs": "column",
+      "readings": null
+    },
+    "unseen_rate": {
+      "needs": "recipe",
+      "readings": null
+    },
+    "class_recall": {
+      "needs": "labels",
+      "readings": [
+        "binary",
+        "multiclass",
+        "ordinal",
+        "anomaly-reconstruction",
+        "anomaly-svdd"
+      ]
+    },
+    "output_psi": {
+      "needs": "predictions",
+      "reads": "score_field",
+      "readings": [
+        "binary",
+        "regression",
+        "quantile",
+        "forecast",
+        "reconstruction",
+        "anomaly-reconstruction",
+        "anomaly-svdd"
+      ]
+    },
+    "prediction_mix": {
+      "needs": "predictions",
+      "readings": [
+        "binary",
+        "multiclass",
+        "ordinal"
+      ]
+    },
+    "label_rate": {
+      "needs": "predictions",
+      "readings": [
+        "multilabel"
+      ]
+    },
+    "alert_rate": {
+      "needs": "predictions",
+      "readings": [
+        "anomaly-reconstruction",
+        "anomaly-svdd"
+      ]
+    },
+    "residual": {
+      "needs": "targets",
+      "readings": [
+        "regression",
+        "quantile",
+        "forecast"
+      ]
+    }
+  },
+  "serving_templates": {
+    "package": [
+      "package/*.py",
+      "package/inspection/*.py"
+    ],
+    "serve": [
+      "serve/*.py",
+      "serve/static/index.html"
+    ],
+    "bundle": [
+      "bundle/*"
+    ],
+    "tests": [
+      "tests/*.py"
+    ]
+  },
+  "serving_template_rule": {
+    "root": "templates/serving/ of the backend (pytorch: vega-forge/scripts/backends/pytorch/templates/serving/)",
+    "match": "a pattern matches a template path relative to the root when both have the same number of /-separated segments and each segment matches under fnmatch.fnmatchcase: * never crosses a /, and it matches a leading dot",
+    "destinations": {
+      "package": "<package>/<serving module>/",
+      "serve": "serve/",
+      "bundle": "",
+      "tests": "tests/"
+    },
+    "render": "the pattern's first segment names the destination and is replaced by it: package/inspection/codec.py renders to <package>/<serving module>/inspection/codec.py"
+  },
+  "reemit": {
+    "may_change": {
+      "templates": [
+        "package/*.py",
+        "package/inspection/*.py",
+        "serve/*.py",
+        "serve/static/index.html",
+        "bundle/*",
+        "tests/*.py"
+      ],
+      "manifest": [
+        "created_at",
+        "reemits",
+        "blueprint.conformance",
+        "serve",
+        "roles",
+        "roundtrip",
+        "exports",
+        "files (the outputs of the templates only)"
+      ]
+    },
+    "never": [
+      "weights.*",
+      "netspec.json",
+      "recipe.json",
+      "fitted.json",
+      "schema.json",
+      "monitor-reference.json",
+      "examples/*",
+      "graph/*",
+      "records/*",
+      "<package>/ files outside the serving templates' outputs (wherever the map puts them)"
+    ],
+    "refusal": "ERROR: re-emit would change <files>; what the evaluation pinned is not the serving templates' to change — re-pack deliberately (exit 3, bundle untouched)"
+  },
+  "serve_record": {
+    "added": [
+      "endpoints",
+      "templates",
+      "showcase_slot",
+      "inspection",
+      "forced_by"
+    ],
+    "removed": [
+      "story"
+    ],
+    "route_modules": [
+      "routes_meta",
+      "routes_predict",
+      "routes_monitor",
+      "routes_inspect",
+      "routes_showcase"
+    ],
+    "route_module_literals": [
+      "ENDPOINTS",
+      "MODEL_ROUTES",
+      "OPEN_WHILE_UNREADY",
+      "CAPABILITY"
+    ],
+    "capabilities": [
+      "core",
+      "code",
+      "inspection",
+      "showcase"
+    ],
+    "showcase_slot": {
+      "dir": "showcase",
+      "schema": "vega/showcase@1",
+      "routes": [
+        "GET /",
+        "GET /console",
+        "GET /showcase/{path}",
+        "GET /v1/story",
+        "GET /report.pdf",
+        "GET /v1/showcase"
+      ],
+      "env": "<ENV>_SHOWCASE",
+      "flag": "--showcase"
+    },
+    "showcase_open_while_unready": [
+      "/",
+      "/console",
+      "/showcase/",
+      "/v1/showcase"
+    ],
+    "inspection": {
+      "schema": "vega/inspection@1",
+      "keys": [
+        "schema",
+        "enabled",
+        "weights",
+        "network_schema",
+        "explanation_schema",
+        "files",
+        "block_types",
+        "opaque",
+        "chain",
+        "network_digest",
+        "self_test",
+        "source"
+      ],
+      "weights": [
+        "full",
+        "summary"
+      ],
+      "weights_default": "full",
+      "env": "<ENV>_INSPECT_WEIGHTS",
+      "network_schema": "vega/network-view@2",
+      "explanation_schema": "vega/explanation@2"
+    },
+    "forced_by": [
+      "--serve"
+    ]
+  },
+  "code_view": {
+    "schema": "vega/code-view@2",
+    "roles": [
+      "Model",
+      "FeatureTransformer",
+      "Predictor",
+      "ModelStore",
+      "Monitor",
+      "Inspection",
+      "support",
+      "composition_root",
+      "http_entry",
+      "ports",
+      "domain"
+    ],
+    "kinds": [
+      "adapter",
+      "support",
+      "entrypoint"
+    ],
+    "strings": "the page renders code.about.<role>; no English about field is sent"
+  },
+  "manifest_required_keys": [
+    "schema",
+    "slug",
+    "run",
+    "campaign",
+    "chain",
+    "files",
+    "examples",
+    "backend",
+    "python",
+    "created_at",
+    "input_schema",
+    "output",
+    "sample",
+    "roundtrip",
+    "blueprint",
+    "usage"
+  ]
+}

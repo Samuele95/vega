@@ -1,0 +1,4921 @@
+{
+ "schema": "vega/page-predictions-fixture@1",
+ "about": "RowPrediction answers per reading, written by the serving AnswerCodec from vega-pack's output record (tests/fixtures/predictions/make_predictions.py); read by tests/registry.test.js.",
+ "rows": 6,
+ "includes": [
+  "logits",
+  "reconstruction",
+  "embedding"
+ ],
+ "cases": [
+  {
+   "id": "multiclass",
+   "reading": "multiclass",
+   "lane": {
+    "task": "multiclass",
+    "base": null,
+    "view_key": "classes",
+    "shape": "row",
+    "level": null,
+    "link": "softmax",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "calm",
+     "gust",
+     "storm"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "multiclass",
+     "reading": "multiclass",
+     "base": null,
+     "link": "softmax",
+     "decision": "argmax",
+     "head_out": 3,
+     "classes": [
+      "calm",
+      "gust",
+      "storm"
+     ],
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "label",
+      "p_calm",
+      "p_gust",
+      "p_storm",
+      "logit_calm",
+      "logit_gust",
+      "logit_storm",
+      "warnings"
+     ],
+     "field_kinds": {
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "p_calm": {
+       "kind": "probability",
+       "of": "calm"
+      },
+      "p_gust": {
+       "kind": "probability",
+       "of": "gust"
+      },
+      "p_storm": {
+       "kind": "probability",
+       "of": "storm"
+      },
+      "logit_calm": {
+       "kind": "raw",
+       "of": "calm"
+      },
+      "logit_gust": {
+       "kind": "raw",
+       "of": "gust"
+      },
+      "logit_storm": {
+       "kind": "raw",
+       "of": "storm"
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "logit_calm",
+       "score_0"
+      ],
+      [
+       "logit_gust",
+       "score_1"
+      ],
+      [
+       "logit_storm",
+       "score_2"
+      ]
+     ],
+     "decided": [
+      [
+       "label",
+       "argmax"
+      ]
+     ],
+     "score_field": null,
+     "truth": {
+      "column": "kind",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "kind",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "kind",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "label",
+    "probabilities",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "label",
+    "probabilities",
+    "logits",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.01770856558659877,
+      "gust": 0.012748146766988626,
+      "storm": 0.9695432876464126
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.9726981734259741,
+      "gust": 0.025774545355983662,
+      "storm": 0.0015272812180422335
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.5421372817463166,
+      "gust": 0.3951195631782591,
+      "storm": 0.06274315507542437
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.742618492447232,
+      "gust": 0.2553004271721107,
+      "storm": 0.0020810803806573614
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.9245452462076987,
+      "gust": 0.009068621946896921,
+      "storm": 0.06638613184540436
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.12107942502861685,
+      "gust": 0.16206655008706106,
+      "storm": 0.7168540248843221
+     },
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.01770856558659877,
+      "gust": 0.012748146766988626,
+      "storm": 0.9695432876464126
+     },
+     "logits": {
+      "calm": -0.6426604119958079,
+      "gust": -0.9713229565336604,
+      "storm": 3.3601162571759415
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.9726981734259741,
+      "gust": 0.025774545355983662,
+      "storm": 0.0015272812180422335
+     },
+     "logits": {
+      "calm": 3.941053764211431,
+      "gust": 0.3103673229711795,
+      "storm": -2.515530894795365
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.5421372817463166,
+      "gust": 0.3951195631782591,
+      "storm": 0.06274315507542437
+     },
+     "logits": {
+      "calm": 0.4004368304807994,
+      "gust": 0.08410598444794622,
+      "storm": -1.7560329366432361
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.742618492447232,
+      "gust": 0.2553004271721107,
+      "storm": 0.0020810803806573614
+     },
+     "logits": {
+      "calm": 3.058815794794678,
+      "gust": 1.9910743485250593,
+      "storm": -2.8184794762950762
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.9245452462076987,
+      "gust": 0.009068621946896921,
+      "storm": 0.06638613184540436
+     },
+     "logits": {
+      "calm": 1.7668682990575555,
+      "gust": -2.857613374554717,
+      "storm": -0.8669455149272787
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.12107942502861685,
+      "gust": 0.16206655008706106,
+      "storm": 0.7168540248843221
+     },
+     "logits": {
+      "calm": -1.776376093318762,
+      "gust": -1.4848157748885413,
+      "storm": 0.002049399586837918
+     },
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "storm",
+    "calm",
+    "gust",
+    "calm",
+    "calm",
+    "storm"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "calm": "neutral",
+     "gust": "plain",
+     "storm": "alert"
+    },
+    "source": {
+     "calm": "structural:majority",
+     "storm": "user:turn-2"
+    },
+    "proposed": {
+     "neutral": "calm",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_class",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "calm",
+     "gust",
+     "storm"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.01770856558659877,
+      "gust": 0.012748146766988626,
+      "storm": 0.9695432876464126
+     },
+     "logits": {
+      "calm": -0.6426604119958079,
+      "gust": -0.9713229565336604,
+      "storm": 3.3601162571759415
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "binary",
+   "reading": "binary",
+   "lane": {
+    "task": "binary",
+    "base": null,
+    "view_key": "binary",
+    "shape": "row",
+    "level": null,
+    "link": "sigmoid",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "ok",
+     "delayed"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "binary",
+     "reading": "binary",
+     "base": null,
+     "link": "sigmoid",
+     "decision": "threshold",
+     "head_out": 1,
+     "classes": [
+      "ok",
+      "delayed"
+     ],
+     "positive": "delayed",
+     "threshold": 0.4,
+     "threshold_source": "valid-optimum",
+     "threshold_scale": "probability",
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "label",
+      "p_ok",
+      "p_delayed",
+      "score",
+      "prediction",
+      "warnings"
+     ],
+     "field_kinds": {
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "p_ok": {
+       "kind": "probability",
+       "of": "ok"
+      },
+      "p_delayed": {
+       "kind": "probability",
+       "of": "delayed"
+      },
+      "score": {
+       "kind": "raw",
+       "of": "delayed"
+      },
+      "prediction": {
+       "kind": "decision",
+       "of": null
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "score",
+       "score"
+      ]
+     ],
+     "decided": [
+      [
+       "prediction",
+       "prediction"
+      ]
+     ],
+     "score_field": "p_delayed",
+     "truth": {
+      "column": "delayed",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "delayed",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "delayed",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "label",
+    "probabilities",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "label",
+    "probabilities",
+    "logits",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.13416257255127584,
+      "delayed": 0.8658374274487242
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.5670155263661883,
+      "delayed": 0.43298447363381165
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.8998484856829043,
+      "delayed": 0.10015151431709565
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.08176325804191653,
+      "delayed": 0.9182367419580835
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.954354142145431,
+      "delayed": 0.045645857854568934
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.675202592583437,
+      "delayed": 0.32479740741656304
+     },
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.13416257255127584,
+      "delayed": 0.8658374274487242
+     },
+     "logits": {
+      "delayed": 1.8646448702409084
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.5670155263661883,
+      "delayed": 0.43298447363381165
+     },
+     "logits": {
+      "delayed": -0.26968481701376373
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.8998484856829043,
+      "delayed": 0.10015151431709565
+     },
+     "logits": {
+      "delayed": -2.1955422174230343
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.08176325804191653,
+      "delayed": 0.9182367419580835
+     },
+     "logits": {
+      "delayed": 2.418627271705385
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.954354142145431,
+      "delayed": 0.045645857854568934
+     },
+     "logits": {
+      "delayed": -3.040121954851787
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.675202592583437,
+      "delayed": 0.32479740741656304
+     },
+     "logits": {
+      "delayed": -0.7318111568372266
+     },
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "delayed",
+    "delayed",
+    "delayed",
+    "delayed",
+    "ok",
+    "ok"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "ok": "neutral",
+     "delayed": "alert"
+    },
+    "source": {
+     "ok": "structural:majority",
+     "delayed": "user:turn-2"
+    },
+    "proposed": {
+     "neutral": "ok",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_class",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "ok",
+     "delayed"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7
+    ],
+    "breakdown_weak": [
+     false,
+     false
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.13416257255127584,
+      "delayed": 0.8658374274487242
+     },
+     "logits": {
+      "delayed": 1.8646448702409084
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "multilabel",
+   "reading": "multilabel",
+   "lane": {
+    "task": "multilabel",
+    "base": null,
+    "view_key": "labels",
+    "shape": "row",
+    "level": null,
+    "link": "sigmoid_each",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "red",
+     "green",
+     "blue"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "multilabel",
+     "reading": "multilabel",
+     "base": null,
+     "link": "sigmoid_each",
+     "decision": "per-label-threshold",
+     "head_out": 3,
+     "classes": [
+      "red",
+      "green",
+      "blue"
+     ],
+     "positive": null,
+     "threshold": 0.5,
+     "threshold_source": "valid-optimum",
+     "threshold_scale": "probability",
+     "threshold_per_label": {
+      "red": 0.3,
+      "green": 0.6,
+      "blue": 0.5
+     },
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "p_red",
+      "p_green",
+      "p_blue",
+      "logit_red",
+      "logit_green",
+      "logit_blue",
+      "pred_red",
+      "pred_green",
+      "pred_blue",
+      "warnings"
+     ],
+     "field_kinds": {
+      "p_red": {
+       "kind": "probability",
+       "of": "red"
+      },
+      "p_green": {
+       "kind": "probability",
+       "of": "green"
+      },
+      "p_blue": {
+       "kind": "probability",
+       "of": "blue"
+      },
+      "logit_red": {
+       "kind": "raw",
+       "of": "red"
+      },
+      "logit_green": {
+       "kind": "raw",
+       "of": "green"
+      },
+      "logit_blue": {
+       "kind": "raw",
+       "of": "blue"
+      },
+      "pred_red": {
+       "kind": "flag",
+       "of": "red"
+      },
+      "pred_green": {
+       "kind": "flag",
+       "of": "green"
+      },
+      "pred_blue": {
+       "kind": "flag",
+       "of": "blue"
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "logit_red",
+       "score_0"
+      ],
+      [
+       "logit_green",
+       "score_1"
+      ],
+      [
+       "logit_blue",
+       "score_2"
+      ]
+     ],
+     "decided": [
+      [
+       "pred_red",
+       "threshold"
+      ],
+      [
+       "pred_green",
+       "threshold"
+      ],
+      [
+       "pred_blue",
+       "threshold"
+      ]
+     ],
+     "score_field": null,
+     "truth": {
+      "column": "tags",
+      "type": "labels",
+      "sep": ";"
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "tags",
+     "type": "labels",
+     "sep": ";"
+    },
+    "label": {
+     "column": "tags",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "probabilities",
+    "labels",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "probabilities",
+    "logits",
+    "labels",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.553298394317111,
+      "green": 0.0368478832448612,
+      "blue": 0.9336149322972627
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.5412492938187877,
+      "green": 0.0867817818515796,
+      "blue": 0.9099233155217442
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.8767931995430865,
+      "green": 0.05213056841342802,
+      "blue": 0.9019858443018439
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.2272942431681003,
+      "green": 0.12371596695397256,
+      "blue": 0.8126041274450571
+     },
+     "labels": [
+      "blue"
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.1866531226945762,
+      "green": 0.04999155861471154,
+      "blue": 0.22984730019079627
+     },
+     "labels": [],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.29216782661279916,
+      "green": 0.4792367962501169,
+      "blue": 0.16426921537997044
+     },
+     "labels": [],
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.553298394317111,
+      "green": 0.0368478832448612,
+      "blue": 0.9336149322972627
+     },
+     "logits": {
+      "red": 0.21400662499268572,
+      "green": -3.263413186135455,
+      "blue": 2.6435919279672855
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.5412492938187877,
+      "green": 0.0867817818515796,
+      "blue": 0.9099233155217442
+     },
+     "logits": {
+      "red": 0.16537303586586838,
+      "green": -2.353578151112346,
+      "blue": 2.31269897000234
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.8767931995430865,
+      "green": 0.05213056841342802,
+      "blue": 0.9019858443018439
+     },
+     "logits": {
+      "red": 1.9624069120781606,
+      "green": -2.900465259886798,
+      "blue": 2.2194869121219925
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.2272942431681003,
+      "green": 0.12371596695397256,
+      "blue": 0.8126041274450571
+     },
+     "logits": {
+      "red": -1.2236529216758418,
+      "green": -1.9577019279074013,
+      "blue": 1.4670207180730443
+     },
+     "labels": [
+      "blue"
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.1866531226945762,
+      "green": 0.04999155861471154,
+      "blue": 0.22984730019079627
+     },
+     "logits": {
+      "red": -1.4719057464698315,
+      "green": -2.9446167067544584,
+      "blue": -1.209173630405182
+     },
+     "labels": [],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "probabilities": {
+      "red": 0.29216782661279916,
+      "green": 0.4792367962501169,
+      "blue": 0.16426921537997044
+     },
+     "logits": {
+      "red": -0.8848786365186221,
+      "green": -0.08310060439051285,
+      "blue": -1.626799894119268
+     },
+     "labels": [],
+     "warnings": []
+    }
+   ],
+   "truth": [
+    [
+     "red",
+     "blue"
+    ],
+    [
+     "red",
+     "blue"
+    ],
+    [
+     "red",
+     "blue"
+    ],
+    [
+     "red"
+    ],
+    [],
+    []
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "red": "neutral",
+     "green": "plain",
+     "blue": "plain"
+    },
+    "source": {
+     "red": "structural:majority"
+    },
+    "proposed": {
+     "neutral": "red",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_label",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "red",
+     "green",
+     "blue"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "probabilities": {
+      "red": 0.553298394317111,
+      "green": 0.0368478832448612,
+      "blue": 0.9336149322972627
+     },
+     "logits": {
+      "red": 0.21400662499268572,
+      "green": -3.263413186135455,
+      "blue": 2.6435919279672855
+     },
+     "labels": [
+      "red",
+      "blue"
+     ],
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "ordinal",
+   "reading": "ordinal",
+   "lane": {
+    "task": "ordinal",
+    "base": null,
+    "view_key": "ordinal",
+    "shape": "row",
+    "level": null,
+    "link": "cumulative",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "low",
+     "mid",
+     "high"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "ordinal",
+     "reading": "ordinal",
+     "base": null,
+     "link": "cumulative",
+     "decision": "cumulative",
+     "head_out": 2,
+     "classes": [
+      "low",
+      "mid",
+      "high"
+     ],
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "label",
+      "p_low",
+      "p_mid",
+      "p_high",
+      "cum_low",
+      "cum_mid",
+      "logit_cum_low",
+      "logit_cum_mid",
+      "warnings"
+     ],
+     "field_kinds": {
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "p_low": {
+       "kind": "probability",
+       "of": "low"
+      },
+      "p_mid": {
+       "kind": "probability",
+       "of": "mid"
+      },
+      "p_high": {
+       "kind": "probability",
+       "of": "high"
+      },
+      "cum_low": {
+       "kind": "cumulative",
+       "of": "low"
+      },
+      "cum_mid": {
+       "kind": "cumulative",
+       "of": "mid"
+      },
+      "logit_cum_low": {
+       "kind": "raw",
+       "of": "low"
+      },
+      "logit_cum_mid": {
+       "kind": "raw",
+       "of": "mid"
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "logit_cum_low",
+       "score_0"
+      ],
+      [
+       "logit_cum_mid",
+       "score_1"
+      ]
+     ],
+     "decided": [
+      [
+       "label",
+       "cumulative"
+      ]
+     ],
+     "score_field": null,
+     "truth": {
+      "column": "grade",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "grade",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "grade",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "label",
+    "probabilities",
+    "cumulative",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "label",
+    "probabilities",
+    "cumulative",
+    "logits",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.55999149192997,
+      "mid": 0.3252940946910505,
+      "high": 0.11471441337897947
+     },
+     "cumulative": {
+      "low": 0.44000850807002995,
+      "mid": 0.11471441337897947
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.6888397824235974,
+      "mid": 0.25645496283896385,
+      "high": 0.05470525473743863
+     },
+     "cumulative": {
+      "low": 0.3111602175764025,
+      "mid": 0.05470525473743863
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.04863129486891815,
+      "mid": 0.476935995846497,
+      "high": 0.47443270928458486
+     },
+     "cumulative": {
+      "low": 0.9513687051310818,
+      "mid": 0.47443270928458486
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "high",
+     "probabilities": {
+      "low": 0.04869379882268199,
+      "mid": 0.19506759393396644,
+      "high": 0.7562386072433516
+     },
+     "cumulative": {
+      "low": 0.951306201177318,
+      "mid": 0.7562386072433516
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "high",
+     "probabilities": {
+      "low": 0.24798709822381837,
+      "mid": 0.10496373484142252,
+      "high": 0.6470491669347591
+     },
+     "cumulative": {
+      "low": 0.7520129017761816,
+      "mid": 0.6470491669347591
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.29715535609414867,
+      "mid": 0.3403497119539124,
+      "high": 0.36249493195193894
+     },
+     "cumulative": {
+      "low": 0.7028446439058513,
+      "mid": 0.36249493195193894
+     },
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.55999149192997,
+      "mid": 0.3252940946910505,
+      "high": 0.11471441337897947
+     },
+     "cumulative": {
+      "low": 0.44000850807002995,
+      "mid": 0.11471441337897947
+     },
+     "logits": {
+      "low": -0.2411275273834303,
+      "mid": -2.043464611915897
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.6888397824235974,
+      "mid": 0.25645496283896385,
+      "high": 0.05470525473743863
+     },
+     "cumulative": {
+      "low": 0.3111602175764025,
+      "mid": 0.05470525473743863
+     },
+     "logits": {
+      "low": -0.7947007589963496,
+      "mid": -2.849537009128039
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.04863129486891815,
+      "mid": 0.476935995846497,
+      "high": 0.47443270928458486
+     },
+     "cumulative": {
+      "low": 0.9513687051310818,
+      "mid": 0.47443270928458486
+     },
+     "logits": {
+      "low": 2.973634438946328,
+      "mid": -0.10235843890571569
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "high",
+     "probabilities": {
+      "low": 0.04869379882268199,
+      "mid": 0.19506759393396644,
+      "high": 0.7562386072433516
+     },
+     "cumulative": {
+      "low": 0.951306201177318,
+      "mid": 0.7562386072433516
+     },
+     "logits": {
+      "low": 2.9722843010816553,
+      "mid": 1.1321670961292418
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "high",
+     "probabilities": {
+      "low": 0.24798709822381837,
+      "mid": 0.10496373484142252,
+      "high": 0.6470491669347591
+     },
+     "cumulative": {
+      "low": 0.7520129017761816,
+      "mid": 0.6470491669347591
+     },
+     "logits": {
+      "low": 1.1093767588992607,
+      "mid": 0.6060935196536259
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.29715535609414867,
+      "mid": 0.3403497119539124,
+      "high": 0.36249493195193894
+     },
+     "cumulative": {
+      "low": 0.7028446439058513,
+      "mid": 0.36249493195193894
+     },
+     "logits": {
+      "low": 0.8608807906783597,
+      "mid": -0.5645517335055332
+     },
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "low",
+    "low",
+    "low",
+    "high",
+    "low",
+    "mid"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "low": "neutral",
+     "mid": "plain",
+     "high": "plain"
+    },
+    "source": {
+     "low": "structural:majority"
+    },
+    "proposed": {
+     "neutral": "low",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_class",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "low",
+     "mid",
+     "high"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.55999149192997,
+      "mid": 0.3252940946910505,
+      "high": 0.11471441337897947
+     },
+     "cumulative": {
+      "low": 0.44000850807002995,
+      "mid": 0.11471441337897947
+     },
+     "logits": {
+      "low": -0.2411275273834303,
+      "mid": -2.043464611915897
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "regression",
+   "reading": "regression",
+   "lane": {
+    "task": "regression",
+    "base": null,
+    "view_key": "value",
+    "shape": "row",
+    "level": null,
+    "link": "identity",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "regression",
+     "reading": "regression",
+     "base": null,
+     "link": "identity",
+     "decision": "none",
+     "head_out": 1,
+     "classes": null,
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "value",
+      "warnings"
+     ],
+     "field_kinds": {
+      "value": {
+       "kind": "value",
+       "of": null
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "value",
+       "score"
+      ]
+     ],
+     "decided": [],
+     "score_field": "value",
+     "truth": {
+      "column": "price",
+      "type": "number",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "price",
+     "type": "number",
+     "sep": null
+    },
+    "label": {
+     "column": "price",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "value",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "value",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "value": 200.682,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 196.864,
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "value": 212.458,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 202.479,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 259.133,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 270.247,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "value": 200.682,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 196.864,
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "value": 212.458,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 202.479,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 259.133,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 270.247,
+     "warnings": []
+    }
+   ],
+   "truth": [
+    196.682,
+    203.864,
+    208.458,
+    209.479,
+    255.133,
+    277.247
+   ],
+   "class_roles": null,
+   "breakdown": {
+    "kind": "per_bin",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5,
+     0.3,
+     0.1
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true,
+     true,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "value": 200.682,
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "quantile",
+   "reading": "quantile",
+   "lane": {
+    "task": "regression",
+    "base": null,
+    "view_key": "value",
+    "shape": "row",
+    "level": null,
+    "link": "identity",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "regression",
+     "reading": "quantile",
+     "base": null,
+     "link": "identity",
+     "decision": "none",
+     "head_out": 3,
+     "classes": null,
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": [
+      0.1,
+      0.5,
+      0.9
+     ],
+     "horizons": null,
+     "fields": [
+      "value",
+      "q_10",
+      "q_50",
+      "q_90",
+      "warnings"
+     ],
+     "field_kinds": {
+      "value": {
+       "kind": "value",
+       "of": null
+      },
+      "q_10": {
+       "kind": "quantile",
+       "of": 0.1
+      },
+      "q_50": {
+       "kind": "quantile",
+       "of": 0.5
+      },
+      "q_90": {
+       "kind": "quantile",
+       "of": 0.9
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "q_10",
+       "score_0"
+      ],
+      [
+       "q_50",
+       "score_1"
+      ],
+      [
+       "q_90",
+       "score_2"
+      ]
+     ],
+     "decided": [],
+     "score_field": "value",
+     "truth": {
+      "column": "price",
+      "type": "number",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "price",
+     "type": "number",
+     "sep": null
+    },
+    "label": {
+     "column": "price",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "value",
+    "quantiles",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "value",
+    "quantiles",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "value": 164.445,
+     "quantiles": {
+      "0.1": 140.445,
+      "0.5": 164.445,
+      "0.9": 188.445
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 190.924,
+     "quantiles": {
+      "0.1": 166.924,
+      "0.5": 190.924,
+      "0.9": 214.924
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "value": 171.119,
+     "quantiles": {
+      "0.1": 147.119,
+      "0.5": 171.119,
+      "0.9": 195.119
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 192.148,
+     "quantiles": {
+      "0.1": 168.148,
+      "0.5": 192.148,
+      "0.9": 216.148
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 251.157,
+     "quantiles": {
+      "0.1": 227.157,
+      "0.5": 251.157,
+      "0.9": 275.157
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 168.602,
+     "quantiles": {
+      "0.1": 144.602,
+      "0.5": 168.602,
+      "0.9": 192.602
+     },
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "value": 164.445,
+     "quantiles": {
+      "0.1": 140.445,
+      "0.5": 164.445,
+      "0.9": 188.445
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 190.924,
+     "quantiles": {
+      "0.1": 166.924,
+      "0.5": 190.924,
+      "0.9": 214.924
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "value": 171.119,
+     "quantiles": {
+      "0.1": 147.119,
+      "0.5": 171.119,
+      "0.9": 195.119
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 192.148,
+     "quantiles": {
+      "0.1": 168.148,
+      "0.5": 192.148,
+      "0.9": 216.148
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 251.157,
+     "quantiles": {
+      "0.1": 227.157,
+      "0.5": 251.157,
+      "0.9": 275.157
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "value": 168.602,
+     "quantiles": {
+      "0.1": 144.602,
+      "0.5": 168.602,
+      "0.9": 192.602
+     },
+     "warnings": []
+    }
+   ],
+   "truth": [
+    160.445,
+    197.924,
+    167.119,
+    199.148,
+    247.157,
+    175.602
+   ],
+   "class_roles": null,
+   "breakdown": {
+    "kind": "per_bin",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5,
+     0.3,
+     0.1
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true,
+     true,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "value": 164.445,
+     "quantiles": {
+      "0.1": 140.445,
+      "0.5": 164.445,
+      "0.9": 188.445
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "forecast",
+   "reading": "forecast",
+   "lane": {
+    "task": "forecast",
+    "base": null,
+    "view_key": "horizon",
+    "shape": "window",
+    "level": null,
+    "link": "horizon",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "forecast",
+     "reading": "forecast",
+     "base": "regression",
+     "link": "horizon",
+     "decision": "none",
+     "head_out": 3,
+     "classes": null,
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": [
+      1,
+      2,
+      3
+     ],
+     "fields": [
+      "value_h1",
+      "value_h2",
+      "value_h3",
+      "answered",
+      "warnings"
+     ],
+     "field_kinds": {
+      "value_h1": {
+       "kind": "horizon",
+       "of": 1
+      },
+      "value_h2": {
+       "kind": "horizon",
+       "of": 2
+      },
+      "value_h3": {
+       "kind": "horizon",
+       "of": 3
+      },
+      "answered": {
+       "kind": "answered",
+       "of": null
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "value_h1",
+       "score_0"
+      ],
+      [
+       "value_h2",
+       "score_1"
+      ],
+      [
+       "value_h3",
+       "score_2"
+      ]
+     ],
+     "decided": [],
+     "score_field": "value_h1",
+     "truth": {
+      "column": "load",
+      "type": "number",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "window",
+     "length": 6,
+     "stride": 1,
+     "series_by": "station",
+     "order_by": "ts",
+     "context": "previous-part",
+     "horizon": 3
+    },
+    "truth": {
+     "column": "load",
+     "type": "number",
+     "sep": null
+    },
+    "label": {
+     "column": "load",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "values",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "values",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "values": {
+      "h1": 11.669,
+      "h2": 12.169,
+      "h3": 12.669
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 8.502,
+      "h2": 9.002,
+      "h3": 9.502
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 11.374,
+      "h2": 11.874,
+      "h3": 12.374
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 12.299,
+      "h2": 12.799,
+      "h3": 13.299
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 11.144,
+      "h2": 11.644,
+      "h3": 12.144
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "values": null,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "values": {
+      "h1": 11.669,
+      "h2": 12.169,
+      "h3": 12.669
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 8.502,
+      "h2": 9.002,
+      "h3": 9.502
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 11.374,
+      "h2": 11.874,
+      "h3": 12.374
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 12.299,
+      "h2": 12.799,
+      "h3": 13.299
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": 11.144,
+      "h2": 11.644,
+      "h3": 12.144
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "values": null,
+     "warnings": []
+    }
+   ],
+   "truth": [
+    11.919,
+    8.752,
+    11.624,
+    12.549,
+    11.394,
+    12.209
+   ],
+   "class_roles": null,
+   "breakdown": {
+    "kind": "per_horizon",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "h1",
+     "h2",
+     "h3"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "values": {
+      "h1": 11.669,
+      "h2": 12.169,
+      "h3": 12.669
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "forecast-quantile",
+   "reading": "forecast",
+   "lane": {
+    "task": "forecast",
+    "base": null,
+    "view_key": "horizon",
+    "shape": "window",
+    "level": null,
+    "link": "horizon",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "forecast",
+     "reading": "forecast",
+     "base": "regression",
+     "link": "horizon",
+     "decision": "none",
+     "head_out": 6,
+     "classes": null,
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": [
+      0.1,
+      0.5,
+      0.9
+     ],
+     "horizons": [
+      1,
+      2
+     ],
+     "fields": [
+      "value_h1_q10",
+      "value_h1_q50",
+      "value_h1_q90",
+      "value_h2_q10",
+      "value_h2_q50",
+      "value_h2_q90",
+      "answered",
+      "warnings"
+     ],
+     "field_kinds": {
+      "value_h1_q10": {
+       "kind": "horizon",
+       "of": "1/0.1"
+      },
+      "value_h1_q50": {
+       "kind": "horizon",
+       "of": "1/0.5"
+      },
+      "value_h1_q90": {
+       "kind": "horizon",
+       "of": "1/0.9"
+      },
+      "value_h2_q10": {
+       "kind": "horizon",
+       "of": "2/0.1"
+      },
+      "value_h2_q50": {
+       "kind": "horizon",
+       "of": "2/0.5"
+      },
+      "value_h2_q90": {
+       "kind": "horizon",
+       "of": "2/0.9"
+      },
+      "answered": {
+       "kind": "answered",
+       "of": null
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "value_h1_q10",
+       "score_0"
+      ],
+      [
+       "value_h1_q50",
+       "score_1"
+      ],
+      [
+       "value_h1_q90",
+       "score_2"
+      ],
+      [
+       "value_h2_q10",
+       "score_3"
+      ],
+      [
+       "value_h2_q50",
+       "score_4"
+      ],
+      [
+       "value_h2_q90",
+       "score_5"
+      ]
+     ],
+     "decided": [],
+     "score_field": "value_h1_q50",
+     "truth": {
+      "column": "load",
+      "type": "number",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "window",
+     "length": 6,
+     "stride": 1,
+     "series_by": "station",
+     "order_by": "ts",
+     "context": "previous-part",
+     "horizon": 2
+    },
+    "truth": {
+     "column": "load",
+     "type": "number",
+     "sep": null
+    },
+    "label": {
+     "column": "load",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "values",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "values",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 7.825,
+       "0.5": 9.425,
+       "0.9": 11.025
+      },
+      "h2": {
+       "0.1": 8.325,
+       "0.5": 9.925,
+       "0.9": 11.525
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 7.627,
+       "0.5": 9.227,
+       "0.9": 10.827
+      },
+      "h2": {
+       "0.1": 8.127,
+       "0.5": 9.727,
+       "0.9": 11.327
+      }
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 9.028,
+       "0.5": 10.628,
+       "0.9": 12.228
+      },
+      "h2": {
+       "0.1": 9.528,
+       "0.5": 11.128,
+       "0.9": 12.728
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 9.71,
+       "0.5": 11.31,
+       "0.9": 12.91
+      },
+      "h2": {
+       "0.1": 10.21,
+       "0.5": 11.81,
+       "0.9": 13.41
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 9.432,
+       "0.5": 11.032,
+       "0.9": 12.632
+      },
+      "h2": {
+       "0.1": 9.932,
+       "0.5": 11.532,
+       "0.9": 13.132
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "values": null,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 7.825,
+       "0.5": 9.425,
+       "0.9": 11.025
+      },
+      "h2": {
+       "0.1": 8.325,
+       "0.5": 9.925,
+       "0.9": 11.525
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 7.627,
+       "0.5": 9.227,
+       "0.9": 10.827
+      },
+      "h2": {
+       "0.1": 8.127,
+       "0.5": 9.727,
+       "0.9": 11.327
+      }
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 9.028,
+       "0.5": 10.628,
+       "0.9": 12.228
+      },
+      "h2": {
+       "0.1": 9.528,
+       "0.5": 11.128,
+       "0.9": 12.728
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 9.71,
+       "0.5": 11.31,
+       "0.9": 12.91
+      },
+      "h2": {
+       "0.1": 10.21,
+       "0.5": 11.81,
+       "0.9": 13.41
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 9.432,
+       "0.5": 11.032,
+       "0.9": 12.632
+      },
+      "h2": {
+       "0.1": 9.932,
+       "0.5": 11.532,
+       "0.9": 13.132
+      }
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "values": null,
+     "warnings": []
+    }
+   ],
+   "truth": [
+    8.075,
+    7.877,
+    9.278,
+    9.96,
+    9.682,
+    9.403
+   ],
+   "class_roles": null,
+   "breakdown": {
+    "kind": "per_horizon",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "h1",
+     "h2"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7
+    ],
+    "breakdown_weak": [
+     false,
+     false
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "values": {
+      "h1": {
+       "0.1": 7.825,
+       "0.5": 9.425,
+       "0.9": 11.025
+      },
+      "h2": {
+       "0.1": 8.325,
+       "0.5": 9.925,
+       "0.9": 11.525
+      }
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "reconstruction",
+   "reading": "reconstruction",
+   "lane": {
+    "task": "unsupervised",
+    "base": null,
+    "view_key": "reconstruction",
+    "shape": "row",
+    "level": null,
+    "link": "reconstruction",
+    "family": "mlp-plain",
+    "goal": "reconstruct",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "unsupervised",
+     "reading": "reconstruction",
+     "base": null,
+     "link": "reconstruction",
+     "decision": "none",
+     "head_out": 3,
+     "classes": null,
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "reconstruction_error",
+      "recon_a",
+      "recon_b",
+      "recon_zone",
+      "warnings"
+     ],
+     "field_kinds": {
+      "reconstruction_error": {
+       "kind": "row_score",
+       "of": null
+      },
+      "recon_a": {
+       "kind": "recon",
+       "of": "a"
+      },
+      "recon_b": {
+       "kind": "recon",
+       "of": "b"
+      },
+      "recon_zone": {
+       "kind": "recon",
+       "of": "zone"
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "recon_a",
+       "score_0"
+      ],
+      [
+       "recon_b",
+       "score_1"
+      ],
+      [
+       "recon_zone",
+       "score_2"
+      ],
+      [
+       "reconstruction_error",
+       "row_score"
+      ]
+     ],
+     "decided": [],
+     "score_field": "reconstruction_error",
+     "truth": null
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": null,
+    "label": {
+     "column": null,
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "reconstruction_error",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "reconstruction_error",
+    "reconstruction",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "reconstruction_error": 0.06877,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.12672,
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.11598,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.05705,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.07829,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.18233,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "reconstruction_error": 0.06877,
+     "reconstruction": {
+      "a": -0.3501,
+      "b": -1.3895,
+      "zone": 2.0926
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.12672,
+     "reconstruction": {
+      "a": 2.0113,
+      "b": -2.3832,
+      "zone": 0.4724
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.11598,
+     "reconstruction": {
+      "a": -0.7911,
+      "b": -0.7557,
+      "zone": 0.3914
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.05705,
+     "reconstruction": {
+      "a": -1.8329,
+      "b": -1.4604,
+      "zone": -1.0745
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.07829,
+     "reconstruction": {
+      "a": -0.757,
+      "b": -2.2402,
+      "zone": 1.2068
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "reconstruction_error": 0.18233,
+     "reconstruction": {
+      "a": -0.555,
+      "b": 0.8746,
+      "zone": 0.8891
+     },
+     "warnings": []
+    }
+   ],
+   "truth": null,
+   "class_roles": null,
+   "breakdown": {
+    "kind": "per_feature",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "a",
+     "b",
+     "zone"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": {
+    "kind": "reconstruction_error",
+    "quantiles": {
+     "0.5": 0.05,
+     "0.9": 0.2,
+     "0.99": 0.6
+    },
+    "n": 40,
+    "source": "the bundle on the demo sample (training part)"
+   },
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "reconstruction_error": 0.06877,
+     "reconstruction": {
+      "a": -0.3501,
+      "b": -1.3895,
+      "zone": 2.0926
+     },
+     "warnings": []
+    },
+    "inputs": {
+     "order": [
+      "a",
+      "b",
+      "zone"
+     ],
+     "shaped": [
+      -0.4164,
+      -0.9811,
+      2.2802
+     ],
+     "raw": null
+    },
+    "outputs": {
+     "kind": "reconstruction",
+     "names": [
+      "a",
+      "b",
+      "zone"
+     ],
+     "link": "reconstruction",
+     "raw": [
+      -0.3501,
+      -1.3895,
+      2.0926
+     ],
+     "read": [
+      -0.3501,
+      -1.3895,
+      2.0926
+     ],
+     "answer": {}
+    }
+   }
+  },
+  {
+   "id": "anomaly-reconstruction",
+   "reading": "anomaly-reconstruction",
+   "lane": {
+    "task": "anomaly",
+    "base": null,
+    "view_key": "anomaly",
+    "shape": "row",
+    "level": null,
+    "link": "reconstruction",
+    "family": "mlp-plain",
+    "goal": "anomaly",
+    "score_source": "reconstruction",
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "anomaly",
+     "reading": "anomaly-reconstruction",
+     "base": null,
+     "link": "reconstruction",
+     "decision": "threshold",
+     "head_out": 3,
+     "classes": null,
+     "positive": null,
+     "threshold": 0.2,
+     "threshold_source": null,
+     "threshold_scale": "score",
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "score",
+      "prediction",
+      "recon_a",
+      "recon_b",
+      "recon_zone",
+      "warnings"
+     ],
+     "field_kinds": {
+      "score": {
+       "kind": "score",
+       "of": null
+      },
+      "prediction": {
+       "kind": "alarm",
+       "of": null
+      },
+      "recon_a": {
+       "kind": "recon",
+       "of": "a"
+      },
+      "recon_b": {
+       "kind": "recon",
+       "of": "b"
+      },
+      "recon_zone": {
+       "kind": "recon",
+       "of": "zone"
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "recon_a",
+       "score_0"
+      ],
+      [
+       "recon_b",
+       "score_1"
+      ],
+      [
+       "recon_zone",
+       "score_2"
+      ],
+      [
+       "score",
+       "row_score"
+      ]
+     ],
+     "decided": [
+      [
+       "prediction",
+       "prediction"
+      ]
+     ],
+     "score_field": "score",
+     "truth": null
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": null,
+    "label": {
+     "column": null,
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "score",
+    "anomalous",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "score",
+    "anomalous",
+    "reconstruction",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "score": 0.4,
+     "anomalous": true,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.03173,
+     "anomalous": false,
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "score": 0.07212,
+     "anomalous": false,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.12835,
+     "anomalous": false,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.05349,
+     "anomalous": false,
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.05828,
+     "anomalous": false,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "score": 0.4,
+     "anomalous": true,
+     "reconstruction": {
+      "a": 0.805,
+      "b": 0.7968,
+      "zone": 0.6542
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.03173,
+     "anomalous": false,
+     "reconstruction": {
+      "a": -0.0075,
+      "b": 0.4255,
+      "zone": 0.9998
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "score": 0.07212,
+     "anomalous": false,
+     "reconstruction": {
+      "a": 0.4984,
+      "b": 2.6147,
+      "zone": -0.6656
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.12835,
+     "anomalous": false,
+     "reconstruction": {
+      "a": 0.2504,
+      "b": 0.9931,
+      "zone": 1.1494
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.05349,
+     "anomalous": false,
+     "reconstruction": {
+      "a": -0.4465,
+      "b": -0.2332,
+      "zone": -0.0026
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.05828,
+     "anomalous": false,
+     "reconstruction": {
+      "a": -0.3473,
+      "b": 0.5744,
+      "zone": -1.6236
+     },
+     "warnings": []
+    }
+   ],
+   "truth": null,
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "normal": "neutral",
+     "anomalous": "alert"
+    },
+    "source": {
+     "normal": "task:anomaly",
+     "anomalous": "task:anomaly"
+    },
+    "proposed": {
+     "neutral": "normal",
+     "rule": "task:anomaly",
+     "alert": [
+      "anomalous"
+     ],
+     "evidence": [
+      "task:anomaly"
+     ]
+    }
+   },
+   "breakdown": {
+    "kind": "at_k",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "k10",
+     "k50"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7
+    ],
+    "breakdown_weak": [
+     false,
+     false
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "score": 0.4,
+     "anomalous": true,
+     "reconstruction": {
+      "a": 0.805,
+      "b": 0.7968,
+      "zone": 0.6542
+     },
+     "warnings": []
+    },
+    "inputs": {
+     "order": [
+      "a",
+      "b",
+      "zone"
+     ],
+     "shaped": [
+      0.728,
+      1.1969,
+      0.7145
+     ],
+     "raw": null
+    },
+    "outputs": {
+     "kind": "reconstruction",
+     "names": [
+      "a",
+      "b",
+      "zone"
+     ],
+     "link": "reconstruction",
+     "raw": [
+      0.805,
+      0.7968,
+      0.6542
+     ],
+     "read": [
+      0.805,
+      0.7968,
+      0.6542
+     ],
+     "answer": {}
+    }
+   }
+  },
+  {
+   "id": "anomaly-svdd",
+   "reading": "anomaly-svdd",
+   "lane": {
+    "task": "anomaly",
+    "base": null,
+    "view_key": "anomaly",
+    "shape": "row",
+    "level": null,
+    "link": "distance",
+    "family": "mlp-plain",
+    "goal": "anomaly",
+    "score_source": "distance",
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "normal",
+     "fraud"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "anomaly",
+     "reading": "anomaly-svdd",
+     "base": null,
+     "link": "distance",
+     "decision": "threshold",
+     "head_out": 2,
+     "classes": [
+      "normal",
+      "fraud"
+     ],
+     "positive": "fraud",
+     "threshold": 1.0,
+     "threshold_source": null,
+     "threshold_scale": "score",
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "score",
+      "prediction",
+      "label",
+      "emb_0",
+      "emb_1",
+      "warnings"
+     ],
+     "field_kinds": {
+      "score": {
+       "kind": "score",
+       "of": null
+      },
+      "prediction": {
+       "kind": "alarm",
+       "of": null
+      },
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "emb_0": {
+       "kind": "embedding",
+       "of": 0
+      },
+      "emb_1": {
+       "kind": "embedding",
+       "of": 1
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "emb_0",
+       "score_0"
+      ],
+      [
+       "emb_1",
+       "score_1"
+      ],
+      [
+       "score",
+       "row_score"
+      ]
+     ],
+     "decided": [
+      [
+       "prediction",
+       "prediction"
+      ]
+     ],
+     "score_field": "score",
+     "truth": {
+      "column": "is_fraud",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "row"
+    },
+    "truth": {
+     "column": "is_fraud",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "is_fraud",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "score",
+    "anomalous",
+    "label",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "score",
+    "anomalous",
+    "label",
+    "embedding",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "score": 3.0,
+     "anomalous": true,
+     "label": "fraud",
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.79325,
+     "anomalous": false,
+     "label": "normal",
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "score": 1.63858,
+     "anomalous": true,
+     "label": "fraud",
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 1.28446,
+     "anomalous": true,
+     "label": "fraud",
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.83686,
+     "anomalous": false,
+     "label": "normal",
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 1.67619,
+     "anomalous": true,
+     "label": "fraud",
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "score": 3.0,
+     "anomalous": true,
+     "label": "fraud",
+     "embedding": [
+      -1.359,
+      0.4304
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.79325,
+     "anomalous": false,
+     "label": "normal",
+     "embedding": [
+      -0.1805,
+      -0.8722
+     ],
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "score": 1.63858,
+     "anomalous": true,
+     "label": "fraud",
+     "embedding": [
+      0.4431,
+      -1.2009
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 1.28446,
+     "anomalous": true,
+     "label": "fraud",
+     "embedding": [
+      0.3564,
+      1.0759
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 0.83686,
+     "anomalous": false,
+     "label": "normal",
+     "embedding": [
+      -0.8989,
+      0.1697
+     ],
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "score": 1.67619,
+     "anomalous": true,
+     "label": "fraud",
+     "embedding": [
+      -0.2013,
+      -1.2789
+     ],
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "fraud",
+    "normal",
+    "fraud",
+    "fraud",
+    "normal",
+    "fraud"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "normal": "neutral",
+     "fraud": "alert"
+    },
+    "source": {
+     "normal": "task:anomaly",
+     "fraud": "task:anomaly"
+    },
+    "proposed": {
+     "neutral": "normal",
+     "rule": "task:anomaly",
+     "alert": [
+      "fraud"
+     ],
+     "evidence": [
+      "task:anomaly"
+     ]
+    }
+   },
+   "breakdown": {
+    "kind": "at_k",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "k10",
+     "k50"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7
+    ],
+    "breakdown_weak": [
+     false,
+     false
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "score": 3.0,
+     "anomalous": true,
+     "label": "fraud",
+     "embedding": [
+      -1.359,
+      0.4304
+     ],
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "sequence-binary",
+   "reading": "binary",
+   "lane": {
+    "task": "sequence-classification",
+    "base": "binary",
+    "view_key": "binary",
+    "shape": "window",
+    "level": null,
+    "link": "sigmoid",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "ok",
+     "delayed"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "sequence-classification",
+     "reading": "binary",
+     "base": "binary",
+     "link": "sigmoid",
+     "decision": "threshold",
+     "head_out": 1,
+     "classes": [
+      "ok",
+      "delayed"
+     ],
+     "positive": "delayed",
+     "threshold": 0.6,
+     "threshold_source": null,
+     "threshold_scale": "probability",
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "label",
+      "p_ok",
+      "p_delayed",
+      "score",
+      "prediction",
+      "answered",
+      "warnings"
+     ],
+     "field_kinds": {
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "p_ok": {
+       "kind": "probability",
+       "of": "ok"
+      },
+      "p_delayed": {
+       "kind": "probability",
+       "of": "delayed"
+      },
+      "score": {
+       "kind": "raw",
+       "of": "delayed"
+      },
+      "prediction": {
+       "kind": "decision",
+       "of": null
+      },
+      "answered": {
+       "kind": "answered",
+       "of": null
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "score",
+       "score"
+      ]
+     ],
+     "decided": [
+      [
+       "prediction",
+       "prediction"
+      ]
+     ],
+     "score_field": "p_delayed",
+     "truth": {
+      "column": "event",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "window",
+     "length": 6,
+     "stride": 1,
+     "series_by": "station",
+     "order_by": "ts",
+     "context": "previous-part"
+    },
+    "truth": {
+     "column": "event",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "event",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "label",
+    "probabilities",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "label",
+    "probabilities",
+    "logits",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.7900051004439602,
+      "delayed": 0.20999489955603978
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.30250944968404814,
+      "delayed": 0.6974905503159519
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.9726948322292148,
+      "delayed": 0.027305167770785198
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.3523837769478567,
+      "delayed": 0.6476162230521433
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.04522922695038456,
+      "delayed": 0.9547707730496154
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "label": null,
+     "probabilities": null,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.7900051004439602,
+      "delayed": 0.20999489955603978
+     },
+     "logits": {
+      "delayed": -1.3249561591042704
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.30250944968404814,
+      "delayed": 0.6974905503159519
+     },
+     "logits": {
+      "delayed": 0.8353764500616948
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.9726948322292148,
+      "delayed": 0.027305167770785198
+     },
+     "logits": {
+      "delayed": -3.5729944171408556
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.3523837769478567,
+      "delayed": 0.6476162230521433
+     },
+     "logits": {
+      "delayed": 0.6085774154280573
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "delayed",
+     "probabilities": {
+      "ok": 0.04522922695038456,
+      "delayed": 0.9547707730496154
+     },
+     "logits": {
+      "delayed": 3.0497277916290226
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "label": null,
+     "probabilities": null,
+     "logits": null,
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "ok",
+    "delayed",
+    "delayed",
+    "delayed",
+    "ok",
+    "delayed"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "ok": "neutral",
+     "delayed": "alert"
+    },
+    "source": {
+     "ok": "structural:majority",
+     "delayed": "user:turn-2"
+    },
+    "proposed": {
+     "neutral": "ok",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_class",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "ok",
+     "delayed"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7
+    ],
+    "breakdown_weak": [
+     false,
+     false
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "label": "ok",
+     "probabilities": {
+      "ok": 0.7900051004439602,
+      "delayed": 0.20999489955603978
+     },
+     "logits": {
+      "delayed": -1.3249561591042704
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "sequence-ordinal",
+   "reading": "ordinal",
+   "lane": {
+    "task": "sequence-regression",
+    "base": "ordinal",
+    "view_key": "ordinal",
+    "shape": "window",
+    "level": null,
+    "link": "cumulative",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "low",
+     "mid",
+     "high"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "sequence-regression",
+     "reading": "ordinal",
+     "base": "ordinal",
+     "link": "cumulative",
+     "decision": "cumulative",
+     "head_out": 2,
+     "classes": [
+      "low",
+      "mid",
+      "high"
+     ],
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "label",
+      "p_low",
+      "p_mid",
+      "p_high",
+      "cum_low",
+      "cum_mid",
+      "logit_cum_low",
+      "logit_cum_mid",
+      "answered",
+      "warnings"
+     ],
+     "field_kinds": {
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "p_low": {
+       "kind": "probability",
+       "of": "low"
+      },
+      "p_mid": {
+       "kind": "probability",
+       "of": "mid"
+      },
+      "p_high": {
+       "kind": "probability",
+       "of": "high"
+      },
+      "cum_low": {
+       "kind": "cumulative",
+       "of": "low"
+      },
+      "cum_mid": {
+       "kind": "cumulative",
+       "of": "mid"
+      },
+      "logit_cum_low": {
+       "kind": "raw",
+       "of": "low"
+      },
+      "logit_cum_mid": {
+       "kind": "raw",
+       "of": "mid"
+      },
+      "answered": {
+       "kind": "answered",
+       "of": null
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "logit_cum_low",
+       "score_0"
+      ],
+      [
+       "logit_cum_mid",
+       "score_1"
+      ]
+     ],
+     "decided": [
+      [
+       "label",
+       "cumulative"
+      ]
+     ],
+     "score_field": null,
+     "truth": {
+      "column": "level",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "window",
+     "length": 6,
+     "stride": 1,
+     "series_by": "station",
+     "order_by": "ts",
+     "context": "previous-part"
+    },
+    "truth": {
+     "column": "level",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "level",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "label",
+    "probabilities",
+    "cumulative",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "label",
+    "probabilities",
+    "cumulative",
+    "logits",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.5621258399247864,
+      "mid": 0.13038706646437848,
+      "high": 0.3074870936108351
+     },
+     "cumulative": {
+      "low": 0.43787416007521357,
+      "mid": 0.3074870936108351
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.03927965912279385,
+      "mid": 0.9520134039918549,
+      "high": 0.008706936885351289
+     },
+     "cumulative": {
+      "low": 0.9607203408772061,
+      "mid": 0.008706936885351289
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.25506608398520714,
+      "mid": 0.7388255340065039,
+      "high": 0.00610838200828897
+     },
+     "cumulative": {
+      "low": 0.7449339160147929,
+      "mid": 0.00610838200828897
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.48230425528625864,
+      "mid": 0.47640761535969156,
+      "high": 0.04128812935404981
+     },
+     "cumulative": {
+      "low": 0.5176957447137414,
+      "mid": 0.04128812935404981
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.018873555373050133,
+      "mid": 0.8607602511396639,
+      "high": 0.12036619348728597
+     },
+     "cumulative": {
+      "low": 0.9811264446269499,
+      "mid": 0.12036619348728597
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "label": null,
+     "probabilities": null,
+     "cumulative": null,
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.5621258399247864,
+      "mid": 0.13038706646437848,
+      "high": 0.3074870936108351
+     },
+     "cumulative": {
+      "low": 0.43787416007521357,
+      "mid": 0.3074870936108351
+     },
+     "logits": {
+      "low": -0.24979417595362038,
+      "mid": -0.811893760904456
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.03927965912279385,
+      "mid": 0.9520134039918549,
+      "high": 0.008706936885351289
+     },
+     "cumulative": {
+      "low": 0.9607203408772061,
+      "mid": 0.008706936885351289
+     },
+     "logits": {
+      "low": 3.1969765528546814,
+      "mid": -4.734890164153262
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.25506608398520714,
+      "mid": 0.7388255340065039,
+      "high": 0.00610838200828897
+     },
+     "cumulative": {
+      "low": 0.7449339160147929,
+      "mid": 0.00610838200828897
+     },
+     "logits": {
+      "low": 1.0717728466420542,
+      "mid": -5.091966236798355
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.48230425528625864,
+      "mid": 0.47640761535969156,
+      "high": 0.04128812935404981
+     },
+     "cumulative": {
+      "low": 0.5176957447137414,
+      "mid": 0.04128812935404981
+     },
+     "logits": {
+      "low": 0.07081255433605377,
+      "mid": -3.1450155482186744
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "label": "mid",
+     "probabilities": {
+      "low": 0.018873555373050133,
+      "mid": 0.8607602511396639,
+      "high": 0.12036619348728597
+     },
+     "cumulative": {
+      "low": 0.9811264446269499,
+      "mid": 0.12036619348728597
+     },
+     "logits": {
+      "low": 3.9509395891858765,
+      "mid": -1.9889669834458277
+     },
+     "warnings": []
+    },
+    {
+     "answered": false,
+     "label": null,
+     "probabilities": null,
+     "cumulative": null,
+     "logits": null,
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "low",
+    "mid",
+    "low",
+    "mid",
+    "low",
+    "mid"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "low": "neutral",
+     "mid": "plain",
+     "high": "plain"
+    },
+    "source": {
+     "low": "structural:majority"
+    },
+    "proposed": {
+     "neutral": "low",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_class",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "low",
+     "mid",
+     "high"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "label": "low",
+     "probabilities": {
+      "low": 0.5621258399247864,
+      "mid": 0.13038706646437848,
+      "high": 0.3074870936108351
+     },
+     "cumulative": {
+      "low": 0.43787416007521357,
+      "mid": 0.3074870936108351
+     },
+     "logits": {
+      "low": -0.24979417595362038,
+      "mid": -0.811893760904456
+     },
+     "warnings": []
+    }
+   }
+  },
+  {
+   "id": "graph-multiclass",
+   "reading": "multiclass",
+   "lane": {
+    "task": "multiclass",
+    "base": null,
+    "view_key": "classes",
+    "shape": "graph",
+    "level": "graph",
+    "link": "softmax",
+    "family": "mlp-plain",
+    "goal": "predict",
+    "score_source": null,
+    "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss"
+   },
+   "schema": {
+    "classes": [
+     "calm",
+     "gust",
+     "storm"
+    ],
+    "output": {
+     "schema": "vega/output@2",
+     "kind": "multiclass",
+     "reading": "multiclass",
+     "base": null,
+     "link": "softmax",
+     "decision": "argmax",
+     "head_out": 3,
+     "classes": [
+      "calm",
+      "gust",
+      "storm"
+     ],
+     "positive": null,
+     "threshold": null,
+     "threshold_source": null,
+     "threshold_scale": null,
+     "threshold_per_label": null,
+     "quantiles": null,
+     "horizons": null,
+     "fields": [
+      "graph_id",
+      "label",
+      "p_calm",
+      "p_gust",
+      "p_storm",
+      "logit_calm",
+      "logit_gust",
+      "logit_storm",
+      "warnings"
+     ],
+     "field_kinds": {
+      "graph_id": {
+       "kind": "group",
+       "of": null
+      },
+      "label": {
+       "kind": "class",
+       "of": null
+      },
+      "p_calm": {
+       "kind": "probability",
+       "of": "calm"
+      },
+      "p_gust": {
+       "kind": "probability",
+       "of": "gust"
+      },
+      "p_storm": {
+       "kind": "probability",
+       "of": "storm"
+      },
+      "logit_calm": {
+       "kind": "raw",
+       "of": "calm"
+      },
+      "logit_gust": {
+       "kind": "raw",
+       "of": "gust"
+      },
+      "logit_storm": {
+       "kind": "raw",
+       "of": "storm"
+      },
+      "warnings": {
+       "kind": "warnings",
+       "of": null
+      }
+     },
+     "compared": [
+      [
+       "logit_calm",
+       "score_0"
+      ],
+      [
+       "logit_gust",
+       "score_1"
+      ],
+      [
+       "logit_storm",
+       "score_2"
+      ]
+     ],
+     "decided": [
+      [
+       "label",
+       "argmax"
+      ]
+     ],
+     "score_field": null,
+     "truth": {
+      "column": "kind",
+      "type": "class",
+      "sep": null
+     }
+    },
+    "sample": {
+     "shape": "graph",
+     "level": "graph",
+     "graph_id": "mol"
+    },
+    "truth": {
+     "column": "kind",
+     "type": "class",
+     "sep": null
+    },
+    "label": {
+     "column": "kind",
+     "decode": {}
+    },
+    "input": [
+     {
+      "name": "a",
+      "dtype": "float64"
+     },
+     {
+      "name": "b",
+      "dtype": "float64"
+     },
+     {
+      "name": "zone",
+      "dtype": "string"
+     }
+    ]
+   },
+   "keys": [
+    "answered",
+    "graph_id",
+    "label",
+    "probabilities",
+    "warnings"
+   ],
+   "keys_included": [
+    "answered",
+    "graph_id",
+    "label",
+    "probabilities",
+    "logits",
+    "warnings"
+   ],
+   "predictions": [
+    {
+     "answered": true,
+     "graph_id": "g-0",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.8862720951006432,
+      "gust": 0.030542764425702036,
+      "storm": 0.08318514047365466
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-1",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.6567726266199563,
+      "gust": 0.06373712349417633,
+      "storm": 0.27949024988586746
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "graph_id": "g-2",
+     "label": "gust",
+     "probabilities": {
+      "calm": 0.10501193627090939,
+      "gust": 0.8050608486586434,
+      "storm": 0.08992721507044724
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-3",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.5415862759748545,
+      "gust": 0.10300417519483875,
+      "storm": 0.3554095488303067
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-4",
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.24650554951817508,
+      "gust": 0.22654932671172465,
+      "storm": 0.5269451237701003
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-5",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.5211394317800665,
+      "gust": 0.25339456266602894,
+      "storm": 0.22546600555390459
+     },
+     "warnings": []
+    }
+   ],
+   "predictions_included": [
+    {
+     "answered": true,
+     "graph_id": "g-0",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.8862720951006432,
+      "gust": 0.030542764425702036,
+      "storm": 0.08318514047365466
+     },
+     "logits": {
+      "calm": 1.3847025018420724,
+      "gust": -1.9831936928057914,
+      "storm": -0.9812527748956248
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-1",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.6567726266199563,
+      "gust": 0.06373712349417633,
+      "storm": 0.27949024988586746
+     },
+     "logits": {
+      "calm": 3.3603527207572346,
+      "gust": 1.027782019607391,
+      "storm": 2.5059822482329426
+     },
+     "warnings": [
+      "unseen category 'x' in column 'zone'"
+     ]
+    },
+    {
+     "answered": true,
+     "graph_id": "g-2",
+     "label": "gust",
+     "probabilities": {
+      "calm": 0.10501193627090939,
+      "gust": 0.8050608486586434,
+      "storm": 0.08992721507044724
+     },
+     "logits": {
+      "calm": 0.6408960546945914,
+      "gust": 2.6777398951851787,
+      "storm": 0.48582265392663393
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-3",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.5415862759748545,
+      "gust": 0.10300417519483875,
+      "storm": 0.3554095488303067
+     },
+     "logits": {
+      "calm": -1.7640130415267528,
+      "gust": -3.4237458997429107,
+      "storm": -2.1852446398236767
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-4",
+     "label": "storm",
+     "probabilities": {
+      "calm": 0.24650554951817508,
+      "gust": 0.22654932671172465,
+      "storm": 0.5269451237701003
+     },
+     "logits": {
+      "calm": -2.678281308719394,
+      "gust": -2.7627031160174194,
+      "storm": -1.9185694015560237
+     },
+     "warnings": []
+    },
+    {
+     "answered": true,
+     "graph_id": "g-5",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.5211394317800665,
+      "gust": 0.25339456266602894,
+      "storm": 0.22546600555390459
+     },
+     "logits": {
+      "calm": -1.8486945052828283,
+      "gust": -2.5697643244665684,
+      "storm": -2.686542738455025
+     },
+     "warnings": []
+    }
+   ],
+   "truth": [
+    "calm",
+    "calm",
+    "calm",
+    "calm",
+    "calm",
+    "calm"
+   ],
+   "class_roles": {
+    "schema": "vega/class-roles@1",
+    "roles": {
+     "calm": "neutral",
+     "gust": "plain",
+     "storm": "alert"
+    },
+    "source": {
+     "calm": "structural:majority",
+     "storm": "user:turn-2"
+    },
+    "proposed": {
+     "neutral": "calm",
+     "rule": "structural:majority",
+     "alert": [],
+     "evidence": []
+    }
+   },
+   "breakdown": {
+    "kind": "per_class",
+    "metric": "f1",
+    "names": "breakdown_names",
+    "values": "breakdown_values",
+    "weak": "breakdown_weak",
+    "direction": "max",
+    "caption": "The score per part on the sealed test part."
+   },
+   "values": {
+    "breakdown_names": [
+     "calm",
+     "gust",
+     "storm"
+    ],
+    "breakdown_values": [
+     0.9,
+     0.7,
+     0.5
+    ],
+    "breakdown_weak": [
+     false,
+     false,
+     true
+    ]
+   },
+   "reference": null,
+   "explanation": {
+    "schema": "vega/explanation@2",
+    "prediction": {
+     "answered": true,
+     "graph_id": "g-0",
+     "label": "calm",
+     "probabilities": {
+      "calm": 0.8862720951006432,
+      "gust": 0.030542764425702036,
+      "storm": 0.08318514047365466
+     },
+     "logits": {
+      "calm": 1.3847025018420724,
+      "gust": -1.9831936928057914,
+      "storm": -0.9812527748956248
+     },
+     "warnings": []
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,392 @@
+{
+ "schema": "dataset-shaper/recipe@1",
+ "input": {
+  "path": "data-lens/fixtures/sensors.csv",
+  "digest": "sha256:2c2ccbea64d3054fd30e83bf8eeb0a5474511455869f7e00810ddb9f3150cd9b",
+  "rows": 1440,
+  "columns": 11,
+  "model": "/root/work/chain/sensors.domain.html",
+  "layers_read": [
+   "geometry"
+  ]
+ },
+ "seed": 7,
+ "goal": "train-ready",
+ "target": "station",
+ "steps": [
+  {
+   "id": "S1",
+   "op": "parse_datetime",
+   "columns": [
+    "ts"
+   ],
+   "params": {
+    "errors": "coerce"
+   },
+   "source": "analysis:context.time",
+   "rationale": "the timestamp is a string on disk",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "the calendar parts come from it"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S2",
+   "op": "parse_geometry",
+   "columns": [
+    "lat",
+    "lon"
+   ],
+   "params": {
+    "kind": "latlon",
+    "lat": "lat",
+    "lon": "lon",
+    "crs": "EPSG:4326"
+   },
+   "source": "user:the coordinates are WGS84 degrees, as the sensor firmware reports them",
+   "rationale": "a distance without a declared CRS is a number without a unit",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "every spatial step below needs it"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S3",
+   "op": "drop_identity",
+   "columns": [
+    "reading_id"
+   ],
+   "params": {},
+   "source": "geometry:typing/reading_id",
+   "rationale": "unique on every row",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "-1",
+    "downstream": {
+     "model_family": "a tree would memorise it"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S4",
+   "op": "select_partition",
+   "columns": [],
+   "params": {
+    "label": "station",
+    "task": "multiclass classification"
+   },
+   "source": "geometry:partitions/station",
+   "rationale": "the analyst's chosen partition; nothing in the file derives the station",
+   "alternatives": [
+    {
+     "op": "select_partition",
+     "params": {
+      "label": "alarm"
+     },
+     "when": "if the question is the alarm rather than the source"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "leakage": "none — no column defines the station"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S5",
+   "op": "drop_leakage",
+   "columns": [],
+   "params": {},
+   "source": "geometry:partitions/station.dropped_for_leakage",
+   "rationale": "the station has an empty leakage set; the step is here so the recipe says so",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "leakage": "nothing to drop"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S5b",
+   "op": "drop_derived",
+   "columns": [],
+   "params": {},
+   "source": "geometry:derivations",
+   "rationale": "alarm is the head of the threshold rule over reading_c and humidity_pct, both of which stay: keeping it is an exactly redundant column, and a model would learn the rule rather than the phenomenon",
+   "alternatives": [
+    {
+     "op": "drop_derived",
+     "params": {
+      "keep": [
+       "alarm"
+      ]
+     },
+     "when": "if the alarm is wanted as a displayed flag beside the prediction rather than as a feature"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "-1",
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a tree would rediscover the two thresholds",
+     "leakage": "none for this label",
+     "dimensionality": "one fewer column",
+     "interpretability": "the alarm is a policy, not a measurement"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S6",
+   "op": "split",
+   "columns": [],
+   "params": {
+    "kind": "time",
+    "time_column": "ts",
+    "test": 0.2,
+    "valid": 0.1
+   },
+   "source": "analysis:context.time",
+   "rationale": "hourly readings with a trend and a change point: a random split would leak the future",
+   "alternatives": [
+    {
+     "op": "split",
+     "params": {
+      "kind": "stratified",
+      "by": "station"
+     },
+     "when": "if the model is never used forward in time"
+    }
+   ],
+   "consequences": {
+    "rows": "1440 -> 1008 / 144 / 288",
+    "columns": "none",
+    "downstream": {
+     "leakage": "a random split leaks the trend"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S7",
+   "op": "impute",
+   "columns": [
+    "calibration"
+   ],
+   "params": {
+    "strategy": "median",
+    "indicator": true
+   },
+   "source": "analysis:F1/T1",
+   "rationale": "F1 — calibration is missing 62 % of the time at the hill station and 6 % elsewhere: the missingness depends on the station, and the station is the label — a median within the station would carry the label into the row's features, which the executor refuses — so the train median fills it and the indicator keeps the mechanism visible",
+   "alternatives": [
+    {
+     "op": "impute",
+     "params": {
+      "strategy": "median",
+      "indicator": false
+     },
+     "when": "if the missingness were judged uninformative (a median grouped by the station is not an alternative: the station is the label)"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+1",
+    "downstream": {
+     "preprocessing": "the indicator carries the missingness mechanism the median cannot",
+     "leakage": "the median is fitted on train alone; no label reaches the features"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S8",
+   "op": "lag",
+   "columns": [
+    "reading_c"
+   ],
+   "params": {
+    "lags": [
+     1,
+     24
+    ],
+    "group_by": "station",
+    "time_column": "ts"
+   },
+   "source": "analysis:F2/T2",
+   "rationale": "F2 — the reading is autocorrelated at lag 1 and has a daily period; the previous hour and the same hour yesterday are the two features that carry it",
+   "alternatives": [
+    {
+     "op": "datetime_expand",
+     "params": {
+      "parts": [
+       "hour"
+      ],
+      "cyclic": true
+     },
+     "when": "if the model must work on the first reading of a new station, where no lag exists"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+2",
+    "downstream": {
+     "modeling": "the first rows of each station carry a missing lag"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S9",
+   "op": "datetime_expand",
+   "columns": [
+    "ts"
+   ],
+   "params": {
+    "parts": [
+     "hour",
+     "dow",
+     "is_weekend"
+    ],
+    "cyclic": true
+   },
+   "source": "shaper:default",
+   "rationale": "the daily period the analysis measured needs an hour a model can read, and the cyclic pair keeps 23:00 next to 00:00",
+   "alternatives": [
+    {
+     "op": "datetime_expand",
+     "params": {
+      "cyclic": false
+     },
+     "when": "for a tree-only consumer"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+7",
+    "downstream": {
+     "model_family": "a linear model needs the sin/cos pair"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S10",
+   "op": "spatial_reproject",
+   "columns": [],
+   "params": {
+    "to_crs": "EPSG:32632",
+    "x": "x_m",
+    "y": "y_m"
+   },
+   "source": "shaper:default",
+   "rationale": "distances in degrees are not distances; UTM 32N is the metric CRS over Turin",
+   "alternatives": [
+    {
+     "op": "spatial_reproject",
+     "params": {
+      "to_crs": null
+     },
+     "when": "without pyproj, the local equirectangular projection about the centroid is accurate to a fraction of a percent at this extent"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+2",
+    "downstream": {
+     "preprocessing": "every distance below is in metres"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S11",
+   "op": "spatial_features",
+   "columns": [],
+   "params": {
+    "features": [
+     "n_neighbours_within",
+     "nearest_distance"
+    ],
+    "radius_m": 500
+   },
+   "source": "analysis:F3/T3",
+   "rationale": "F3 — Moran's I is ~1 for the coordinates and 0.34 for the reading: location carries signal, and neighbourhood density is the feature that expresses it",
+   "alternatives": [
+    {
+     "op": "spatial_grid",
+     "params": {
+      "kind": "square",
+      "size_m": 500
+     },
+     "when": "if the model should see a cell id rather than a density"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "+2",
+    "downstream": {
+     "modeling": "two spatial features instead of raw coordinates"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S12",
+   "op": "scale",
+   "columns": [],
+   "params": {
+    "kind": "standard",
+    "columns": [
+     "reading_c",
+     "humidity_pct",
+     "calibration",
+     "battery_pct"
+    ]
+   },
+   "source": "shaper:default",
+   "rationale": "four unimodal, roughly symmetric numerics: standard scaling is the conventional choice and nothing in the analysis argues against it",
+   "alternatives": [
+    {
+     "op": "scale",
+     "params": {
+      "kind": "robust"
+     },
+     "when": "if outliers had been judged genuine"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "model_family": "comparable scales for a regularised model"
+    }
+   },
+   "reversible": false
+  }
+ ],
+ "outputs": {
+  "dir": "shaped/",
+  "format": "csv",
+  "files": []
+ }
+}

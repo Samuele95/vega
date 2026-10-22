@@ -1,0 +1,1057 @@
+{
+ "schema": "vega/network-view@2",
+ "available": true,
+ "model_version": "sha256:c2c04b780f06b87cb1a3746c2e7d03537a35a9537b6dd326b72cb2526b12c014",
+ "spec_digest": "sha256:ab29f0e1126542ff13c7c897dfccae08fd8affa750ae30f56e38ad6ad820a59a",
+ "weights": "full",
+ "family": {
+  "name": "gcn",
+  "source": "catalog"
+ },
+ "task": {
+  "kind": "multiclass",
+  "base": null,
+  "link": "softmax",
+  "outputs": {
+   "kind": "classes",
+   "names": [
+    "k0",
+    "k1",
+    "k2"
+   ]
+  },
+  "positive": null,
+  "threshold": null,
+  "threshold_scale": null,
+  "quantiles": null,
+  "decision_rule": "argmax",
+  "targets": [
+   "logit"
+  ],
+  "default_target": "logit"
+ },
+ "sample": {
+  "shape": "graph",
+  "length": null,
+  "stride": null,
+  "horizon": null,
+  "autoregressive": null,
+  "level": "node",
+  "directed": false,
+  "self_loops": true,
+  "protocol": "inductive",
+  "batching": "full"
+ },
+ "inputs": {
+  "numeric": [
+   "x0",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x5"
+  ],
+  "nominal": [],
+  "past_target": null,
+  "order": [
+   "x0",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x5"
+  ],
+  "width": 6,
+  "edges": {
+   "weighted": false
+  },
+  "axis_labels": {
+   "feature": [
+    "x0",
+    "x1",
+    "x2",
+    "x3",
+    "x4",
+    "x5"
+   ],
+   "step": null,
+   "token": null
+  }
+ },
+ "params": {
+  "total": 155,
+  "trainable": 155
+ },
+ "nodes": [
+  {
+   "id": "input.num",
+   "block": null,
+   "type": "input",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": null,
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "feature"
+   ],
+   "per": "node",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "columns": [
+     "x0",
+     "x1",
+     "x2",
+     "x3",
+     "x4",
+     "x5"
+    ],
+    "stream": "numeric"
+   },
+   "formula": "x = the shaped inputs (numeric, nominal ids, edges)",
+   "code": null
+  },
+  {
+   "id": "input.edges",
+   "block": null,
+   "type": "input",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": null,
+   "out_shape": [
+    2
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "node",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "columns": [],
+    "stream": "edges"
+   },
+   "formula": "x = the shaped inputs (numeric, nominal ids, edges)",
+   "code": null
+  },
+  {
+   "id": "B1",
+   "block": "B1",
+   "type": "edge_dropout",
+   "view": "edges",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "gdrop",
+   "path": "stages.0",
+   "in_shape": [
+    2
+   ],
+   "out_shape": [
+    2
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "node",
+   "config": {
+    "p": 0.1
+   },
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "p": 0.1,
+    "active_at_inference": false
+   },
+   "formula": "E' = E (inactive at inference)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "EdgeDropout",
+    "anchor": "class EdgeDropout("
+   }
+  },
+  {
+   "id": "B2",
+   "block": "B2",
+   "type": "gcn_conv",
+   "view": "graph",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "graph",
+   "path": "stages.1",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "node",
+   "config": {
+    "out": 8
+   },
+   "params": {
+    "count": 56,
+    "trainable": 56,
+    "weight": "B2.weight",
+    "bias": "B2.bias",
+    "normalize": true,
+    "self_loops": true
+   },
+   "formula": "h'_i = Σ_{j∈N(i)∪{i}} Â_ij·W h_j + b",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "GcnConv",
+    "anchor": "class GcnConv("
+   }
+  },
+  {
+   "id": "B3",
+   "block": "B3",
+   "type": "activation",
+   "view": "pointwise",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.2",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "node",
+   "config": {
+    "name": "relu"
+   },
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "name": "relu"
+   },
+   "formula": "a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Activation",
+    "anchor": "class Activation("
+   }
+  },
+  {
+   "id": "B4",
+   "block": "B4",
+   "type": "dropout",
+   "view": "pointwise",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.3",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "node",
+   "config": {
+    "p": 0.2
+   },
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "p": 0.2,
+    "active_at_inference": false
+   },
+   "formula": "y = x (inactive at inference)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dropout",
+    "anchor": "class Dropout("
+   }
+  },
+  {
+   "id": "B5",
+   "block": "B5",
+   "type": "gcn_conv",
+   "view": "graph",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "graph",
+   "path": "stages.4",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "node",
+   "config": {
+    "out": 8
+   },
+   "params": {
+    "count": 72,
+    "trainable": 72,
+    "weight": "B5.weight",
+    "bias": "B5.bias",
+    "normalize": true,
+    "self_loops": true
+   },
+   "formula": "h'_i = Σ_{j∈N(i)∪{i}} Â_ij·W h_j + b",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "GcnConv",
+    "anchor": "class GcnConv("
+   }
+  },
+  {
+   "id": "B6",
+   "block": "B6",
+   "type": "head",
+   "view": "units",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.5",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    3
+   ],
+   "axes": [
+    "output"
+   ],
+   "per": "node",
+   "config": {
+    "out": 3,
+    "activation": "none",
+    "bias": true
+   },
+   "params": {
+    "count": 27,
+    "trainable": 27,
+    "weight": "B6.weight",
+    "bias": "B6.bias",
+    "activation": "none",
+    "row_norms": [
+     0.888225317,
+     0.828994513,
+     1.15874112
+    ],
+    "col_norms": [
+     0.662971914,
+     0.583256304,
+     0.556295216,
+     0.575618088,
+     0.728091419,
+     0.590977013,
+     0.151535943,
+     0.704274654
+    ]
+   },
+   "formula": "z = W·x + b ; ordinal: z_j = w·x + θ_j with θ_0 ≥ θ_1 ≥ …",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Head",
+    "anchor": "class Head("
+   }
+  },
+  {
+   "id": "output",
+   "block": null,
+   "type": "output",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": [
+    3
+   ],
+   "out_shape": [
+    3
+   ],
+   "axes": [
+    "output"
+   ],
+   "per": "node",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "link": "softmax",
+    "outputs": {
+     "kind": "classes",
+     "names": [
+      "k0",
+      "k1",
+      "k2"
+     ]
+    }
+   },
+   "formula": "ŷ = link(z)",
+   "code": null
+  }
+ ],
+ "edges": [
+  {
+   "from": "input.edges",
+   "to": "B1",
+   "kind": "edges"
+  },
+  {
+   "from": "input.num",
+   "to": "B2",
+   "kind": "data"
+  },
+  {
+   "from": "B2",
+   "to": "B3",
+   "kind": "data"
+  },
+  {
+   "from": "B3",
+   "to": "B4",
+   "kind": "data"
+  },
+  {
+   "from": "B4",
+   "to": "B5",
+   "kind": "data"
+  },
+  {
+   "from": "B5",
+   "to": "B6",
+   "kind": "data"
+  },
+  {
+   "from": "B1",
+   "to": "B2",
+   "kind": "edges"
+  },
+  {
+   "from": "B1",
+   "to": "B5",
+   "kind": "edges"
+  },
+  {
+   "from": "B6",
+   "to": "output",
+   "kind": "readout"
+  }
+ ],
+ "chain": null,
+ "tensors": {
+  "B2.weight": {
+   "id": "B2.weight",
+   "node": "B2",
+   "role": "weight",
+   "shape": [
+    8,
+    6
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.176502064,
+    -0.461360067,
+    0.275095522,
+    -0.452263415,
+    0.822177589,
+    0.377267152,
+    -0.146668479,
+    0.232912078,
+    0.657928467,
+    1.15696311,
+    -0.376921207,
+    0.434814543,
+    0.211366728,
+    -0.114126235,
+    0.445888042,
+    0.206889749,
+    0.439373493,
+    -0.214697391,
+    -0.00101714104,
+    0.161242217,
+    0.00800262857,
+    0.00676566968,
+    -0.313704729,
+    0.0515941679,
+    0.0766063184,
+    -0.0250296928,
+    -0.0060208221,
+    0.284328818,
+    -0.268873572,
+    0.28435424,
+    -0.062659286,
+    0.0229297094,
+    -0.0779311433,
+    0.36708954,
+    0.310501367,
+    0.0025049299,
+    -0.179025456,
+    0.757872045,
+    0.220053241,
+    -0.468019843,
+    -0.00178863737,
+    -0.0458609909,
+    0.294712365,
+    -0.0925073326,
+    -0.30182907,
+    0.546315312,
+    -0.813452184,
+    -0.577319026
+   ],
+   "summary": {
+    "n": 48,
+    "mean": 0.0724577345,
+    "std": 0.375629747,
+    "min": -0.813452184,
+    "max": 1.15696311,
+    "l2": 2.65041428,
+    "abs_q": [
+     0.250892825,
+     0.601501858,
+     0.999613915,
+     1.15696311
+    ],
+    "hist": {
+     "lo": -0.813452184,
+     "hi": 1.15696311,
+     "counts": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      3,
+      0,
+      1,
+      3,
+      1,
+      3,
+      3,
+      3,
+      7,
+      2,
+      1,
+      4,
+      4,
+      1,
+      2,
+      3,
+      0,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B2.bias": {
+   "id": "B2.bias",
+   "node": "B2",
+   "role": "bias",
+   "shape": [
+    8
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.0522775576,
+    -0.0514337048,
+    -0.0127291251,
+    -0.00114910456,
+    0.0997800827,
+    -0.151983857,
+    0.298360407,
+    0.0611383282
+   ],
+   "summary": {
+    "n": 8,
+    "mean": 0.0237131836,
+    "std": 0.125924176,
+    "min": -0.151983857,
+    "max": 0.298360407,
+    "l2": 0.362427518,
+    "abs_q": [
+     0.0567079429,
+     0.195896822,
+     0.288114049,
+     0.298360407
+    ],
+    "hist": {
+     "lo": -0.151983857,
+     "hi": 0.298360407,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B5.weight": {
+   "id": "B5.weight",
+   "node": "B5",
+   "role": "weight",
+   "shape": [
+    8,
+    8
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.273324877,
+    -0.202038333,
+    -0.170731038,
+    -0.788955867,
+    0.141693518,
+    -0.39286533,
+    -0.191694736,
+    -0.387482047,
+    -0.211418137,
+    0.00841483381,
+    -0.454610109,
+    0.536289036,
+    -0.450949252,
+    -0.176142454,
+    -0.00905832183,
+    0.219661087,
+    0.0744473413,
+    0.0110701136,
+    0.171641171,
+    0.127843514,
+    -0.3466869,
+    0.200526416,
+    -0.235449284,
+    -0.413049012,
+    -0.0410829037,
+    -0.186629415,
+    0.0761856362,
+    0.0933803469,
+    -0.224363059,
+    0.100068837,
+    -0.0335119478,
+    -0.587857962,
+    0.533560514,
+    -0.0152625637,
+    -0.067881383,
+    0.287379801,
+    -0.51045686,
+    -0.258359432,
+    0.314452589,
+    -0.692862272,
+    -0.319221467,
+    0.568241179,
+    0.194427639,
+    -0.364172995,
+    0.00173596246,
+    0.245887741,
+    -0.296196729,
+    -0.00940460432,
+    0.107698016,
+    -0.000430191663,
+    0.525846839,
+    0.0259776469,
+    -0.068342194,
+    0.0661283061,
+    -0.147472829,
+    -0.298768461,
+    -0.0956065357,
+    -0.239701912,
+    0.641579688,
+    0.748270035,
+    -0.142624721,
+    -0.996115088,
+    -0.136579007,
+    0.229148909
+   ],
+   "summary": {
+    "n": 64,
+    "mean": -0.0654031799,
+    "std": 0.333659754,
+    "min": -0.996115088,
+    "max": 0.748270035,
+    "l2": 2.72007538,
+    "abs_q": [
+     0.206728235,
+     0.558655536,
+     0.865604779,
+     0.996115088
+    ],
+    "hist": {
+     "lo": -0.996115088,
+     "hi": 0.748270035,
+     "counts": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      2,
+      4,
+      3,
+      4,
+      5,
+      5,
+      1,
+      5,
+      7,
+      4,
+      4,
+      3,
+      3,
+      1,
+      1,
+      0,
+      0,
+      1,
+      3,
+      0,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "B5.bias": {
+   "id": "B5.bias",
+   "node": "B5",
+   "role": "bias",
+   "shape": [
+    8
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.0646469817,
+    0.0667190254,
+    0.0619170517,
+    -0.063510485,
+    -0.0256604087,
+    -0.0995153934,
+    -0.0435772128,
+    -0.111757271
+   ],
+   "summary": {
+    "n": 8,
+    "mean": -0.0350039594,
+    "std": 0.0628949296,
+    "min": -0.111757271,
+    "max": 0.0667190254,
+    "l2": 0.203588788,
+    "abs_q": [
+     0.0640787333,
+     0.103187957,
+     0.11090034,
+     0.111757271
+    ],
+    "hist": {
+     "lo": -0.111757271,
+     "hi": 0.0667190254,
+     "counts": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2
+     ]
+    }
+   }
+  },
+  "B6.weight": {
+   "id": "B6.weight",
+   "node": "B6",
+   "role": "weight",
+   "shape": [
+    3,
+    8
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.191270202,
+    0.518898427,
+    -0.113310598,
+    0.384202451,
+    0.11298389,
+    -0.530913889,
+    -0.0353168547,
+    -0.163619727,
+    -0.435848117,
+    -0.167145535,
+    0.429842591,
+    0.428110123,
+    -0.148467809,
+    -0.254779786,
+    -0.0169518571,
+    0.118511438,
+    0.461501777,
+    -0.207351685,
+    -0.33445546,
+    -0.0211279467,
+    -0.703781962,
+    -0.049714379,
+    0.146384761,
+    -0.674675047
+   ],
+   "summary": {
+    "n": 24,
+    "mean": -0.0603456416,
+    "std": 0.33735854,
+    "min": -0.703781962,
+    "max": 0.518898427,
+    "l2": 1.67894525,
+    "abs_q": [
+     0.199310943,
+     0.527309251,
+     0.697087372,
+     0.703781962
+    ],
+    "hist": {
+     "lo": -0.703781962,
+     "hi": 0.518898427,
+     "counts": [
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      3,
+      1,
+      0,
+      4,
+      0,
+      0,
+      0,
+      2,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "B6.bias": {
+   "id": "B6.bias",
+   "node": "B6",
+   "role": "bias",
+   "shape": [
+    3
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0878652409,
+    -0.0634979829,
+    -0.0214717761
+   ],
+   "summary": {
+    "n": 3,
+    "mean": 0.000965160628,
+    "std": 0.0637979544,
+    "min": -0.0634979829,
+    "max": 0.0878652409,
+    "l2": 0.110513943,
+    "abs_q": [
+     0.0634979829,
+     0.0829917893,
+     0.0873778957,
+     0.0878652409
+    ],
+    "hist": {
+     "lo": -0.0634979829,
+     "hi": 0.0878652409,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  }
+ },
+ "limits": {
+  "inline_tensor_max": 262144,
+  "inline_total_max": 1048576,
+  "json_list_max": 1024,
+  "vector_max": 4096,
+  "heat_max": 64,
+  "graph_nodes_max": 256,
+  "explain_float_budget": 262144,
+  "explain_exact_float_budget": 4194304,
+  "explain_rows_max": 4096,
+  "explain_edges_max": 65536,
+  "ig_steps_default": 32,
+  "ig_steps_max": 128,
+  "ig_batch_max": 65536
+ },
+ "inspection": {
+  "schema": "vega/inspection@1",
+  "readers": "sha256:a34c8711902127951b403455045d55f457346ac9c57fa6c9a191187d9b288ae0"
+ },
+ "network_digest": "sha256:7df69139373b222d1e69fa8eda42ea9c174ea9a0a038a7a9e5bc1f07dc79a70c"
+}

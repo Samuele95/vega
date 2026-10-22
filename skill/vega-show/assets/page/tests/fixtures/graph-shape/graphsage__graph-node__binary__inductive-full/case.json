@@ -1,0 +1,17 @@
+{
+  "effective": "binary",
+  "extra": null,
+  "family": "graphsage",
+  "files": {
+    "explain": "graphsage__graph-node__binary__inductive-full/explain.json",
+    "network": "graphsage__graph-node__binary__inductive-full/network.json"
+  },
+  "id": "graphsage/graph-node/binary/inductive-full",
+  "level": "node",
+  "reading": "binary",
+  "shape": "graph",
+  "slug": "graphsage__graph-node__binary__inductive-full",
+  "target": "binary_logit",
+  "task": "binary",
+  "variant": "inductive-full"
+}

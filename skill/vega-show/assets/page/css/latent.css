@@ -1,0 +1,5 @@
+/* The latent area (js/net/renderers/latent.js): the caption a pointer on the latent code writes
+   under the drawing — the split of what the code reads into means and log-variances set apart from
+   the formula below it. Only the page's tokens (page.css). */
+.latent-split{margin:4px 0 2px;color:var(--fg2)}
+.latent-split + .formula{margin-top:2px}

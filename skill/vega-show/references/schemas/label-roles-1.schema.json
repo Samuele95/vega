@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:label-roles:1",
+  "title": "vega/label-roles@1 — docs/label-roles.json, the report's role → label map",
+  "description": "Written by /document-project in Vega mode at every compile (the H02 patch) and by lanekit's report_stub (T03); read by vega-show (role_map.read_role_map, H01) and never written by it. A role whose object the report does not carry is absent, never guessed. number, page and title are optional per role; when present, vega-show verifies each against the .aux the map names (show-contract.md §6.3). A map whose aux_digest differs from the current .aux is ERROR exit 2 (gate PF6), not a fork.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "lane", "generated_at", "adapter", "report", "roles"],
+  "properties": {
+    "schema": { "const": "vega/label-roles@1" },
+    "lane": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$" },
+    "adapter": { "enum": ["latex-aux"] },
+    "report": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tex", "pdf", "aux", "aux_digest"],
+      "properties": {
+        "tex": { "type": "string", "pattern": "\\.tex$" },
+        "pdf": { "type": "string", "pattern": "\\.pdf$" },
+        "aux": { "type": "string", "pattern": "\\.aux$" },
+        "aux_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "propertyNames": { "enum": ["intro.lane", "chapter.forge-data", "chapter.lens", "chapter.shape", "chapter.blueprint",
+                                  "chapter.net", "chapter.train", "chapter.eval", "chapter.pack", "shape.lineage",
+                                  "blueprint.modules", "net.blocks", "net.decisions", "net.forward", "net.loss", "net.update",
+                                  "train.ladder", "train.curves", "eval.metrics", "eval.calibration", "pack.layout",
+                                  "pack.slice", "conclusion"] },
+      "additionalProperties": { "$ref": "#/$defs/binding" }
+    }
+  },
+  "$defs": {
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["label", "kind", "stage"],
+      "properties": {
+        "label": { "type": "string", "pattern": "^[^\\s{}]+$" },
+        "kind": { "enum": ["section", "figure", "table", "equation"] },
+        "stage": { "enum": ["forge-data", "lens", "shape", "blueprint", "net", "train", "eval", "pack"] },
+        "number": { "type": "string", "minLength": 1 },
+        "page": { "oneOf": [ { "type": "integer", "minimum": 1 }, { "type": "string", "minLength": 1 } ] },
+        "title": { "type": "string" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema": "vega/label-roles@1", "lane": "dataset:cicids2017", "generated_at": "2026-09-29T11:00:00Z",
+      "adapter": "latex-aux",
+      "report": { "tex": "docs/main.tex", "pdf": "docs/main.pdf", "aux": "docs/main.aux",
+                  "aux_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+      "roles": { "net.forward": { "label": "eq:mlp", "kind": "equation", "stage": "net", "number": "3", "page": 14, "title": "" },
+                 "pack.slice":  { "label": "fig:serving", "kind": "figure", "stage": "pack", "number": "9.2", "page": 41,
+                                  "title": "The serving slice of the module map" },
+                 "chapter.net": { "label": "sec:method:network", "kind": "section", "stage": "net" } }
+    },
+    {
+      "schema": "vega/label-roles@1", "lane": "L02", "generated_at": "2026-09-29T11:00:00+02:00",
+      "adapter": "latex-aux",
+      "report": { "tex": "docs/main.tex", "pdf": "docs/main.pdf", "aux": "docs/main.aux",
+                  "aux_digest": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210" },
+      "roles": { "net.forward": { "label": "vega:net.forward", "kind": "equation", "stage": "net", "number": "3.14", "page": 15,
+                                  "title": "net.forward" } }
+    }
+  ]
+}

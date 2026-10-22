@@ -1,0 +1,291 @@
+{
+ "schema": "dataset-forge/geometry@1",
+ "from_run": "geometry.json",
+ "source": {"path": "dataset-forge/fixtures/orders.csv"},
+ "markers": [
+  "OK: 15 columns typed; 5 retyped by meaning (customer_id, zip, qty, discount_pct, delivered_days)",
+  "OK: basis of 8 named columns against a TwoNN intrinsic dimension of 7.11",
+  "OK: 5 derivations, each with its provenance triple; symbolic channel untested in this fixture (no A-box in the base model)",
+  "WARN: weight_kg is nearly collinear with qty but not derivable — recorded as a disagreement",
+  "OK: one defensible label candidate (late); partition single-candidate"
+ ],
+ "typing": [
+  {"column": "order_id", "final_type": "id", "role": "identity",
+   "reason": "unique on every row: the order's key determines every column and would poison every dependency measure, so it leaves the analysis"},
+  {"column": "customer_id", "final_type": "nominal", "role": "foreign-key",
+   "reason": "an *_id with repeats (79 customers over 600 orders): a key into a customer table the file does not carry, not a quantity",
+   "consequences": {
+    "decision": "customer_id is a foreign key and stays outside the basis",
+    "alternatives": ["keep it as a numeric dimension, as the script parsed it"],
+    "downstream": {
+     "preprocessing": "no scaling: a customer number has no magnitude; if a model ever needs the customer, it arrives as a category or a join",
+     "model_family": "kept numeric, a linear model would read customer 48 as twice customer 24 and a tree would split on arbitrary numbering",
+     "leakage": "none today; a per-customer lateness rate joined later would have to be fitted on the training part only",
+     "dimensionality": "one column fewer in the space /vega-forge sees",
+     "interpretability": "the basis names what an order is, not who placed it"}}},
+  {"column": "zip", "final_type": "nominal", "role": "dimension",
+   "reason": "a postal code parsed as an integer: five codes, categorical by meaning (the name hint says so too)",
+   "consequences": {
+    "decision": "zip is nominal",
+    "alternatives": ["keep zip ordinal, as parsed"],
+    "downstream": {
+     "preprocessing": "encoded as a category (one-hot or an embedding), never scaled — 80121 is not larger than 10121 in any sense",
+     "model_family": "an ordinal zip gives a linear model a meaningless slope across Italy",
+     "leakage": "none",
+     "dimensionality": "one input column, five categories",
+     "interpretability": "a code names a place; its digits carry no order"}}},
+  {"column": "city", "final_type": "nominal", "role": "derived",
+   "reason": "the name of the place the postal code already fixes"},
+  {"column": "region", "final_type": "nominal", "role": "derived",
+   "reason": "the region of the city: one step further up the same lookup"},
+  {"column": "unit_price", "final_type": "numeric", "role": "dimension",
+   "reason": "a price the business sets per item"},
+  {"column": "qty", "final_type": "numeric", "role": "dimension",
+   "reason": "a count of items: nine small integers form a scale, and the multiplication in total needs it as a quantity",
+   "consequences": {
+    "decision": "qty is numeric",
+    "alternatives": ["keep qty ordinal, as the script typed it"],
+    "downstream": {
+     "preprocessing": "scaled with the other quantities; no category encoding",
+     "model_family": "as codes, the rule total = unit_price × qty could not be written and a linear model would lose the proportionality",
+     "leakage": "none",
+     "dimensionality": "one input either way",
+     "interpretability": "one more item is a unit step, which is what a coefficient on qty says"}}},
+  {"column": "total", "final_type": "numeric", "role": "derived",
+   "reason": "the amount the order came to"},
+  {"column": "discount_pct", "final_type": "numeric", "role": "dimension",
+   "reason": "a percentage with three values (0, 5, 10) that enters subtotal arithmetically: a policy's steps, still a quantity",
+   "consequences": {
+    "decision": "discount_pct is numeric",
+    "alternatives": ["keep discount_pct ordinal and encode its three levels"],
+    "downstream": {
+     "preprocessing": "scaled, not encoded",
+     "model_family": "encoded as three levels, a linear model would spend two parameters where the arithmetic uses one",
+     "leakage": "none",
+     "dimensionality": "one input instead of three one-hot columns",
+     "interpretability": "a percentage point keeps its meaning in the coefficient"}}},
+  {"column": "order_date", "final_type": "datetime", "role": "dimension",
+   "reason": "when the order was placed; no column defines it"},
+  {"column": "delivered_days", "final_type": "numeric", "role": "dimension",
+   "reason": "a duration in days (14 values): the threshold rule compares it as a number",
+   "consequences": {
+    "decision": "delivered_days is numeric",
+    "alternatives": ["keep delivered_days ordinal"],
+    "downstream": {
+     "preprocessing": "scaled as a duration",
+     "model_family": "as codes the threshold at seven days would be learned as fourteen unrelated levels",
+     "leakage": "delivered_days defines late; the numeric reading is what makes the leakage visible as a rule",
+     "dimensionality": "one input when late is not the label, none when it is",
+     "interpretability": "a day more is a day more"}}},
+  {"column": "late", "final_type": "boolean", "role": "derived",
+   "reason": "a flag the delivery time decides"},
+  {"column": "note", "final_type": "nominal", "role": "dimension",
+   "reason": "four fixed phrases: low-cardinality text read as a nominal, not free text"},
+  {"column": "weight_kg", "final_type": "numeric", "role": "dimension",
+   "reason": "the shipment's weight, measured, not computed from any column"},
+  {"column": "subtotal", "final_type": "numeric", "role": "derived",
+   "reason": "the amount after the discount"}
+ ],
+ "space": {
+  "reading": "The question behind every number here is how many independent directions the orders really span. Ten columns are numeric as the script parses them — including customer_id, zip and late, which the typing above takes out of the arithmetic — and they are of full rank: no column is an exact linear combination of the others, so the redundancy the file carries is not linear. The variance says more: 95 % of it lives in six directions, and the two-nearest-neighbour estimate, which measures the dimension of the surface the points actually lie on, is about seven. That gap between ten columns and seven dimensions is the signature of products and lookups — total is unit_price times qty, not a sum — and it is what the derivations below go and name."
+ },
+ "basis": {
+  "members": ["unit_price", "qty", "discount_pct", "zip", "order_date", "delivered_days", "weight_kg", "note"],
+  "reading": "Having found that the space is smaller than the table, the next question is which columns span it. The basis — the columns no rule derives from the others — has eight members against an intrinsic dimension near seven. The surplus of about one is weight_kg: it is not derivable, yet it moves almost in step with qty, because every item weighs roughly the same. A basis that size is honest; a smaller one would have to pretend that weight is a function of quantity, which the data refutes on its residuals."
+ },
+ "derivations": [
+  {"column": "total", "rule_id": "swrl-total", "layer": "swrl",
+   "formula": "total = unit_price × qty", "body": ["unit_price", "qty"],
+   "cycle": ["unit_price", "qty", "total"],
+   "provenance": {
+    "semantic": {"status": "confirmed", "note": "price times quantity, by meaning"},
+    "symbolic": {"status": "untested", "note": "not run in this fixture: its base model carries no A-box; run_query.py --engine swrl on a forged model records the count"},
+    "empirical": {"status": "confirmed", "evidence": "degree-2 fit R²=1.000000 on 600 rows: total ← unit_price*qty (linear_derivability)"}},
+   "consequences": {
+    "decision": "unit_price and qty enter the basis; total is derived",
+    "alternatives": ["total and qty in the basis, unit_price derived", "total and unit_price in the basis, qty derived", "all three kept as features"],
+    "downstream": {
+     "preprocessing": "total needs no scaling decision of its own; it inherits from its parents",
+     "model_family": "keeping all three hands a linear model an exactly determined product — coefficients unstable; a tree is indifferent but wastes splits",
+     "leakage": "if total were ever the label, unit_price and qty would have to leave the features or the model learns the multiplication",
+     "dimensionality": "/vega-forge sees two inputs for this cycle, not three",
+     "interpretability": "unit_price is set by the business and qty by the customer; total is the outcome — the chosen direction keeps the controllable quantities as inputs"}}},
+  {"column": "subtotal", "rule_id": "swrl-subtotal", "layer": "swrl",
+   "formula": "subtotal = total × (1 − discount_pct / 100)", "body": ["total", "discount_pct"],
+   "provenance": {
+    "semantic": {"status": "confirmed", "note": "the discount applied to the total"},
+    "symbolic": {"status": "untested", "note": "not run in this fixture (no A-box)"},
+    "empirical": {"status": "confirmed", "evidence": "degree-2 fit R²=1.000000 on 600 rows, marked formula_ambiguous: derivability holds, the coefficient split does not — the formula here is the semantic channel's"}},
+   "consequences": {
+    "decision": "subtotal is derived from total and discount_pct",
+    "alternatives": ["keep subtotal as a feature next to total"],
+    "downstream": {
+     "preprocessing": "none of its own",
+     "model_family": "kept, it doubles the direction total already carries (pearson 0.9974 between them)",
+     "leakage": "subtotal as a label would need total and discount_pct out of the features",
+     "dimensionality": "one input fewer",
+     "interpretability": "the discount stays visible as its own column instead of hiding inside an amount"}}},
+  {"column": "city", "rule_id": "horn-city", "layer": "rules",
+   "formula": "city = lookup(zip)", "body": ["zip"],
+   "cycle": ["zip", "city", "region"],
+   "provenance": {
+    "semantic": {"status": "confirmed", "note": "a postal code names one city"},
+    "symbolic": {"status": "untested", "note": "a Horn lookup; the Prolog runner was not run in this fixture"},
+    "empirical": {"status": "confirmed", "evidence": "exact functional dependency zip → city (5 groups)"}},
+   "consequences": {
+    "decision": "zip is the place's basis member; city is derived",
+    "alternatives": ["city in the basis, zip and region derived", "region in the basis, zip and city derived"],
+    "downstream": {
+     "preprocessing": "one nominal to encode instead of three",
+     "model_family": "three encodings of the same five places would triple the categorical inputs for no information",
+     "leakage": "none",
+     "dimensionality": "one place input, five categories",
+     "interpretability": "the code is what the order form records; the names are lookups"}}},
+  {"column": "region", "rule_id": "horn-region", "layer": "rules",
+   "formula": "region = lookup(city)", "body": ["city"],
+   "cycle": ["zip", "city", "region"],
+   "provenance": {
+    "semantic": {"status": "confirmed", "note": "a city lies in one region"},
+    "symbolic": {"status": "untested", "note": "a Horn lookup; the Prolog runner was not run in this fixture"},
+    "empirical": {"status": "confirmed", "evidence": "exact functional dependency city → region (5 groups)"}},
+   "consequences": {
+    "decision": "region is derived through city",
+    "alternatives": ["region in the basis"],
+    "downstream": {
+     "preprocessing": "none of its own",
+     "model_family": "with five places and five regions the region adds no split a tree could not make on zip",
+     "leakage": "none",
+     "dimensionality": "no input of its own",
+     "interpretability": "a coarser name for the same place"}}},
+  {"column": "late", "rule_id": "swrl-late", "layer": "swrl",
+   "formula": "late ⇔ delivered_days > 7", "body": ["delivered_days"],
+   "provenance": {
+    "semantic": {"status": "confirmed", "note": "a delivery is late past a week, by the policy the flag encodes"},
+    "symbolic": {"status": "untested", "note": "not run in this fixture (no A-box)"},
+    "empirical": {"status": "confirmed", "evidence": "exact functional dependency delivered_days → late (14 groups); the threshold at 7 separates them"}},
+   "consequences": {
+    "decision": "late is a rule head over delivered_days",
+    "alternatives": ["treat late as a primitive outcome"],
+    "downstream": {
+     "preprocessing": "none",
+     "model_family": "a model given delivered_days recovers the threshold exactly and learns nothing about lateness",
+     "leakage": "delivered_days must leave the features whenever late is the label",
+     "dimensionality": "one input fewer when late is the label",
+     "interpretability": "lateness is a policy over a measurement; the measurement is what happened"}}}
+ ],
+ "cycles": [
+  {"id": "price-qty-total", "members": ["unit_price", "qty", "total"],
+   "reading": "Price, quantity and amount determine each other two by two: any one of them is the product or the quotient of the other two, so which one leaves the basis is a semantic choice, not a computed one.",
+   "orientations": [
+    {"id": "total-derived", "derived": ["total"],
+     "consequences": {
+      "decision": "unit_price and qty in the basis; total derived (the report's orientation)",
+      "alternatives": ["total derived from its parents is the only orientation whose inputs are both decided before the order closes"],
+      "downstream": {
+       "preprocessing": "scale unit_price and qty; total follows",
+       "model_family": "a network sees two controllable quantities",
+       "leakage": "none unless total is the label",
+       "dimensionality": "two inputs",
+       "interpretability": "inputs are what the business and the customer chose"}}},
+    {"id": "unit-price-derived", "derived": ["unit_price"],
+     "derivations": [{"column": "unit_price", "formula": "unit_price = total / qty", "body": ["total", "qty"]}],
+     "consequences": {
+      "decision": "total and qty in the basis; unit_price derived",
+      "alternatives": [],
+      "downstream": {
+       "preprocessing": "total is heavy-tailed (it multiplies two spreads) and would want a log transform",
+       "model_family": "the model sees an outcome as an input; price becomes implicit",
+       "leakage": "subtotal's body now lies entirely in the basis, so subtotal turns into a candidate label whose leakage set is total and discount_pct",
+       "dimensionality": "still two inputs",
+       "interpretability": "a price hidden behind a quotient is harder to read than the price itself"}}},
+    {"id": "qty-derived", "derived": ["qty"],
+     "derivations": [{"column": "qty", "formula": "qty = total / unit_price", "body": ["total", "unit_price"]}],
+     "consequences": {
+      "decision": "total and unit_price in the basis; qty derived",
+      "alternatives": [],
+      "downstream": {
+       "preprocessing": "total wants a log transform, as in the previous orientation",
+       "model_family": "weight_kg loses its natural partner in the basis: its near-collinearity is now with a derived column",
+       "leakage": "subtotal's body lies in the basis here too",
+       "dimensionality": "still two inputs",
+       "interpretability": "a count recovered by division reads worse than the count"}}}
+   ]},
+  {"id": "zip-city-region", "members": ["zip", "city", "region"],
+   "reading": "The five postal codes, five cities and five regions are in bijection: each names the other two, so the place has one basis member and the choice among the three is about what the order form records.",
+   "orientations": [
+    {"id": "zip-basis", "derived": ["city", "region"],
+     "consequences": {
+      "decision": "zip in the basis; city and region derived (the report's orientation)",
+      "alternatives": [],
+      "downstream": {
+       "preprocessing": "encode zip as a category",
+       "model_family": "one categorical input with five levels",
+       "leakage": "none",
+       "dimensionality": "one input",
+       "interpretability": "the code is the recorded fact"}}},
+    {"id": "city-basis", "derived": ["zip", "region"],
+     "derivations": [{"column": "zip", "formula": "zip = lookup(city)", "body": ["city"]},
+                     {"column": "region", "formula": "region = lookup(city)", "body": ["city"]}],
+     "consequences": {
+      "decision": "city in the basis; zip and region derived",
+      "alternatives": [],
+      "downstream": {
+       "preprocessing": "encode city instead of zip — the same five levels",
+       "model_family": "no change: the same partition of the orders",
+       "leakage": "none",
+       "dimensionality": "one input",
+       "interpretability": "a name reads better than a code, and breaks the day a city has two codes"}}},
+    {"id": "region-basis", "derived": ["zip", "city"],
+     "derivations": [{"column": "zip", "formula": "zip = lookup(region)", "body": ["region"]},
+                     {"column": "city", "formula": "city = lookup(region)", "body": ["region"]}],
+     "consequences": {
+      "decision": "region in the basis; zip and city derived",
+      "alternatives": [],
+      "downstream": {
+       "preprocessing": "encode region — five levels today",
+       "model_family": "no change on this file; on a file with several cities per region the region would lose detail",
+       "leakage": "none",
+       "dimensionality": "one input",
+       "interpretability": "the coarsest name, correct only while the bijection holds"}}}
+   ]}
+ ],
+ "disagreements": [
+  {"column": "weight_kg", "kind": "empirical-without-semantic",
+   "evidence": "pearson 0.966 and nmi 0.6272 with qty; not derivable (no fit reaches R² 0.999)",
+   "reading": "The script sees weight move with quantity and the meaning says why without making it a rule: an order weighs its item count times a per-item weight the file does not carry. That hidden unit weight is a dimension of its own, so weight_kg stays in the basis — and a model will see two nearly parallel inputs."},
+  {"column": "subtotal", "kind": "empirical-formula-non-canonical",
+   "evidence": "linear_derivability marks subtotal formula_ambiguous: its degree-2 regressors are mutually dependent",
+   "reading": "The script establishes that subtotal is derivable but spreads the coefficients across total and unit_price*qty, which are the same column; the canonical formula is the semantic channel's, and the rule states it."}
+ ],
+ "orthogonality": {
+  "pairs": [
+   {"a": "qty", "b": "weight_kg", "independence": "definitional, not statistical: no rule links them, yet the data puts them on nearly one line"},
+   {"a": "unit_price", "b": "qty", "independence": "definitional and statistical: price and quantity are chosen by different people and barely move together"},
+   {"a": "order_date", "b": "delivered_days", "independence": "definitional and, on this file, statistical: no season makes deliveries slower"}
+  ],
+  "reading": "With the basis settled, the remaining question is whether its members are independent only by definition or in the data as well. Almost every pair is both: normalized mutual information stays below 0.05. The one exception is qty and weight_kg, independent by definition and nearly collinear in the data — the hidden unit weight again — and it is the pair a linear model would stumble on."
+ },
+ "partitions": {
+  "chosen": "late",
+  "provenance": "single-candidate",
+  "candidates": [
+   {"label": "late", "task": "binary classification", "rule_id": "swrl-late",
+    "features": ["unit_price", "qty", "discount_pct", "zip", "order_date", "weight_kg", "note"],
+    "dropped_for_leakage": ["delivered_days"],
+    "input_dim": 7,
+    "consequences": {
+     "decision": "late is the label; delivered_days leaves the features",
+     "alternatives": [],
+     "downstream": {
+      "preprocessing": "the shaper drops delivered_days with the partition, and the split comes after it",
+      "model_family": "a binary classifier over seven inputs, one of them a five-level nominal",
+      "leakage": "delivered_days defines late: kept, it would make the task a lookup of the threshold",
+      "dimensionality": "/vega-forge receives input_dim 7",
+      "interpretability": "the model must predict lateness from what is known when the order is placed"}}}
+  ]
+ },
+ "handoff": {
+  "next": "/data-lens orders.domain.html",
+  "note": "late is the single defensible candidate; /dataset-shaper orders.domain.html --target late materializes it once the analysis has run."
+ }
+}

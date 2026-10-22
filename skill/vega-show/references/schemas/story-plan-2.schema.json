@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:story-plan:2",
+  "title": "vega/story-plan@2 — showcase/plan/story-plan.json, the authoring file",
+  "description": "One file, two halves. draft_plan.py (H04) writes proposals and every authored slot as null with status draft; the model fills authored under the contract (no digit outside {placeholders}, no record path, closed-set values only) and sets status authored; plan_rules.py (H05) validates it (V1–V15) and resolve_story.py turns it into vega/story@2. The plan pins the fact set and the page template it was drafted against (V1). Proposal items may carry extra evidence fields; authored slots are closed (show-contract.md §3).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "status", "facts", "template", "proposals", "authored"],
+  "properties": {
+    "schema": { "const": "vega/story-plan@2" },
+    "status": { "enum": ["draft", "authored"] },
+    "facts": {
+      "type": "object", "additionalProperties": false, "required": ["file", "digest"],
+      "properties": { "file": { "const": "plan/facts.json" }, "digest": { "$ref": "#/$defs/digest" } }
+    },
+    "template": {
+      "type": "object", "additionalProperties": false, "required": ["version", "manifest_digest"],
+      "properties": { "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }, "manifest_digest": { "$ref": "#/$defs/digest" } }
+    },
+    "carried_from": { "type": ["string", "null"] },
+    "proposals": {
+      "type": "object", "additionalProperties": false,
+      "required": ["modality", "view_key", "lexicon", "motif", "class_roles", "input_groups", "choices", "runs", "results_facts",
+                   "limits", "code_steps", "report_roles", "context_steps", "prose_sources"],
+      "properties": {
+        "modality": { "enum": ["row", "spatial-row", "window", "graph"] },
+        "view_key": { "enum": ["classes", "binary", "labels", "value", "ordinal", "reconstruction", "anomaly", "horizon"] },
+        "lexicon": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/lexicon_key" },
+          "required": ["row", "feature", "source"],
+          "additionalProperties": {
+            "type": "object", "required": ["one", "many", "article", "source"],
+            "properties": { "one": { "$ref": "#/$defs/noun" }, "many": { "$ref": "#/$defs/noun" },
+                            "article": { "enum": ["a", "an", "the"] },
+                            "source": { "type": "string", "pattern": "^(user:.+|show:\\d{4}-\\d{2}-\\d{2}|bundle:MANIFEST\\.serve\\.identity\\.(noun|nouns)|vega:default)$" } }
+          }
+        },
+        "motif": {
+          "type": "object", "required": ["modality", "base", "admissible", "stance", "fork"],
+          "properties": { "modality": { "enum": ["row", "spatial-row", "window", "graph"] },
+                          "base": { "$ref": "#/$defs/motif" },
+                          "admissible": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/motif" } },
+                          "stance": { "type": ["string", "null"] },
+                          "fork": { "enum": ["S3", null] } }
+        },
+        "class_roles": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "object", "required": ["neutral", "alert_candidates", "basis_found", "memory", "evidence", "fork"],
+              "properties": {
+                "neutral": { "oneOf": [ { "type": "null" },
+                                        { "type": "object", "required": ["class", "rule"],
+                                          "properties": { "class": { "type": "string" },
+                                                          "rule": { "enum": ["structural:majority", "structural:negative", "task:anomaly"] },
+                                                          "share": { "type": ["string", "null"] } } } ] },
+                "alert_candidates": { "type": "array", "items": { "type": "string" } },
+                "basis_found": { "type": ["string", "null"] },
+                "memory": { "type": ["string", "null"] },
+                "evidence": { "type": "array", "items": { "type": "string" } },
+                "fork": { "enum": ["S2", null] } } }
+          ]
+        },
+        "input_groups": {
+          "type": "array", "minItems": 1,
+          "items": { "type": "object", "required": ["suggested_id", "members", "evidence"],
+                     "properties": { "suggested_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,31}$" },
+                                     "members": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+                                     "evidence": { "type": "array", "items": { "type": "object" } } } }
+        },
+        "choices": {
+          "type": "array",
+          "items": { "type": "object", "required": ["decision", "family", "mandatory"],
+                     "properties": { "decision": { "type": "string", "minLength": 1 },
+                                     "family": { "enum": ["architecture", "objective", "optimization", "regularization"] },
+                                     "type": { "type": ["string", "null"] },
+                                     "params": { "type": "object", "additionalProperties": { "$ref": "#/$defs/key" } },
+                                     "rationale_ref": { "type": ["string", "null"] },
+                                     "tested_by": { "type": "array" },
+                                     "mandatory": { "type": "boolean" } } }
+        },
+        "runs": {
+          "type": "array",
+          "items": { "type": "object", "required": ["id", "label", "selected", "reference", "primary"],
+                     "properties": { "id": { "type": "string", "minLength": 1 }, "label": { "type": "string" },
+                                     "selected": { "type": "boolean" }, "reference": { "type": "boolean" },
+                                     "primary": { "$ref": "#/$defs/key" } } }
+        },
+        "results_facts": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/key" } },
+        "limits": {
+          "type": "array",
+          "items": { "type": "object", "required": ["id", "mandatory", "facts"],
+                     "properties": { "id": { "type": "string" }, "mandatory": { "type": "boolean" },
+                                     "facts": { "type": "array", "items": { "$ref": "#/$defs/key" } },
+                                     "prose_ref": { "type": ["string", "null"] } } }
+        },
+        "code_steps": {
+          "type": "array",
+          "items": { "type": "object", "required": ["step", "role", "status"],
+                     "properties": { "step": { "$ref": "#/$defs/walk_id" },
+                                     "role": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/report_role" } ] },
+                                     "status": { "enum": ["bound", "brief", "no-role"] } } }
+        },
+        "report_roles": {
+          "type": "object", "required": ["status", "bindings"],
+          "properties": {
+            "status": { "enum": ["emitted", "proposed", "absent"] },
+            "bindings": { "type": "object", "propertyNames": { "$ref": "#/$defs/report_role" },
+                          "additionalProperties": { "type": "object", "required": ["label", "source"],
+                                                    "properties": { "label": { "type": "string" },
+                                                                    "source": { "enum": ["document-project", "proposed"] },
+                                                                    "evidence": { "type": ["string", "null"] } } } },
+            "fork": { "enum": ["S1", null] }
+          }
+        },
+        "context_steps": { "type": "array", "minItems": 4, "maxItems": 5, "uniqueItems": true, "items": { "$ref": "#/$defs/context_step" } },
+        "prose_sources": {
+          "type": "array",
+          "items": { "type": "object", "required": ["what", "ref"],
+                     "properties": { "what": { "type": "string" }, "ref": { "type": "string" } } }
+        }
+      }
+    },
+    "authored": {
+      "type": "object", "additionalProperties": false,
+      "required": ["locale", "lexicon", "motif", "class_roles", "report_roles", "headline", "lead", "context", "network",
+                   "experiments", "results", "input_groups", "code_notes", "monitor_note"],
+      "properties": {
+        "locale": { "enum": ["en", null] },
+        "lexicon": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "propertyNames": { "$ref": "#/$defs/lexicon_key" },
+                       "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["one", "many", "article"],
+                                                 "properties": { "one": { "$ref": "#/$defs/noun" }, "many": { "$ref": "#/$defs/noun" },
+                                                                 "article": { "enum": ["a", "an", "the"] } } } } ]
+        },
+        "motif": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/motif" } ] },
+        "class_roles": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "additionalProperties": false, "required": ["roles", "source"],
+                       "properties": { "roles": { "type": "object", "additionalProperties": { "enum": ["neutral", "alert", "plain"] } },
+                                       "source": { "type": "object",
+                                                   "additionalProperties": { "type": "string",
+                                                                             "pattern": "^(structural:(majority|negative)|task:anomaly|user:.+|show:\\d{4}-\\d{2}-\\d{2}|registry:[A-Za-z0-9_-]+|vega:default)$" } } } } ]
+        },
+        "report_roles": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "propertyNames": { "$ref": "#/$defs/report_role" }, "additionalProperties": { "type": "string" } } ]
+        },
+        "class_names": {
+          "description": "the words a class of the task is shown by ({class: words}, '1' -> 'late'); optional, V15 holds its keys to the task's classes",
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 30 } } ]
+        },
+        "headline": { "type": ["string", "null"] },
+        "lead": { "type": ["string", "null"] },
+        "context": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "additionalProperties": false, "required": ["steps", "facts"],
+                       "properties": { "steps": { "type": "object", "propertyNames": { "$ref": "#/$defs/context_step" },
+                                                  "additionalProperties": { "type": "string" } },
+                                       "facts": { "type": "array",
+                                                  "items": { "type": "object", "additionalProperties": false, "required": ["label", "fact"],
+                                                             "properties": { "label": { "type": "string" }, "fact": { "$ref": "#/$defs/key" } } } } } } ]
+        },
+        "network": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "additionalProperties": false, "required": ["lead", "choices"],
+                       "properties": { "lead": { "type": "string" },
+                                       "choices": { "type": "array",
+                                                    "items": { "type": "object", "additionalProperties": false, "required": ["decision", "title", "text"],
+                                                               "properties": { "decision": { "type": "string" }, "title": { "type": "string" },
+                                                                               "text": { "type": "string" } } } } } } ]
+        },
+        "experiments": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "additionalProperties": false, "required": ["lead", "caption", "labels"],
+                       "properties": { "lead": { "type": "string" }, "caption": { "type": "string" },
+                                       "labels": { "type": "object", "additionalProperties": { "type": "string" } } } } ]
+        },
+        "results": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "additionalProperties": false, "required": ["headline", "notes", "breakdown_caption", "limits"],
+                       "properties": { "headline": { "type": "string" },
+                                       "notes": { "type": "object", "propertyNames": { "$ref": "#/$defs/key" }, "additionalProperties": { "type": "string" } },
+                                       "breakdown_caption": { "type": ["string", "null"] },
+                                       "limits": { "type": "array",
+                                                   "items": { "type": "object", "additionalProperties": false, "required": ["id", "title", "text"],
+                                                              "properties": { "id": { "type": "string" }, "title": { "type": "string" },
+                                                                              "text": { "type": "string" } } } } } } ]
+        },
+        "input_groups": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "array",
+                       "items": { "type": "object", "additionalProperties": false, "required": ["id", "label", "text", "members"],
+                                  "properties": { "id": { "type": "string" }, "label": { "type": "string" }, "text": { "type": "string" },
+                                                  "members": { "type": "array", "items": { "type": "string" } } } } } ]
+        },
+        "code_notes": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "propertyNames": { "$ref": "#/$defs/walk_id" }, "additionalProperties": { "type": "string" } } ]
+        },
+        "monitor_note": { "type": ["string", "null"] }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "status": { "const": "authored" } } },
+      "then": { "properties": { "authored": {
+        "properties": { "locale": { "type": "string" }, "lexicon": { "type": "object" }, "motif": { "type": "string" },
+                        "headline": { "type": "string" }, "lead": { "type": "string" }, "context": { "type": "object" },
+                        "network": { "type": "object" }, "experiments": { "type": "object" }, "results": { "type": "object" },
+                        "input_groups": { "type": "array" }, "code_notes": { "type": "object" } } } } } }
+  ],
+  "$defs": {
+    "key": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "walk_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "noun": { "type": "string", "pattern": "^[a-z][a-z' -]{0,30}$" },
+    "lexicon_key": { "enum": ["row", "feature", "source", "step", "window", "node", "edge", "graph", "target"] },
+    "motif": { "enum": ["grid", "points", "traces", "lanes", "links", "contours"] },
+    "context_step": { "enum": ["problem", "data", "windows", "graph", "cleaning", "split"] },
+    "report_role": { "enum": ["intro.lane", "chapter.forge-data", "chapter.lens", "chapter.shape", "chapter.blueprint",
+                              "chapter.net", "chapter.train", "chapter.eval", "chapter.pack", "shape.lineage",
+                              "blueprint.modules", "net.blocks", "net.decisions", "net.forward", "net.loss", "net.update",
+                              "train.ladder", "train.curves", "eval.metrics", "eval.calibration", "pack.layout",
+                              "pack.slice", "conclusion"] }
+  },
+  "examples": [
+    {
+      "schema": "vega/story-plan@2", "status": "draft",
+      "facts": { "file": "plan/facts.json", "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111" },
+      "template": { "version": "2.3.0", "manifest_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222" },
+      "carried_from": null,
+      "proposals": {
+        "modality": "row", "view_key": "classes",
+        "lexicon": { "row": { "one": "flow", "many": "flows", "article": "a", "source": "bundle:MANIFEST.serve.identity.noun" },
+                     "feature": { "one": "input", "many": "inputs", "article": "an", "source": "vega:default" },
+                     "source": { "one": "source data", "many": "source data", "article": "the", "source": "vega:default" } },
+        "motif": { "modality": "row", "base": "points", "admissible": ["points", "lanes", "grid"], "stance": null, "fork": "S3" },
+        "class_roles": { "neutral": { "class": "BENIGN", "rule": "structural:majority", "share": "train_share_benign" },
+                         "alert_candidates": ["Bot", "DDoS"], "basis_found": null, "memory": null, "evidence": [], "fork": "S2" },
+        "input_groups": [ { "suggested_id": "iat", "members": ["Flow IAT Mean", "Flow IAT Max"],
+                            "evidence": [ { "kind": "correlation", "pairs": 1, "threshold": 0.8 } ] },
+                          { "suggested_id": "port", "members": ["Destination Port"], "evidence": [ { "kind": "encoded" } ] },
+                          { "suggested_id": "size", "members": ["Total Fwd Packets", "Flow Bytes/s"], "evidence": [ { "kind": "name-token", "token": "Fwd" } ] } ],
+        "choices": [ { "decision": "B1", "family": "architecture", "type": "dense", "params": { "units": "block_b1_units" },
+                       "rationale_ref": "netspec.json#blocks[id=B1].rationale", "tested_by": [], "mandatory": true },
+                     { "decision": "loss", "family": "objective", "type": null, "params": {}, "rationale_ref": null, "tested_by": [], "mandatory": true } ],
+        "runs": [ { "id": "R7", "label": "loss weight → none", "selected": true, "reference": false, "primary": "run_r7_primary" } ],
+        "results_facts": ["eval_network_balanced_accuracy", "eval_network_accuracy"],
+        "limits": [ { "id": "split", "mandatory": true, "facts": ["train_rows", "valid_rows", "test_rows"],
+                      "prose_ref": "records/evaluation.json#readings.limits" } ],
+        "code_steps": [ { "step": "root", "role": "blueprint.modules", "status": "bound" }, { "step": "dense", "role": "net.forward", "status": "bound" },
+                        { "step": "explain", "role": null, "status": "no-role" } ],
+        "report_roles": { "status": "proposed",
+                          "bindings": { "net.forward": { "label": "eq:mlp", "source": "proposed", "evidence": "anchor equation.3; title contains network" } },
+                          "fork": null },
+        "context_steps": ["problem", "data", "cleaning", "split"],
+        "prose_sources": [ { "what": "the verdict reading", "ref": "records/evaluation.json#readings.verdict" } ]
+      },
+      "authored": { "locale": null, "lexicon": null, "motif": null, "class_roles": null, "report_roles": null, "headline": null,
+                    "lead": null, "context": null, "network": null, "experiments": null, "results": null, "input_groups": null,
+                    "code_notes": null, "monitor_note": null }
+    },
+    {
+      "schema": "vega/story-plan@2", "status": "authored",
+      "facts": { "file": "plan/facts.json", "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111" },
+      "template": { "version": "2.3.0", "manifest_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222" },
+      "proposals": {
+        "modality": "row", "view_key": "value",
+        "lexicon": { "row": { "one": "house", "many": "houses", "article": "a", "source": "user:turn-2" },
+                     "feature": { "one": "feature", "many": "features", "article": "a", "source": "vega:default" },
+                     "source": { "one": "listing site", "many": "listing sites", "article": "the", "source": "vega:default" } },
+        "motif": { "modality": "row", "base": "points", "admissible": ["points", "lanes", "grid"], "stance": null, "fork": null },
+        "class_roles": null,
+        "input_groups": [ { "suggested_id": "all", "members": ["rooms", "area"], "evidence": [] } ],
+        "choices": [], "runs": [], "results_facts": [], "limits": [], "code_steps": [],
+        "report_roles": { "status": "absent", "bindings": {}, "fork": "S1" },
+        "context_steps": ["problem", "data", "cleaning", "split"], "prose_sources": []
+      },
+      "authored": { "locale": "en",
+                    "lexicon": { "row": { "one": "house", "many": "houses", "article": "a" },
+                                 "feature": { "one": "feature", "many": "features", "article": "a" },
+                                 "source": { "one": "listing site", "many": "listing sites", "article": "the" } },
+                    "motif": "points", "class_roles": null, "report_roles": null,
+                    "headline": "What a {row.one} sells for", "lead": "A small network reads each listing.",
+                    "context": { "steps": { "problem": "Prices vary.", "data": "Listings.", "cleaning": "None.", "split": "Random." },
+                                 "facts": [ { "label": "houses", "fact": "source_rows" }, { "label": "sealed", "fact": "test_rows" } ] },
+                    "network": { "lead": "Small.", "choices": [ { "decision": "B1", "title": "Dense", "text": "Mixes the features." } ] },
+                    "experiments": { "lead": "One run.", "caption": "Validation error.", "labels": {} },
+                    "results": { "headline": "It beats the mean.", "notes": {}, "breakdown_caption": null,
+                                 "limits": [ { "id": "split", "title": "Random split", "text": "Drawn once." } ] },
+                    "input_groups": [ { "id": "all", "label": "size", "text": "how big", "members": ["rooms", "area"] } ],
+                    "code_notes": { "dense": "Mixes every feature." }, "monitor_note": null }
+    }
+  ]
+}

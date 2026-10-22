@@ -1,0 +1,18 @@
+{
+  "schema": "vega/lint-allow@1",
+  "about": "Allowed exceptions to lint_templates.py (D6 §15.2). One entry per exception: `file` (repository-relative, a glob allowed), `token` (the foreign-literals token), `reason` (required: an entry without one is refused) and, optionally, `match` (a regex the line must contain, so the entry covers one sense of the word or one line, not every line of the file). Every other hit on today's templates is a dataset literal its owner removes (S05, S07, S11, W02, W05, W08...), not an exception.",
+  "allow": [
+    {
+      "file": "vega-forge/scripts/backends/pytorch/templates/domain.py",
+      "token": "traffic",
+      "match": "^TrafficClass = ClassValue$",
+      "reason": "the v2.2 name kept as an alias of ClassValue for one release (D2 gap 11, BUILD-PLAN B02 and §1 'ClassValue, with TrafficClass = ClassValue kept for one release'); the class itself and the 'IDS' wording are gone. Remove this entry in the release that drops the alias."
+    },
+    {
+      "file": "vega-forge/scripts/backends/pytorch/templates/domain.py",
+      "token": "traffic",
+      "match": "^# >>> compat: TrafficClass$",
+      "reason": "the compat section that holds the alias above: the emitter keeps it only for a blueprint that still names TrafficClass (T5r1), so no other package carries the word. Remove it with the alias."
+    }
+  ]
+}

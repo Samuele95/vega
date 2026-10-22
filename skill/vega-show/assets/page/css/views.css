@@ -1,0 +1,65 @@
+/* The views area (js/views/**: the start, try-one, many-at-once and results views, the task and
+   shape modules): the note on the views a lane does without, the label chips of a label set, the
+   forecast line beside the verdict, the histograms, the confusion table and the small plots of
+   many at once, the sub-heads inside an answer's detail and what tipped it. Only the page's tokens
+   (page.css); every colour is a role or the ink of the page. */
+
+/* start: a tour view this lane does not show, and why */
+.views-off{margin:10px 0 0}
+
+/* try one: a sub-head inside the answer's detail or the stepper's input step */
+.views-sub{margin:14px 0 2px}
+/* try one: a value beyond the target's training range (value) */
+.views-range-beyond{margin:2px 0 8px}
+/* try one: the lead above the bars of what tipped the answer, the attribution's method beside it
+   and the gap between its terms and the score's change when the record states one */
+.views-why-lead{margin-top:10px}
+.views-method{margin:4px 0 6px}
+.views-completeness{color:var(--fg2)}
+
+/* results: a limit's quote of the record's own words */
+.res-limit-recorded{display:block;margin-top:4px;color:var(--fg2);font:12.5px var(--mono);overflow-wrap:anywhere}
+
+/* results: the breakdown's own metric, named before its caption */
+.res-class-metric{color:var(--fg2);font-weight:500}
+
+/* a phone: a bar's value goes under its bar, so an interval is never cut at the viewport's edge */
+@media (max-width:600px){
+ .bar{grid-template-columns:120px 1fr}
+ .bar .val{grid-column:2;text-align:left;white-space:normal;overflow-wrap:anywhere}
+ .scale{margin-right:0}
+}
+
+/* try one: the predicted label set (labels), each chip in its role colour */
+.views-chips{display:inline-flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.views-chip{font:14px var(--mono);padding:1px 10px;border-left:2px solid var(--line-hi);color:var(--fg2)}
+.views-chip.role-neutral,.views-chip.role-plain{color:var(--accent);border-left-color:var(--accent)}
+.views-chip.role-alert{color:var(--alert);border-left-color:var(--alert)}
+
+/* try one: the forecast beside the verdict (horizon) */
+.views-forecast{display:inline-flex;align-items:center;gap:14px}
+.views-forecast .p{margin-left:0}
+
+/* many at once: a histogram, a series heading, the bin that holds the threshold */
+.views-hist{gap:4px}
+.views-hist .bar .name{font:12px var(--mono);color:var(--muted)}
+.views-hist-group{margin:10px 0 2px}
+.views-hist-mark .name,.views-hist-mark .val{color:var(--fg)}
+.views-hist-mark .track{box-shadow:0 0 0 1px var(--line-hi)}
+
+/* many at once: true against answered */
+.views-confusion{margin-top:12px;width:auto}
+.views-confusion th,.views-confusion td{padding:4px 10px;text-align:right;border-bottom:1px solid var(--line)}
+.views-confusion th{color:var(--muted);font-weight:400;max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* the small plots: answered against true (y = x), the forecast and its quantile band */
+.views-plot{display:block;max-width:100%;height:auto;margin-top:10px;overflow:visible}
+.views-plot-ref{stroke:var(--muted2);stroke-width:1;stroke-dasharray:3 3}
+.views-plot-dot{fill:var(--accent)}
+.views-plot-line{fill:none;stroke:var(--accent);stroke-width:1.5}
+.views-plot-band{fill:var(--sel);stroke:none}
+.views-forecast .views-plot{margin-top:0}
+
+/* a disclosure the lane does without (no runs tried, no network to read the weights of, no per-unit
+   breakdown, no drift monitor): its toggle and its box leave the view */
+.view .disclose[hidden],.view .reveal[hidden]{display:none}

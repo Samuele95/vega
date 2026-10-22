@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — the chain</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.72);--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:4px;border-radius:2px}
+@keyframes vegaflow{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/vega-panel.css">
+<style>
+/* shell placement (template: notes/page-template.md) */
+[data-brand]{position:fixed;z-index:10;top:calc(24px + 12px);left:calc(24px + 18px + 6px)}
+[data-pagebar]{position:fixed;z-index:9;top:24px;left:50%;transform:translate(-50%,-50%);width:min(340px,42vw);max-width:none!important;margin:0!important;padding:0 10px!important;background:var(--bg)}
+[data-ticks]{position:fixed;z-index:9;left:50%;bottom:calc(24px + 22px);transform:translateX(-50%);width:min(260px,40vw);display:flex;gap:4px;pointer-events:none}
+[data-fighud]{position:fixed;left:0;top:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:rgba(4,8,14,.55);border-left:1px solid var(--acc);max-width:210px}
+[data-fighud] span{white-space:normal}
+[data-fighud] > div > span:first-child{line-height:1.4!important}
+@media (max-width:600px){[data-fighud]{left:calc(12px + 18px);top:calc(12px + 54px);transform:scale(.88);transform-origin:top left;transition:opacity .4s}}
+[data-stop-card]{min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;justify-content:flex-end;align-items:flex-start;padding:18vh calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-stop-card] > .vp{width:min(600px,42vw)}
+[data-stop-card] .vp h1{font-size:clamp(46px,5.4vw,78px)!important;line-height:1.02!important}
+[data-stop-card] .vp h2{font-size:clamp(34px,3.6vw,52px)!important;line-height:1.08!important}
+[data-stop-card] .vp p{font-size:16.5px!important}
+@media (max-width:899px){[data-stop-card]{justify-content:center;padding:52vh 24px 8vh}[data-stop-card] > .vp{width:100%}}
+@media (max-width:600px){[data-brand]{top:calc(12px + 12px);left:calc(12px + 12px + 6px)}[data-pagebar]{top:12px;width:44vw}[data-ticks]{bottom:calc(12px + 56px);width:52vw}}
+</style>
+</helmet>
+<div style="position:relative;color:var(--fg)">
+  <div data-stage="1" style="position:fixed;inset:0;z-index:0;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)"></div>
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="31" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0;pointer-events:none"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:var(--bg);opacity:.38"></div>
+    <div data-fig="chain" tabindex="0" role="group" aria-label="The chain in 3D. Drag to orbit; use the left and right arrow keys to move between chapters." onKeyDown="{{ onFigKey }}" style="position:absolute;inset:0;outline-offset:-30px">
+      <x-import data-fig="chain" component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="The chain as a 3D constellation: /vega at the centre, the ten stages spiralling around it, linked in order." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <div data-fig="camp" style="position:absolute;inset:0">
+      <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="Schematic of a training campaign over a loss landscape: a baseline run, one-change ablations branching from it, a budgeted search, and the selected run." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <x-import component-from-global-scope="vega-readouts" from="../assets/vega-readouts.js"></x-import>
+  </div>
+
+  <header>
+    <a data-brand="1" href="index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg)">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span>THE CHAIN</span></span>
+    </a>
+  </header>
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="chain" brand="page"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters" room="320"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+
+  <div data-pagebar="1" aria-label="Page 1 of 6" style="max-width:1200px;margin:0 auto;padding:4px clamp(20px,4vw,48px) 0;display:flex;align-items:center;gap:6px">
+    <a href="chain.dc.html" aria-current="page" title="The chain" aria-label="The chain" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--fg)"></span></a>
+    <a href="data.dc.html" title="The data lane" aria-label="The data lane" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="promise.dc.html" title="The rules" aria-label="The rules" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="proof.dc.html" title="The proof" aria-label="The proof" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="coverage.dc.html" title="Coverage" aria-label="Coverage" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="install.dc.html" title="Install" aria-label="Install" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <span style="margin-left:14px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);white-space:nowrap">01 / 06</span>
+  </div>
+
+  </div>
+  <main style="position:relative;pointer-events:none">
+
+    <section aria-labelledby="h-chain" data-stop="0" data-rail="Ten stages" data-rail-full="Ten stages, one line of light." data-stop-card="1">
+      <div class="vp">
+      <h1 id="h-chain" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(32px,4.6vw,52px);line-height:1.08;letter-spacing:-.01em;font-family:'Newsreader',Georgia,serif">Ten stages, one line of light.</h1>
+      <p style="margin:18px 0 0;max-width:36em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">Raw file in; a trained, evaluated, shipped network and its showcase out.</p>
+      </div>
+    </section>
+    <div data-hudparts="1">
+      <div data-fighud="1" aria-hidden="true" style="opacity:0">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">{{ d.num }} · {{ d.group }}</span>
+          <span style="font:500 15px/1.1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--fg)">{{ d.name }}</span>
+        </div>
+        <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--acc)">{{ progress }}</span>
+      </div>
+    </div>
+    <section aria-labelledby="h-vega" data-stop="1" data-rail="/vega drives the chain" data-rail-full="/vega drives the chain." data-stop-card="1">
+      <div class="vp">
+        <h2 id="h-vega" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">/vega drives the chain.</h2>
+        <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">It runs each stage in order, checks every product and keeps the ledger. Attended, it asks at real decisions; unattended, it takes the documented default and marks it.</p>
+      </div>
+    </section>
+    <section aria-labelledby="h-lane" data-stop="2" data-rail="The data lane" data-rail-full="The data lane." data-stop-card="1">
+      <div class="vp">
+        <h2 id="h-lane" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">The data lane.</h2>
+        <ul data-stages="1" style="list-style:none;margin:22px 0 0;padding:0;display:flex;flex-direction:column">
+          <li data-node="1" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">dataset-forge</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">maps the data’s shape.</span></li>
+          <li data-node="2" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">data-lens</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">keeps only findings that change a decision.</span></li>
+          <li data-node="3" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">dataset-shaper</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">turns decisions into a traced, verified recipe.</span></li>
+        </ul>
+      </div>
+    </section>
+    <section aria-labelledby="h-net" data-stop="3" data-rail="The network" data-rail-full="The network." data-stop-card="1">
+      <div class="vp">
+        <h2 id="h-net" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">The network.</h2>
+        <ul data-stages="1" style="list-style:none;margin:22px 0 0;padding:0;display:flex;flex-direction:column">
+          <li data-node="4" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">blueprint</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">sets the architecture.</span></li>
+          <li data-node="5" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">vega-forge</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">writes the spec, every choice cited.</span></li>
+          <li data-node="6" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">vega-train</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">changes one thing at a time, each with a hypothesis.</span></li>
+          <li data-node="7" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">vega-eval</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">opens the sealed test once.</span></li>
+          <li data-node="8" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">vega-pack</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">ships a bundle proven by a round trip.</span></li>
+        </ul>
+      </div>
+    </section>
+    <section aria-labelledby="h-tell" data-stop="4" data-rail="Telling it" data-rail-full="Telling it." data-stop-card="1">
+      <div class="vp">
+        <h2 id="h-tell" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">Telling it.</h2>
+        <ul data-stages="1" style="list-style:none;margin:22px 0 0;padding:0;display:flex;flex-direction:column">
+          <li data-node="9" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">document</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">writes the LaTeX report (optional).</span></li>
+          <li data-node="10" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;align-items:baseline;padding:11px 0;border-top:1px solid var(--line)"><code style="font:13px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">vega-show</code><span style="font-size:16px;line-height:1.5;color:var(--fg)">builds a showcase that says only what was measured.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-camp" data-stop="5" data-rail="It searches like a scientist" data-rail-full="It searches like a scientist." data-stop-card="1" data-rail-compact="1">
+      <div class="vp">
+        <h2 id="h-camp" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">It searches like a scientist.</h2>
+        <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">A baseline, then one change at a time inside a budget — the winner chosen by a rule fixed in advance.</p>
+        <span style="display:block;margin-top:20px;font:500 10.5px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim)">SCHEMATIC · NO MEASURED VALUES</span>
+        <footer style="display:flex;justify-content:center;padding:12px 0 0">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+      </div>
+    </section>
+
+  </main>
+
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STAGES = [
+  { id: 'dataset-forge', cmd: '/dataset-forge', group: 'The data lane', x: 55, y: 290, role: "Maps the data’s shape: how many dimensions it really uses, its basis — the columns nothing else can derive — how every other column is derived, and what can be feature or label.", takes: 'a tabular file', produces: 'a domain model with a geometry layer + interactive explorer' },
+  { id: 'data-lens', cmd: '/data-lens', group: 'The data lane', x: 140, y: 200, role: 'Checks quality, distributions, segments, importance, leakage and drift — and keeps a finding only if it changes a decision.', takes: 'the geometry model', produces: 'an analysis layer with findings and transformation candidates' },
+  { id: 'dataset-shaper', cmd: '/dataset-shaper', group: 'The data lane', x: 230, y: 292, role: 'Turns those decisions into a traced recipe, runs it deterministically and verifies the result.', takes: 'geometry + analysis', produces: 'train/valid/test parts, a manifest, a reproduction script, a shape layer', rule: 'No step without a traced decision.' },
+  { id: 'blueprint', cmd: '/blueprint --mode pipeline', group: 'Architecture', x: 320, y: 190, role: 'Proposes the pipeline’s architecture: its ports, its modules and its stance on model families.', takes: 'the shaped model', produces: 'a blueprint and a machine-readable hand-off', note: 'An external skill Vega patches.' },
+  { id: 'vega-forge', cmd: '/vega-forge', group: 'The network sub-chain', x: 410, y: 285, role: 'Writes the network spec — every choice citing its source — and the code, inside the blueprint. A conformance gate checks it.', takes: 'shaped data + blueprint', produces: 'network spec, code package, smoke pass, notebook, architecture layer', rule: 'No choice without a traced source.' },
+  { id: 'vega-train', cmd: '/vega-train', group: 'The network sub-chain', x: 500, y: 200, role: 'Runs a training campaign: a baseline, then one change at a time, each with a written hypothesis; a budgeted search; diagnostics; and a selection rule fixed in advance.', takes: 'the forged network', produces: 'a campaign ledger, checkpoints, notebook, training layer', rule: 'No run without a hypothesis, no number without a record.' },
+  { id: 'vega-eval', cmd: '/vega-eval', group: 'The network sub-chain', x: 590, y: 290, role: 'Opens the sealed test once, reports every metric with an interval, compares pair by pair against honest baselines, and gives a verdict.', takes: 'the selected run', produces: 'stored predictions, metrics, verdict, notebook, evaluation layer', rule: 'The test is opened once, under a seal, and every number that comes out of it travels with an interval and a baseline.' },
+  { id: 'vega-pack', cmd: '/vega-pack', group: 'The network sub-chain', x: 680, y: 192, role: 'Packs the evaluated network into a bundle that runs without the skills — proven by a round trip — with a model card, a service and exports.', takes: 'the evaluated run', produces: 'a bundle (predict.py, service, card, tests), bundle layer', rule: 'What ships is what was evaluated, proven by a round trip.' },
+  { id: 'document', cmd: '/document-project vega <lane>', group: 'Telling it', x: 770, y: 282, role: 'Writes the book-quality LaTeX report from the stage briefs, one chapter per stage.', takes: 'the briefs', produces: 'a compiled PDF report', note: 'Optional.' },
+  { id: 'vega-show', cmd: '/vega-show', group: 'Telling it', x: 855, y: 198, role: 'Builds the guided showcase page, served by the bundle; its story is written under a contract.', takes: 'the bundle (+ report)', produces: 'a verified showcase served by the bundle, showcase layer', rule: 'The page says nothing the chain did not measure, and touches nothing the chain shipped.' }
+];
+const NEXT = ['data-lens', 'dataset-shaper', 'blueprint', 'vega-forge', 'vega-train', 'vega-eval', 'vega-pack', 'document (optional), or vega-show directly', 'vega-show', 'Nobody: the chain ends here, in a showcase served beside the API.'];
+const VEGA = { num: '00', group: 'Orchestrator', name: 'vega', cmd: '/vega', role: 'Reads your project, picks the lane, runs each stage, checks every product and keeps the ledger.', takes: 'a dataset, codebase, schema or prose', produces: "the chain's state (ledger), each stage invoked in order", next: 'Every stage, in order — and it checks each product before proposing the next.', hasRule: false, hasNote: true, note: 'Runs attended (it asks you at real decision points) or unattended (it takes the documented default, marks it, and continues).' };
+const PAGES = [
+  { num: '00', label: 'Threshold', href: 'index.dc.html', note: '' },
+  { num: '01', label: 'The chain', href: 'chain.dc.html', note: 'HERE' },
+  { num: '02', label: 'The data lane', href: 'data.dc.html', note: '' },
+  { num: '03', label: 'The rules', href: 'promise.dc.html', note: '' },
+  { num: '04', label: 'The proof', href: 'proof.dc.html', note: '' },
+  { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: '' },
+  { num: '06', label: 'Install', href: 'install.dc.html', note: '' },
+  { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+  { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+];
+const pad = (n) => (n < 10 ? '0' : '') + n;
+
+class Component extends DCLogic {
+  state = { indexOpen: false, sel: 0, view: '3d', narrow: false, cs: 0 };
+  closeRef = { current: null }; figRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  setFig = (el) => { this.figRef.current = el; };
+
+  componentDidMount() {
+    const go = (u) => { if (window.VegaFly) window.VegaFly.go(u); else location.href = u; };
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 'n' || e.key === 'N') go('data.dc.html');
+      else if (e.key === 'p' || e.key === 'P') go('index.dc.html');
+      else if (/^[0-6]$/.test(e.key)) go(PAGES[+e.key].href);
+    };
+    addEventListener('keydown', this.onKey);
+    this.reveal();
+    this.sync3d();
+    this.onResize = () => { const n = innerWidth < 900; if (n !== this.state.narrow) this.setState({ narrow: n }); this.campFrame(); };
+    this.onResize(); addEventListener('resize', this.onResize);
+    // the camera owns the active stop: stops 1–11 are the cards 0–10 (stop 0 the title, stop 12 the campaign)
+    this.onStop = (e) => { const k = e.detail.index, sel = [0, 0, 1, 4, 9, 10][k] || 0; if (sel !== this.state.sel) this.setState({ sel }); };
+    addEventListener('vegastop', this.onStop); addEventListener('vegastop', () => requestAnimationFrame(() => this.campFrame())); // after the rail has laid out for the new stop
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    this.campAuto = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.campT = setInterval(() => { if (this.campAuto) this.setState(s => ({ cs: (s.cs + 1) % 4 })); }, 3600);
+  }
+  // a stage is a camera stop now: scroll to it and the camera flies there
+  // a star (or a stage name) belongs to its group's chapter: picking it plays that chapter's shot
+  groupOf = (i) => i === 0 ? 1 : i <= 3 ? 2 : i <= 8 ? 3 : 4;
+  goStop = (k) => {
+    if (window.VegaReel && window.VegaReel.go(k)) return;
+    const c = document.querySelector('[data-stop="' + k + '"]'); if (c) scrollTo({ top: c.getBoundingClientRect().top + scrollY, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  };
+  goStep = (i) => this.goStop(this.groupOf(i));
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); this.io && this.io.disconnect(); clearTimeout(this.t3); clearTimeout(this.tcam); removeEventListener('vegastop', this.onStop); removeEventListener('resize', this.confRO); removeEventListener('vegastop', this.figShow); removeEventListener('vegaindex', this.onIndex); removeEventListener('resize', this.onResize); clearInterval(this.campT); if (this.confRO) {   } }
+  sync3d() {
+    clearTimeout(this.t3);
+    if (false) return;
+    this.syncCamp();
+    const el = document.querySelector('[data-fig="chain"] vega-constellation');
+    if (!el || !el.setData) { this.t3 = setTimeout(() => this.sync3d(), 150); return; }
+    if (el !== this.c3) {
+      this.c3 = el;
+      const N = [{ x: 0, y: 30, z: 0, size: 6, kind: 'core', label: '/vega', sub: 'ORCHESTRATOR', labelPos: 'above', glow: 'acc', delay: 0 }];
+      STAGES.forEach((s, i) => {
+        const a = i * 0.64 - 0.5, r = 260 + (i % 2) * 40;
+        N.push({ x: Math.sin(a) * r, y: -190 + i * 42, z: Math.cos(a) * r, size: 3.6, label: s.id, sub: pad(i + 1), glow: s.group === 'Telling it' ? 'cy' : 'acc', delay: 300 + i * 90 });
+      });
+      const E = [];
+      for (let i = 1; i <= 10; i++) E.push({ a: 0, b: i, dash: [2, 6], alpha: 0.16, w: 0.8, pulse: false });
+      for (let i = 1; i < 8; i++) E.push({ a: i, b: i + 1, alpha: 0.5, w: 1.2 });
+      E.push({ a: 8, b: 9, dash: [5, 6], alpha: 0.42 }); E.push({ a: 9, b: 10, dash: [5, 6], alpha: 0.42 });
+      const p8 = N[8], p10 = N[10];
+      E.push({ a: 8, b: 10, alpha: 0.5, w: 1.2, mid: [(p8.x + p10.x) / 2 * 1.35, (p8.y + p10.y) / 2 + 70, (p8.z + p10.z) / 2 * 1.35] });
+      const ring = []; for (let k = 0; k <= 64; k++) { const a = k / 64 * 6.283; ring.push([Math.sin(a) * 330, -215, Math.cos(a) * 330]); }
+      el.setData({ nodes: N, edges: E, radius: 330, zoom: 0.42, showLabels: true, pulse: { tokens: 2, period: 1.05 }, autoRotate: 0.08, yaw: 0.3, pitch: -0.32, guides: [{ pts: ring, alpha: 0.12, dash: [2, 7] }] });
+      el.addEventListener('pick', (e) => this.goStep(e.detail.index));
+    }
+    this.setupCamera();
+  }
+  // the camera's stops (spec §3, chain): 0 the whole spiral, 1–11 each stage's star, 12 the campaign (crossfade)
+  setupCamera() {
+    clearTimeout(this.tcam);
+    if (this.camOn) return;
+    const sc = this.c3, camp = this.cc, cam = document.querySelector('vega-camera'), ro = document.querySelector('vega-readouts');
+    const sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    if (!sc || !camp || !cam || !cam.configure || !ro || !ro.configure || sections.length !== 6) { this.tcam = setTimeout(() => this.setupCamera(), 150); return; }
+    this.camOn = true;
+    const N = sc.d.nodes, small = () => innerWidth <= 600, wide = () => innerWidth >= 900, PI = Math.PI;
+    let prev = 0.3; const base = N.map((n, i) => { if (!i) return prev; let y = Math.atan2(n.x, n.z) + PI; while (y - prev > PI) y -= 2 * PI; while (y - prev < -PI) y += 2 * PI; return (prev = y); });
+    // the star sits mid-way across the stage gap between the rail (or the frame) and the content block
+    const gapX = () => { const r = document.querySelector('vega-rail'), b = document.querySelector('[data-stop-card] .vp'); const l = r && !r.classList.contains('vr-compact') ? r.getBoundingClientRect().right : 24 + 40; const c = b ? b.getBoundingClientRect().left : innerWidth * 0.6; return (l + c) / 2; };
+    const anchor = (W, H) => wide() ? [gapX(), H * 0.48] : [W * 0.5, H * (small() ? 0.22 : 0.24)];
+    const stops = [{ el: sections[0], focus: [0, -10, 0], yaw: 0.3, pitch: -0.32, select: -1, fit: true, get zoom() { return wide() ? 0.42 : 0.36; }, at: (W, H) => wide() ? [W * 0.42, H * 0.55] : [W * 0.5, H * 0.24] }];
+    // 1 /vega; 2–4 a group of stars each (the data lane, the network, telling it), framed whole; 5 the campaign
+    const n0 = N[0];
+    stops.push({ el: sections[1], focus: [n0.x, n0.y, n0.z], select: 0, at: anchor, fit: [0], yaw: (0.3 + base[1] - 0.45) / 2, pitch: -0.3, get zoom() { return wide() ? 0.8 : 0.66; } });
+    [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]].forEach((g, k) => {
+      const c = [0, 1, 2].map(j => g.reduce((t, i) => t + [N[i].x, N[i].y, N[i].z][j], 0) / g.length), yaw = g.reduce((t, i) => t + base[i], 0) / g.length - 0.45;
+      stops.push({ el: sections[2 + k], focus: c, select: -1, at: anchor, fit: g, yaw, pitch: -Math.atan2(c[1], Math.hypot(c[0], c[2])) - 0.18, get zoom() { return wide() ? 0.7 : 0.56; } });
+    });
+    stops.push({ el: sections[5], focus: [0, -10, 0], yaw: base[10] + 0.4, pitch: -0.3, zoom: 0.42, cross: 1, select: -1, at: (W, H) => [W * 0.5, H * 0.5] });
+    cam.configure({ scene: sc, alt: camp, sky: document.querySelector('vega-sky-lab'), stops, free: true, home: 0 });
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters (G2)
+    // the figure HUD (stage number, group, name, NN / 10) is the active star's pinned readout on the stage chapters (1–4),
+    // following a hovered star; below 600px, where the phone scene is too dense for a pinned block, a fixed corner block
+    const fig = document.querySelector('[data-fighud]'), onStage = (a) => a >= 1 && a <= 4;
+    this.confRO = () => {
+      const small = innerWidth <= 600; if (small === this.roSmall) return; this.roSmall = small;
+      if (small) { ro.configure({ scene: sc, items: [] }); fig.classList.remove('vro', 'on'); fig.style.transform = ''; this.figShow(); }
+      else ro.configure({ scene: sc, items: [{ el: fig, node: (a) => onStage(a) ? this.state.sel : -1 }], showAt: onStage });
+    };
+    this.figShow = () => { if (!this.roSmall) return; fig.style.opacity = onStage(cam.active) ? '1' : '0'; };
+    this.confRO(); addEventListener('resize', this.confRO); addEventListener('vegastop', this.figShow);
+    // a stage name in a group's list lights its star while the pointer or focus is on it
+    const lit = (n) => sc.setSelected(n == null ? -1 : +n, false);
+    document.querySelectorAll('[data-stages] [data-node]').forEach(li => { li.addEventListener('pointerenter', () => lit(li.dataset.node)); li.addEventListener('pointerleave', () => lit(null)); });
+  }
+  syncCamp() {
+    const el = document.querySelector('[data-fig="camp"] vega-constellation');
+    if (!el || !el.setData) { clearTimeout(this.tc); this.tc = setTimeout(() => this.syncCamp(), 200); return; }
+    const CS = [0, 2, 5, 17];
+    if (el === this.cc) { el.setSelected(CS[this.state.cs], true); return; } this.cc = el;
+    const Y = (x, z) => -40 + 0.00075 * ((x - 90) * (x - 90) + (z + 60) * (z + 60)) + 20 * Math.sin(x / 60) * Math.cos(z / 75);
+    const guides = [], S = 300, n = 14;
+    for (let i = 0; i <= n; i++) { const a = -S + i * 2 * S / n, r1 = [], r2 = []; for (let j = 0; j <= 30; j++) { const b = -S + j * 2 * S / 30; r1.push([a, Y(a, b), b]); r2.push([b, Y(b, a), a]); } guides.push({ pts: r1, alpha: 0.12 }, { pts: r2, alpha: 0.12 }); }
+    const seg = (pts) => { const out = []; for (let k = 0; k < pts.length - 1; k++) { const [x1, z1] = pts[k], [x2, z2] = pts[k + 1]; for (let j = 0; j <= 12; j++) { const u = j / 12, x = x1 + (x2 - x1) * u, z = z1 + (z2 - z1) * u; out.push([x, Y(x, z) + 5, z]); } } return out; };
+    const N = [], E = [];
+    const bp = [[-250, 230], [-200, 170], [-150, 130], [-105, 70]]; guides.push({ pts: seg(bp), color: 'fg', alpha: 0.8, w: 1.6 });
+    const B = bp[bp.length - 1]; N.push({ x: B[0], y: Y(B[0], B[1]) + 5, z: B[1], size: 3.6, label: 'baseline', labelPos: 'above', delay: 200 });
+    [[-20, 150], [-170, -40], [0, 20], [-70, -110]].forEach((t, i) => {
+      guides.push({ pts: seg([B, t]), color: 'acc', alpha: 0.6, w: 1.1, dash: [4, 4] });
+      N.push({ x: t[0], y: Y(t[0], t[1]) + 5, z: t[1], size: 2.8, glow: 'acc', label: i === 1 ? 'ablation ladder' : '', sub: i === 1 ? 'ONE CHANGE PER RUN' : '', delay: 600 + i * 160 });
+    });
+    let rs = 11; const r = () => { rs = (rs * 16807) % 2147483647; return rs / 2147483647; };
+    for (let k = 0; k < 12; k++) { const a = k === 0 ? 0.9 : r() * 6.283, d = k === 0 ? 105 : 30 + r() * 70, x = 95 + Math.cos(a) * d, z = -60 + Math.sin(a) * d; N.push({ x, y: Y(x, z) + 5, z, size: 1.9, color: 'mut', glow: 'acc', label: k === 0 ? 'budgeted search' : '', delay: 1300 + k * 60 }); }
+    guides.push({ pts: seg([[0, 20], [60, -30]]), color: 'acc', alpha: 0.4, dash: [2, 5] });
+    const sx = 95, sz = -60; N.push({ x: sx, y: Y(sx, sz) + 7, z: sz, size: 4.2, color: 'fg', glow: 'cy', ring: 'cy', label: 'selected', sub: 'BY A RULE STATED IN ADVANCE', labelPos: 'above', delay: 2100 });
+    el.setData({ nodes: N, edges: E, guides, radius: 320, zoom: 0.58, autoRotate: 0.05, yaw: 0.5, pitch: -0.5, showLabels: true, shift: 0 });
+    this.campFrame();
+    el.addEventListener('pick', (e) => { const i = e.detail.index; const k = i === 0 ? 0 : i <= 4 ? 1 : i <= 16 ? 2 : 3; this.campAuto = false; this.setState({ cs: k }); });
+    el.setSelected(CS[this.state.cs], true);
+  }
+  // the campaign sits in the stage area the content leaves free: centred in the gap between the rail and the
+  // text column at ≥900px, above the text block below that (the camera's free-area mask does the rest)
+  campFrame() {
+    const el = document.querySelector('[data-fig="camp"] vega-constellation'), cam = document.querySelector('vega-camera');
+    if (!el || !el.d || !el.d.nodes || !cam || !cam.fitIn || !cam.o) return;
+    // the campaign's extent over a full turn (it rotates and turns toward the selected step), at its base zoom
+    // projected at the stage's size: the campaign canvas may still be hidden (and unsized) when this runs
+    const W = innerWidth, H = innerHeight, Z = 0.58, sh = { d: el.d, W, H }; let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (let a = 0; a < 12; a++) for (const pt of [-0.5, -0.25]) {
+      const yaw = a / 12 * 6.283, o = cam.project(sh, [0, 0, 0], yaw, pt, Z);
+      el.d.nodes.forEach(n => { const p = cam.project(sh, [n.x, n.y, n.z], yaw, pt, Z), dx = p[0] - o[0], dy = p[1] - o[1]; x0 = Math.min(x0, dx); x1 = Math.max(x1, dx); y0 = Math.min(y0, dy); y1 = Math.max(y1, dy); });
+    }
+    // a star's glow each side (its labels slide inside the clip), a label above, a label and its sub below
+    const b = cam.fitIn(cam.count - 1, x0, x1, y0, y1, 14, 34, 40); if (!b) return;
+    el.d.zoom = Z * b.k; el.d.shift = b.at[0] / W - 0.5; el.oy = b.at[1] - H / 2;
+  }
+
+  componentDidUpdate() {
+    this.sync3d();
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+  }
+  reveal() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    const els = [].slice.call(document.querySelectorAll('[data-reveal]')).filter(el => el.getBoundingClientRect().top > innerHeight);
+    els.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(18px)'; });
+    let left = els.slice();
+    const chk = () => { left = left.filter(el => { if (el.getBoundingClientRect().top < innerHeight * 0.9) { el.style.opacity = '1'; el.style.transform = 'none'; return false; } return true; }); if (!left.length) this.io.disconnect(); };
+    const iv = setInterval(chk, 200); addEventListener('scroll', chk, { passive: true });
+    this.io = { disconnect: () => { clearInterval(iv); removeEventListener('scroll', chk); } };
+  }
+  onFigKey = (e) => {
+    const s = this.state.sel;
+    const k = document.querySelector('vega-camera').active;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); this.goStop(Math.min(5, k + 1)); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); this.goStop(Math.max(0, k - 1)); }
+    else if (e.key === 'Home') { e.preventDefault(); this.goStop(0); }
+    else if (e.key === 'End') { e.preventDefault(); this.goStop(5); }
+  };
+
+  renderVals() {
+    const sel = this.state.sel;
+    const P = STAGES.map(s => [s.x, s.y]);
+    const seg = (a, b, opt) => ({ a, b, d: 'M' + P[a][0] + ',' + P[a][1] + ' L' + P[b][0] + ',' + P[b][1], dash: opt ? '5 6' : 'none' });
+    const raw = [];
+    for (let i = 0; i < 7; i++) raw.push(seg(i, i + 1, false));
+    raw.push(seg(7, 8, true)); raw.push(seg(8, 9, true));
+    raw.push({ a: 7, b: 9, d: 'M680,192 Q767,128 855,198', dash: 'none' });
+    const edges = raw.map(e => ({ d: e.d, dash: e.dash, op: (sel - 1 === e.a || sel - 1 === e.b) ? 0.95 : (sel === 0 ? 0.55 : 0.32) }));
+    const chainD = 'M' + P.slice(0, 8).map(p => p.join(',')).join(' L') + ' Q767,128 855,198';
+    const pulse = React.createElement('path', { key: 'pulse', d: chainD, pathLength: 1000, fill: 'none', stroke: 'var(--fg)', strokeWidth: 1.6, strokeLinecap: 'round', strokeDasharray: '34 966', style: { animation: 'vegaflow 11s linear infinite', opacity: 0.85 } });
+    const stars = STAGES.map((s, i) => {
+      const on = sel === i + 1; const low = s.y > 240;
+      return {
+        x: s.x, y: s.y, name: s.id, num: pad(i + 1),
+        r: on ? 6 : 4.2, halo: on ? 0.26 : 0.09, spike: on ? 0.9 : 0,
+        vy1: s.y - 26, vy2: s.y + 26, hx1: s.x - 19, hx2: s.x + 19,
+        ly: low ? s.y + 38 : s.y - 24, ny: low ? s.y + 56 : s.y - 42,
+        tc: on ? 'var(--fg)' : 'var(--mut)',
+        pick: () => { if (this.state.sel !== i + 1) this.setState({ sel: i + 1 }); }
+      };
+    });
+    const orchLines = STAGES.map((s, i) => ({ x: s.x, y: s.y, op: sel === 0 ? 0.5 : (sel === i + 1 ? 0.6 : 0.14) }));
+    let d;
+    if (sel === 0) d = VEGA;
+    else {
+      const s = STAGES[sel - 1];
+      d = { num: pad(sel) + ' / 10', group: s.group.toUpperCase(), name: s.id, cmd: s.cmd, role: s.role, takes: s.takes, produces: s.produces, next: NEXT[sel - 1], hasRule: !!s.rule, rule: s.rule || '', hasNote: !!s.note, note: s.note || '' };
+    }
+    if (sel === 0) d = Object.assign({}, VEGA, { group: 'ORCHESTRATOR' });
+    return {
+      figRef: this.setFig, closeRef: this.setClose, onFigKey: this.onFigKey,
+      edges, orchLines, pulse, d,
+      cols: this.state.narrow ? 'minmax(0,1fr)' : 'minmax(0,7fr) minmax(0,5fr)', gap: this.state.narrow ? '18px' : '40px',
+      stickTop: this.state.narrow ? '8px' : '20px', figH: this.state.narrow ? '44vh' : 'calc(100vh - 40px)',
+      listPad: this.state.narrow ? '0 0 20vh' : '18vh 0 34vh', stepGap: this.state.narrow ? '22px' : '26vh',
+      progress: pad(sel) + ' / 10',
+      ticks: [0,1,2,3,4,5,6,7,8,9,10].map(i => ({ c: i <= sel ? 'var(--acc)' : 'var(--line)', g: i === sel ? '0 0 8px var(--acc)' : 'none' })),
+      steps: [VEGA].concat(STAGES).map((s, i) => {
+        const on = i === sel, v = i === 0;
+        return { i: String(i), stop: String(i + 1), rail: v ? '/vega drives the chain' : s.id, num: pad(i) + (v ? '' : ' / 10'), group: v ? 'ORCHESTRATOR' : s.group.toUpperCase(), cmd: s.cmd, lead: v ? '/vega drives the chain.' : s.id, role: s.role, takes: s.takes, produces: s.produces,
+          hasRule: !v && !!s.rule, rule: s.rule || '', hasNote: !v && !!s.note, note: s.note || '', isVega: v,
+          op: on ? 1 : 0.42, tf: on ? 'none' : 'scale(.985)', bc: on ? 'var(--acc)' : 'var(--line)', 
+          pick: () => this.goStep(i) };
+      }),
+      campCols: this.state.narrow ? 'minmax(0,1fr)' : 'minmax(0,5fr) minmax(0,7fr)',
+      camp: [
+        { title: 'A baseline first.', text: 'The spec, run as written.' },
+        { title: 'An ablation ladder.', text: 'Every run one change, with its hypothesis written down.' },
+        { title: 'A budgeted search.', text: 'Hyper-parameters, inside a stated budget.' },
+        { title: 'A selection rule, stated in advance.', text: 'The run is chosen by the rule — not by the result.' }
+      ].map((c, k) => { const on = this.state.cs === k; return Object.assign(c, { num: pad(k + 1), pressed: on ? 'true' : 'false', bc: on ? 'var(--acc)' : 'var(--line)', bg: on ? 'var(--hi)' : 'transparent', nc: on ? 'var(--acc)' : 'var(--dim)', bar: on ? '100%' : '0%', dur: on && this.campAuto ? '3.6s' : '0s', pick: () => { if (this.state.cs !== k) this.setState({ cs: k }); } }); }),
+      toggleTour: () => { const el = this.c3; if (!el) return; if (this.state.touring) { el.tour(null); this.setState({ touring: false }); } else { this.setState({ touring: true }); el.tour([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 2600, (i) => i < 0 ? this.setState({ touring: false }) : this.setState({ sel: i })); } },
+      tourPressed: this.state.touring ? 'true' : 'false', tourLabel: this.state.touring ? 'STOP' : 'TOUR', tourIcon: this.state.touring ? '■' : '▶', tourBc: this.state.touring ? 'var(--acc)' : 'var(--line)',
+      isThree: this.state.view === '3d', isFlat: this.state.view !== '3d',
+      view3d: () => this.setState({ view: '3d' }), viewFlat: () => { this.c3 && this.c3.tour(null); this.setState({ view: 'flat', touring: false }); },
+      p3d: this.state.view === '3d' ? 'true' : 'false', pFlat: this.state.view !== '3d' ? 'true' : 'false',
+      b3d: this.state.view === '3d' ? 'var(--hi)' : 'transparent', c3d: this.state.view === '3d' ? 'var(--fg)' : 'var(--dim)',
+      bFlat: this.state.view !== '3d' ? 'var(--hi)' : 'transparent', cFlat: this.state.view !== '3d' ? 'var(--fg)' : 'var(--dim)',
+      viewHint: this.state.view === '3d' ? 'DRAG TO ORBIT · CLICK A STAR · DOUBLE-CLICK TO RESET' : 'THE CHAIN, FLAT',
+      st1: stars[0], st2: stars[1], st3: stars[2], st4: stars[3], st5: stars[4], st6: stars[5], st7: stars[6], st8: stars[7], st9: stars[8], st10: stars[9],
+      vegaHalo: sel === 0 ? 0.22 : 0.06, vegaText: sel === 0 ? 'var(--acc)' : 'var(--fg)',
+      pickVega: () => { if (this.state.sel !== 0) this.setState({ sel: 0 }); },
+      list: [{ num: '00', cmd: VEGA.cmd, role: VEGA.role, takes: VEGA.takes, produces: VEGA.produces }].concat(STAGES.map((s, i) => ({ num: pad(i + 1), cmd: s.cmd, role: s.role, takes: s.takes, produces: s.produces }))),
+      indexOpen: this.state.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES
+    };
+  }
+}
+</script>
+</body>
+</html>

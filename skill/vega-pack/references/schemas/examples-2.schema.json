@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:examples@2",
+  "title": "vega/examples@2",
+  "description": "The body of GET /v1/examples (bundle-contract.md §7.4): the test examples, the demonstration sample drawn from the training part, and the presets. Assembled by the service from examples/*.json; examples/demo.json validates against #/$defs/demo and examples/presets.json against #/$defs/presets_file. No English sentence ships here: a preset carries a kind and facts, and the page renders preset.<kind>.name and preset.<kind>.text from its own strings table.",
+  "type": "object",
+  "required": ["schema", "test", "demo", "presets"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "vega/examples@2" },
+    "test": { "$ref": "#/$defs/test" },
+    "demo": {
+      "oneOf": [ { "$ref": "#/$defs/demo" }, { "type": "null" } ],
+      "description": "null when the bundle was packed with --demo-sample 0"
+    },
+    "presets": { "type": "array", "items": { "$ref": "#/$defs/preset" } }
+  },
+  "$defs": {
+    "cell": {
+      "description": "One raw value in the input schema: a number, a string (a code, a category, or a non-finite token such as \"Infinity\"), a boolean, or null.",
+      "type": ["string", "number", "boolean", "null"]
+    },
+    "row": {
+      "description": "One raw row in the input schema (schema.json input), keyed by column name.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/cell" }
+    },
+    "rows": { "type": "array", "items": { "$ref": "#/$defs/row" } },
+    "rows_or_null": { "oneOf": [ { "$ref": "#/$defs/rows" }, { "type": "null" } ] },
+    "truth": {
+      "description": "Typed per MANIFEST.output.truth.type: a class name (class), a list of label names (labels; empty for a multilabel `none` stratum), a number or one number per horizon (number), or null when the reading has no truth. anyOf, not oneOf: the empty list is both a list of names and a list of numbers.",
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "null" },
+        { "type": "array", "items": { "type": "string" } },
+        { "type": "array", "items": { "type": "number" } }
+      ]
+    },
+    "range": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+      ]
+    },
+    "test": {
+      "description": "The packed examples (examples/rows.csv, kind test or synthetic). Row shape: rows; window: rows plus the history that completes their first windows; graph: rows only (R-A3).",
+      "type": "object",
+      "required": ["source", "rows", "history"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "enum": ["test", "synthetic"] },
+        "rows": { "$ref": "#/$defs/rows" },
+        "history": { "$ref": "#/$defs/rows_or_null" }
+      }
+    },
+    "stratum": {
+      "type": "object",
+      "required": ["id", "kind", "name", "n", "range"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,80}$" },
+        "kind": { "enum": ["class", "label", "bin", "none", "typical", "flagged", "all"] },
+        "name": {
+          "description": "The data's own name for the stratum (a class or label name), or null for bins and score strata; never a sentence.",
+          "type": ["string", "null"]
+        },
+        "n": { "type": "integer", "minimum": 0 },
+        "range": { "$ref": "#/$defs/range" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "bin" } } },
+          "then": { "properties": { "range": { "type": "array" } } }
+        }
+      ]
+    },
+    "item": {
+      "description": "One demonstration sample: a row (row shape and graph node level), a window's anchor row with its history (window), or the rows of one graph (graph level).",
+      "type": "object",
+      "required": ["stratum", "rows", "history", "truth"],
+      "additionalProperties": false,
+      "properties": {
+        "stratum": { "type": "string" },
+        "rows": { "$ref": "#/$defs/rows" },
+        "history": { "$ref": "#/$defs/rows_or_null" },
+        "truth": { "$ref": "#/$defs/truth" }
+      }
+    },
+    "demo": {
+      "description": "examples/demo.json (vega/demo@2): drawn from the training part only, stratified per reading; an illustration, not evidence.",
+      "type": "object",
+      "required": ["source", "schema", "strata", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "const": "train" },
+        "schema": { "const": "vega/demo@2" },
+        "strata": { "type": "array", "items": { "$ref": "#/$defs/stratum" } },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+        "rows": {
+          "description": "Row class readings only (the console page): the items' rows, flattened.",
+          "$ref": "#/$defs/rows"
+        },
+        "labels": {
+          "description": "Row class readings only (the console page): the class of each of rows.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "dependentRequired": { "rows": ["labels"], "labels": ["rows"] }
+    },
+    "expected": {
+      "type": "object",
+      "required": ["kind", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["class", "labels", "value", "alarm"] },
+        "value": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "boolean" },
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "array", "minItems": 1, "items": { "type": "number" }, "description": "A forecast's truth: one number per step ahead." }
+          ]
+        },
+        "range": { "$ref": "#/$defs/range" }
+      },
+      "allOf": [
+        { "if": { "properties": { "kind": { "const": "class" } } },
+          "then": { "properties": { "value": { "type": "string" } } } },
+        { "if": { "properties": { "kind": { "const": "labels" } } },
+          "then": { "properties": { "value": { "type": "array" } } } },
+        { "if": { "properties": { "kind": { "const": "value" } } },
+          "then": { "properties": { "value": { "oneOf": [ { "type": "number" }, { "type": "array", "minItems": 1, "items": { "type": "number" } } ] } } } },
+        { "if": { "properties": { "kind": { "const": "alarm" } } },
+          "then": { "properties": { "value": { "type": "boolean" } } } }
+      ]
+    },
+    "fact": {
+      "description": "A fact is data, never prose: a count, a factor, a column name, a raw value, a bin edge pair, or a list of column names.",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string", "maxLength": 200 },
+        { "type": "array", "items": { "type": ["number", "string"] } }
+      ]
+    },
+    "preset": {
+      "type": "object",
+      "required": ["id", "kind", "group", "stratum", "expected", "facts", "row", "rows", "history"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,80}$" },
+        "kind": {
+          "enum": ["typical_correct", "typical_none_correct", "typical_bin", "typical_score",
+                   "typical_sequence", "edge_range", "edge_infinity", "edge_unseen"]
+        },
+        "group": { "enum": ["typical", "edge"] },
+        "stratum": { "type": "string" },
+        "expected": { "oneOf": [ { "$ref": "#/$defs/expected" }, { "type": "null" } ] },
+        "facts": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/fact" }
+        },
+        "row": { "oneOf": [ { "$ref": "#/$defs/row" }, { "type": "null" } ] },
+        "rows": { "$ref": "#/$defs/rows_or_null" },
+        "history": { "$ref": "#/$defs/rows_or_null" }
+      },
+      "anyOf": [
+        { "properties": { "row": { "$ref": "#/$defs/row" } } },
+        { "properties": { "rows": { "$ref": "#/$defs/rows" } } }
+      ],
+      "allOf": [
+        { "if": { "properties": { "kind": { "pattern": "^typical_" } } },
+          "then": { "properties": { "group": { "const": "typical" } } } },
+        { "if": { "properties": { "kind": { "pattern": "^edge_" } } },
+          "then": { "properties": { "group": { "const": "edge" }, "expected": { "type": "null" } } } },
+        { "if": { "properties": { "kind": { "const": "typical_correct" } } },
+          "then": { "properties": { "facts": { "required": ["right", "of"],
+                    "properties": { "right": { "type": "integer", "minimum": 1 }, "of": { "type": "integer", "minimum": 1 } } } } } },
+        { "if": { "properties": { "kind": { "const": "typical_none_correct" } } },
+          "then": { "properties": { "facts": { "required": ["right", "of"],
+                    "properties": { "right": { "const": 0 }, "of": { "type": "integer", "minimum": 1 } } } } } },
+        { "if": { "properties": { "kind": { "const": "typical_bin" } } },
+          "then": { "properties": { "facts": { "required": ["bin"],
+                    "properties": { "bin": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 } } } } } },
+        { "if": { "properties": { "kind": { "const": "typical_score" } } },
+          "then": { "properties": { "facts": { "required": ["of"],
+                    "properties": { "of": { "type": "integer", "minimum": 1 } } } } } },
+        { "if": { "properties": { "kind": { "const": "typical_sequence" } } },
+          "then": { "properties": { "facts": { "required": ["of"],
+                    "properties": { "of": { "type": "integer", "minimum": 1 } } } } } },
+        { "if": { "properties": { "kind": { "const": "edge_range" } } },
+          "then": { "properties": { "facts": { "required": ["column", "factor"],
+                    "properties": { "column": { "type": "string" }, "factor": { "type": "number" } } } } } },
+        { "if": { "properties": { "kind": { "const": "edge_infinity" } } },
+          "then": { "properties": { "facts": { "required": ["columns"],
+                    "properties": { "columns": { "type": "array", "items": { "type": "string" }, "minItems": 1 } } } } } },
+        { "if": { "properties": { "kind": { "const": "edge_unseen" } } },
+          "then": { "properties": { "facts": { "required": ["column", "value"],
+                    "properties": { "column": { "type": "string" }, "value": { "type": ["string", "number"] } } } } } }
+      ]
+    },
+    "presets_file": {
+      "description": "examples/presets.json (vega/presets@2).",
+      "type": "object",
+      "required": ["schema", "presets"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": "vega/presets@2" },
+        "presets": { "type": "array", "items": { "$ref": "#/$defs/preset" } }
+      }
+    }
+  }
+}

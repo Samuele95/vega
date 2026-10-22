@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:page:1",
+  "title": "vega/page@1 — showcase/page.json, the page's mechanical configuration",
+  "description": "Built by page_config.build_page_config (W06) inside build_showcase.py (H06), after resolve_story, and pinned in SHOWCASE.json with role page; checked by page_config.check_page_config (gate BD2) and read by the template at boot. Nothing in it is authored: the lane from the netspec (link from the one vocabulary of vega-forge catalog inspection.links, R-C1), the metric and its direction from vega-forge catalog metric_direction, the motif from the modality's base, the stance or the S3 answer (R-E4), the identity from MANIFEST.serve.identity (R-E6), the views available, the recipe summary, the reference distribution, the explain-catalog subset and the code walk (walk ids per R-E8).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "template", "bundle", "identity", "lane", "metric", "motif", "views", "recipe", "reference", "explain", "walk", "code"],
+  "properties": {
+    "schema": { "const": "vega/page@1" },
+    "template": {
+      "type": "object", "additionalProperties": false, "required": ["version", "manifest_digest"],
+      "properties": { "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }, "manifest_digest": { "$ref": "#/$defs/digest" } }
+    },
+    "bundle": {
+      "type": "object", "additionalProperties": false, "required": ["manifest_digest"],
+      "properties": { "manifest_digest": { "$ref": "#/$defs/digest" } }
+    },
+    "identity": {
+      "type": "object", "additionalProperties": false, "required": ["title", "description", "source"],
+      "properties": { "title": { "type": "string", "minLength": 1 }, "description": { "type": "string" },
+                      "source": { "const": "bundle:MANIFEST.serve.identity" } }
+    },
+    "lane": {
+      "type": "object", "additionalProperties": false,
+      "required": ["task", "base", "view_key", "shape", "level", "link", "family", "goal", "score_source", "source"],
+      "properties": {
+        "task": { "enum": ["binary", "multiclass", "multilabel", "regression", "ordinal", "unsupervised", "anomaly",
+                           "sequence-classification", "sequence-regression", "forecast"] },
+        "base": { "enum": ["binary", "multiclass", "multilabel", "regression", "ordinal", null] },
+        "view_key": { "enum": ["classes", "binary", "labels", "value", "ordinal", "reconstruction", "anomaly", "horizon"] },
+        "shape": { "enum": ["row", "window", "graph"] },
+        "level": { "enum": ["node", "graph", null] },
+        "link": { "enum": ["softmax", "sigmoid", "sigmoid_each", "identity", "cumulative", "reconstruction", "distance", "horizon"] },
+        "family": { "type": "string", "minLength": 1 },
+        "goal": { "enum": ["predict", "reconstruct", "anomaly"] },
+        "score_source": { "enum": ["reconstruction", "distance", null] },
+        "source": { "type": "string", "minLength": 1 }
+      }
+    },
+    "metric": {
+      "type": "object", "additionalProperties": false, "required": ["primary", "direction", "bounds", "secondary", "source"],
+      "properties": {
+        "primary": { "$ref": "#/$defs/metric" },
+        "direction": { "enum": ["max", "min"] },
+        "bounds": { "type": "array", "prefixItems": [ { "type": "number" }, { "type": ["number", "null"] } ], "minItems": 2, "maxItems": 2 },
+        "secondary": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/metric" } },
+        "source": { "type": "string", "minLength": 1 }
+      }
+    },
+    "motif": {
+      "type": "object", "additionalProperties": false, "required": ["id", "base", "modality", "source", "reason"],
+      "properties": {
+        "id": { "$ref": "#/$defs/motif" },
+        "base": { "$ref": "#/$defs/motif" },
+        "modality": { "enum": ["row", "spatial-row", "window", "graph"] },
+        "source": { "type": "string", "pattern": "^(vega:default|user:.+|show:\\d{4}-\\d{2}-\\d{2})$" },
+        "reason": { "type": "string" }
+      },
+      "allOf": [
+        { "if": { "properties": { "modality": { "const": "row" } } },
+          "then": { "properties": { "base": { "const": "points" }, "id": { "enum": ["points", "lanes", "grid"] } } } },
+        { "if": { "properties": { "modality": { "const": "spatial-row" } } },
+          "then": { "properties": { "base": { "const": "contours" }, "id": { "enum": ["contours", "points", "lanes", "grid"] } } } },
+        { "if": { "properties": { "modality": { "const": "window" } } },
+          "then": { "properties": { "base": { "const": "traces" }, "id": { "enum": ["traces", "lanes", "grid"] } } } },
+        { "if": { "properties": { "modality": { "const": "graph" } } },
+          "then": { "properties": { "base": { "const": "links" }, "id": { "enum": ["links", "grid"] } } } }
+      ]
+    },
+    "views": {
+      "type": "object", "additionalProperties": false, "required": ["order", "off"],
+      "properties": {
+        "order": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/tour_view" } },
+        "off": { "type": "object", "propertyNames": { "$ref": "#/$defs/tour_view" },
+                 "additionalProperties": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" } }
+      }
+    },
+    "recipe": {
+      "type": "object", "additionalProperties": false, "required": ["ops", "source"],
+      "properties": {
+        "ops": { "type": "array",
+                 "items": { "type": "object", "additionalProperties": false, "required": ["op", "columns", "step"],
+                            "properties": { "op": { "enum": ["impute", "indicator", "encode", "clip", "log1p", "standard_scale",
+                                                             "robust_scale", "minmax_scale", "bin", "window", "graph_edges", "project", "other"] },
+                                            "columns": { "type": "integer", "minimum": 0 },
+                                            "step": { "type": "string", "minLength": 1 } } } },
+        "source": { "type": "string" }
+      }
+    },
+    "reference": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "quantiles", "n", "source"],
+          "properties": { "kind": { "enum": ["reconstruction_error", "distance"] },
+                          "quantiles": { "type": "object", "propertyNames": { "pattern": "^0\\.\\d+$" },
+                                         "additionalProperties": { "type": "number" }, "minProperties": 1 },
+                          "n": { "type": "integer", "minimum": 1 },
+                          "source": { "type": "string" } } }
+      ]
+    },
+    "explain": {
+      "type": "object", "additionalProperties": false, "required": ["catalog", "digest", "blocks", "activations", "links"],
+      "properties": {
+        "catalog": { "type": "string", "pattern": "explain-catalog\\.json$" },
+        "digest": { "$ref": "#/$defs/digest" },
+        "blocks": { "type": "object" },
+        "activations": { "type": "object" },
+        "links": { "type": "object" }
+      }
+    },
+    "walk": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "code"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "code": { "type": "object", "additionalProperties": false, "required": ["file", "at"],
+                    "properties": { "file": { "type": "string", "minLength": 1 },
+                                    "at": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+                                    "after": { "type": ["string", "null"] },
+                                    "to": { "type": ["string", "null"] } } }
+        }
+      }
+    },
+    "code": {
+      "type": "object", "additionalProperties": false, "required": ["language", "source"],
+      "properties": { "language": { "type": "string", "pattern": "^[a-z][a-z0-9+-]*$" }, "source": { "type": "string" } }
+    }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "metric": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "motif": { "enum": ["grid", "points", "traces", "lanes", "links", "contours"] },
+    "tour_view": { "enum": ["context", "network", "try", "many", "results"] }
+  },
+  "examples": [
+    {
+      "schema": "vega/page@1",
+      "template": { "version": "2.3.0", "manifest_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444" },
+      "bundle": { "manifest_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111" },
+      "identity": { "title": "cids flow classifier", "description": "Classifies each flow of the input schema into one of the classes.",
+                    "source": "bundle:MANIFEST.serve.identity" },
+      "lane": { "task": "multiclass", "base": null, "view_key": "classes", "shape": "row", "level": null, "link": "softmax",
+                "family": "mlp-plain", "goal": "predict", "score_source": null,
+                "source": "netspec:task, netspec:data_contract.sample, netspec:family, netspec:loss" },
+      "metric": { "primary": "f1_macro", "direction": "max", "bounds": [0, 1], "secondary": ["accuracy", "balanced_accuracy", "ece"],
+                  "source": "netspec:metrics; vega-forge catalog metric_direction" },
+      "motif": { "id": "lanes", "base": "points", "modality": "row", "source": "show:2026-09-29", "reason": "rows are flows passing between endpoints" },
+      "views": { "order": ["context", "network", "try", "many", "results"], "off": {} },
+      "recipe": { "ops": [ { "op": "log1p", "columns": 40, "step": "S7" }, { "op": "robust_scale", "columns": 65, "step": "S9" },
+                           { "op": "indicator", "columns": 5, "step": "S5" } ],
+                  "source": "shape:manifest.steps" },
+      "reference": null,
+      "explain": { "catalog": "vega-forge/scripts/backends/pytorch/explain-catalog.json",
+                   "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+                   "blocks": { "dense": {}, "head": {} }, "activations": { "gelu": {} }, "links": { "softmax": {} } },
+      "walk": [ { "id": "root", "code": { "file": "^predict\\.py$", "at": ["^def load\\("], "after": null, "to": null } },
+                { "id": "dense", "code": { "file": "blocks_core\\.py$", "at": ["^class Dense\\("] } },
+                { "id": "link", "code": { "file": "readout\\.py$", "at": ["softmax"] } } ],
+      "code": { "language": "python", "source": "coverage.json:language" }
+    },
+    {
+      "schema": "vega/page@1",
+      "template": { "version": "2.3.0", "manifest_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444" },
+      "bundle": { "manifest_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111" },
+      "identity": { "title": "turbine monitor", "description": "Scores each reading.", "source": "bundle:MANIFEST.serve.identity" },
+      "lane": { "task": "anomaly", "base": null, "view_key": "anomaly", "shape": "row", "level": null, "link": "distance",
+                "family": "deep-svdd", "goal": "anomaly", "score_source": "distance", "source": "netspec:task, netspec:loss" },
+      "metric": { "primary": "pr_auc", "direction": "max", "bounds": [0, 1], "secondary": ["roc_auc"], "source": "netspec:metrics" },
+      "motif": { "id": "points", "base": "points", "modality": "row", "source": "vega:default", "reason": "default applied (unattended)" },
+      "views": { "order": ["context", "network", "try", "results"], "off": { "many": "views.off.no_monitor" } },
+      "recipe": { "ops": [ { "op": "standard_scale", "columns": 12, "step": "S3" } ], "source": "shape:manifest.steps" },
+      "reference": { "kind": "distance", "quantiles": { "0.5": 0.12, "0.9": 0.4, "0.99": 1.3 }, "n": 400, "source": "examples/demo.json (train)" },
+      "explain": { "catalog": "vega-forge/scripts/backends/pytorch/explain-catalog.json",
+                   "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+                   "blocks": {}, "activations": {}, "links": { "distance": {} } },
+      "walk": [ { "id": "root", "code": { "file": "^predict\\.py$", "at": ["^def load\\("] } } ],
+      "code": { "language": "python", "source": "coverage.json:language" }
+    }
+  ]
+}

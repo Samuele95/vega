@@ -1,0 +1,105 @@
+/* data-lens `analysis` layer — scoped styles. Every rule is prefixed .layer-analysis so nothing
+   bleeds into the host or another layer. Tokens fall back to the domain-forge template variables,
+   and the dark scheme mirrors the host's. */
+.layer-analysis { --a-ink: var(--ink, #1a1814); --a-muted: var(--muted, #6d685b);
+  --a-border: var(--border, #e6e1d5); --a-surface: var(--surface, #fff); --a-panel: var(--panel, #f8f6f1);
+  --a-accent: var(--accent, #1b3a73); --a-soft: var(--accent-soft, #eaeef6);
+  --a-high: #9a3a2c; --a-med: #8a6420; --a-low: #2c6570; --a-ok: #2e6b3f; --a-bad: #9a3a2c;
+  padding: 1.25rem; color: var(--a-ink); font: 14px/1.55 var(--sans, system-ui, sans-serif); }
+@media (prefers-color-scheme: dark) {
+  .layer-analysis { --a-ink: var(--ink, #e8e4da); --a-muted: var(--muted, #a39d8e);
+    --a-border: var(--border, #3a362d); --a-surface: var(--surface, #1e1c18); --a-panel: var(--panel, #26231e);
+    --a-accent: var(--accent, #8fb0ea); --a-soft: var(--accent-soft, #2b3550);
+    --a-high: #e07a66; --a-med: #d8b26a; --a-low: #7fc0c9; --a-ok: #7fc98f; --a-bad: #e07a66; }
+}
+.layer-analysis h2 { margin: 0 0 .15rem; font-size: 1.35rem; }
+.layer-analysis h3 { margin: 1.1rem 0 .5rem; font-size: 1rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--a-border); }
+.layer-analysis h4 { margin: 0; font-size: .98rem; }
+.layer-analysis .a-sub, .layer-analysis .a-muted { color: var(--a-muted); font-size: .9rem; margin: .2rem 0 .5rem; }
+.layer-analysis .a-prose { margin: .45rem 0; max-width: 62em; }
+.layer-analysis .a-empty { padding: .8rem 1rem; border: 1px dashed var(--a-border); border-radius: 6px;
+  color: var(--a-muted); background: var(--a-panel); }
+
+.layer-analysis .a-strip { border: 1px solid var(--a-border); border-radius: 6px; background: var(--a-panel);
+  padding: .6rem .85rem; margin: .6rem 0 1rem; }
+.layer-analysis .a-strip h3 { margin: 0 0 .4rem; border: 0; font-size: .82rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--a-muted); }
+.layer-analysis .a-chips { display: flex; flex-wrap: wrap; gap: .3rem; }
+.layer-analysis .a-chip { display: inline-block; padding: .05rem .55rem; border: 1px solid var(--a-border);
+  border-radius: 999px; font-size: .74rem; color: var(--a-muted); background: var(--a-surface); }
+.layer-analysis .a-basis, .layer-analysis .a-label { border-color: var(--a-accent); color: var(--a-accent);
+  background: var(--a-soft); }
+.layer-analysis .a-leak { border-color: var(--a-high); color: var(--a-high); }
+.layer-analysis .a-deriv { font-family: var(--mono, ui-monospace, monospace); }
+.layer-analysis .a-ok { border-color: var(--a-ok); color: var(--a-ok); }
+.layer-analysis .a-bad { border-color: var(--a-bad); color: var(--a-bad); }
+.layer-analysis .a-na { border-style: dashed; }
+.layer-analysis .a-swap { border-color: var(--a-med); color: var(--a-med); }
+
+.layer-analysis .a-filter { display: flex; gap: .8rem; align-items: center; margin: .2rem 0 .7rem;
+  font-size: .82rem; color: var(--a-muted); }
+.layer-analysis .a-sel select { font: inherit; padding: .1rem .3rem; border: 1px solid var(--a-border);
+  border-radius: 4px; background: var(--a-surface); color: var(--a-ink); }
+.layer-analysis .a-cards { display: grid; gap: .8rem; }
+.layer-analysis .a-card { border: 1px solid var(--a-border); border-left-width: 4px; border-radius: 6px;
+  background: var(--a-surface); padding: .7rem .9rem; }
+.layer-analysis .a-sev-high { border-left-color: var(--a-high); }
+.layer-analysis .a-sev-medium { border-left-color: var(--a-med); }
+.layer-analysis .a-sev-low { border-left-color: var(--a-low); }
+.layer-analysis .a-cardhead { display: flex; flex-wrap: wrap; gap: .4rem; align-items: baseline; }
+.layer-analysis .a-sev { text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+.layer-analysis .a-cols { font-family: var(--mono, ui-monospace, monospace); font-size: .8rem;
+  color: var(--a-muted); margin: .3rem 0; }
+.layer-analysis .a-method { display: flex; flex-wrap: wrap; gap: .35rem; align-items: baseline;
+  margin: .35rem 0; font-size: .82rem; }
+.layer-analysis .a-mname { font-weight: 600; }
+.layer-analysis .a-sowhat { display: grid; grid-template-columns: max-content 1fr; gap: .15rem .7rem;
+  margin: .5rem 0 .2rem; font-size: .88rem; }
+.layer-analysis .a-sowhat dt { color: var(--a-muted); text-transform: capitalize; }
+.layer-analysis .a-sowhat dd { margin: 0; }
+.layer-analysis .a-cand { border: 1px solid var(--a-border); border-radius: 5px; padding: .4rem .6rem;
+  margin: .35rem 0; background: var(--a-panel); font-size: .86rem; }
+.layer-analysis .a-candhead { margin: 0 0 .2rem; font-family: var(--mono, ui-monospace, monospace); }
+.layer-analysis .a-params { margin: .2rem 0; font-size: .78rem; white-space: pre-wrap; }
+.layer-analysis .a-alt { color: var(--a-muted); font-size: .82rem; margin: .15rem 0; }
+
+.layer-analysis .a-det { border: 1px solid var(--a-border); border-radius: 5px; padding: .3rem .6rem;
+  margin: .4rem 0; background: var(--a-surface); }
+.layer-analysis .a-det > summary { cursor: pointer; font-size: .85rem; color: var(--a-accent); }
+.layer-analysis .a-mod-panel > summary { font-weight: 600; }
+.layer-analysis .a-table { border-collapse: collapse; font-size: .8rem; margin: .3rem 0; width: 100%; }
+.layer-analysis .a-table th { text-align: left; font-weight: 600; padding: .12rem .6rem .12rem 0;
+  border-bottom: 1px solid var(--a-border); white-space: nowrap; }
+.layer-analysis .a-table td { padding: .12rem .6rem .12rem 0; font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--a-border); }
+.layer-analysis .a-sortable { cursor: pointer; }
+.layer-analysis .a-sortable:hover, .layer-analysis .a-sortable:focus-visible { color: var(--a-accent); }
+.layer-analysis .a-kvline { margin: .15rem 0; font-size: .82rem; }
+.layer-analysis details table { display: block; max-height: 22rem; overflow: auto; }
+
+.layer-analysis .a-fig { margin: .6rem 0; }
+/* A shipped SVG carries no width/height (they are stripped so it scales), so without a cap it
+   fills the pane and its 9pt labels render as headlines. 640px is its natural drawing width. */
+.layer-analysis .a-fig svg, .layer-analysis .a-svg { max-width: min(100%, 640px); height: auto;
+  display: block; }
+.layer-analysis .a-fig figcaption { font-size: .78rem; color: var(--a-muted); }
+
+.layer-analysis .a-turn { border: 1px solid var(--a-border); border-radius: 6px; padding: .7rem .9rem;
+  margin: .6rem 0; background: var(--a-surface); }
+.layer-analysis .a-ungrounded { border-style: dashed; }
+.layer-analysis .a-rerun { font: inherit; font-size: .8rem; padding: .2rem .6rem; cursor: pointer;
+  border: 1px solid var(--a-border); border-radius: 4px; background: var(--a-panel); color: var(--a-ink); }
+.layer-analysis .a-rerun:hover, .layer-analysis .a-rerun:focus-visible { border-color: var(--a-accent);
+  color: var(--a-accent); }
+.layer-analysis .a-code, .layer-analysis .a-result, .layer-analysis .a-err {
+  font-family: var(--mono, ui-monospace, monospace); font-size: .78rem; white-space: pre-wrap;
+  background: var(--a-panel); border: 1px solid var(--a-border); border-radius: 4px; padding: .45rem .6rem;
+  max-height: 22rem; overflow: auto; }
+.layer-analysis .a-err { border-color: var(--a-bad); color: var(--a-bad); }
+.layer-analysis .a-stance, .layer-analysis .a-marker { font-size: .8rem; margin: .1rem 0;
+  font-family: var(--mono, ui-monospace, monospace); color: var(--a-muted); }
+.layer-analysis .a-handoff { margin-top: 1rem; padding: .6rem .85rem; border: 1px solid var(--a-accent);
+  border-radius: 6px; background: var(--a-soft); }
+.layer-analysis .a-handoff h3 { margin-top: 0; border: 0; }
+.layer-analysis-noscript { padding: 1rem; }

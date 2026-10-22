@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title></title>
+<!-- The showcase page: one template for every lane, copied byte for byte into the showcase and
+     served by the bundle's own service. It talks only to that service (health, v1/*) and to the
+     showcase slot (showcase/*), by relative URLs, and needs no network access and no build step.
+     Its words about the project come from the story, its figures from the bundle's records, its
+     drawing of the network from v1/network. Colour carries meaning, and only one: teal is the
+     interface's accent and the neutral role; coral is the alert role or an error; violet is a
+     weight that lowers what it feeds.
+     This shell holds no prose: every text slot names its key in the strings table (data-t for the
+     content, data-t-title and data-t-aria for the attributes), filled by core/text.js at boot, and
+     every other slot (an id and no data-t) is written by the views. Only symbols, arrows and
+     entities are typed here. -->
+<link rel="stylesheet" href="showcase/page/page.css">
+<link rel="stylesheet" href="showcase/page/css/network.css">
+<link rel="stylesheet" href="showcase/page/css/views.css">
+<link rel="stylesheet" href="showcase/page/css/stepper.css">
+<link rel="stylesheet" href="showcase/page/css/code.css">
+<link rel="stylesheet" href="showcase/page/css/sequence.css">
+<link rel="stylesheet" href="showcase/page/css/graph.css">
+<link rel="stylesheet" href="showcase/page/css/latent.css">
+<script type="module" src="showcase/page/js/main.js"></script>
+</head>
+<body>
+<canvas id="field" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<template id="description"></template>
+
+<div class="app">
+  <header>
+    <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <path d="M2 7c5 0 5 5 10 5s5-5 10-5" opacity=".45"/><path d="M2 17c5 0 5-5 10-5s5 5 10 5" opacity=".45"/>
+      <circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><circle cx="5.2" cy="8.2" r="1.2" fill="currentColor" stroke="none" opacity=".7"/><circle cx="18.8" cy="15.8" r="1.2" fill="currentColor" stroke="none" opacity=".7"/>
+    </svg>
+    <div class="crumb caps"><span class="muted" id="crumb-title"></span><span class="muted">/</span><span class="here" id="crumb-here"></span></div>
+    <div class="sp"></div>
+    <div class="status caps"><span class="dot" id="dot"></span><span id="status-text"></span></div>
+    <button class="icon-btn" id="theme" data-t-title="app.theme.title" data-t-aria="app.theme.aria">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+    </button>
+    <div class="sep"></div>
+    <button class="caps" id="open-index" style="color:var(--muted)" data-t-title="app.index.title">&#8801;&nbsp;&nbsp;<span data-t="app.index"></span></button>
+  </header>
+
+  <main id="main">
+    <!-- 0 · threshold -->
+    <section class="view" data-view="start">
+      <div class="col threshold">
+        <h1 class="big enter" id="headline" style="animation-delay:.15s"></h1>
+        <p class="lead enter" id="lead" style="animation-delay:.3s"></p>
+        <div class="facts enter" id="start-facts" style="animation-delay:.45s"></div>
+        <div class="enter" style="animation-delay:.6s"><button class="action caps" id="begin"><span data-t="start.begin"></span> <span class="arrow">&rarr;</span></button></div>
+        <div class="keys enter" id="start-keys" style="animation-delay:.75s"></div>
+      </div>
+    </section>
+
+    <!-- 1 · context -->
+    <section class="view" data-view="context" hidden>
+      <div class="col">
+        <div class="progress" data-progress></div>
+        <div class="steps">
+          <div class="rail" id="ctx-rail"></div>
+          <div>
+            <div id="ctx-step" class="step narrow"></div>
+            <button class="action caps" id="ctx-next"><span data-t="context.next"></span> <span class="arrow">&rarr;</span></button>
+            <div class="facts" id="ctx-facts" hidden></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · network -->
+    <section class="view" data-view="network" hidden>
+      <div class="col">
+        <div class="progress" data-progress></div>
+        <p class="lead" id="net-lead"></p>
+        <div class="net-wrap">
+          <div>
+            <div class="guide" id="guide"><span class="n" id="guide-n"></span><span class="t" id="guide-t"></span><button class="caps go acc" id="guide-go"></button><button class="caps go muted" id="guide-skip" data-t="net.guide.skip" data-t-title="net.guide.skip_title"></button></div>
+            <canvas class="net" id="net"></canvas>
+            <div class="net-cap" id="net-cap"></div>
+            <div class="card" id="unit-card" hidden></div>
+            <div class="fig-head">
+              <div class="switch caps" id="net-switch" role="group" data-t-aria="net.detail.aria"><button class="on" data-mode="simple" data-t="net.detail.simple"></button><button data-mode="detail" data-t="net.detail.every"></button></div>
+              <div class="legend"><span><i style="background:var(--accent)"></i><span data-t="net.legend.raises"></span></span><span><i style="background:var(--neg)"></i><span data-t="net.legend.lowers"></span></span><span data-t="net.legend.strength"></span><span data-t="net.legend.circle"></span></div>
+            </div>
+          </div>
+          <div>
+            <div class="caps muted" style="margin-bottom:10px" data-t="net.decisions"></div>
+            <div class="choices" id="choices"></div>
+            <p class="hint" data-t="net.decisions.hint"></p>
+            <div id="unit-how-box" hidden>
+              <button class="disclose caps" data-for="unit-how" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="net.unit_how"></span></button>
+              <div class="reveal" id="unit-how"><div><p class="hint" id="unit-how-text" style="margin-top:8px"></p></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="rule"></div>
+        <button class="disclose caps" data-for="exp" aria-expanded="false"><span class="chev">&rsaquo;</span><span id="exp-title" data-t="net.tried"></span></button>
+        <div class="reveal" id="exp"><div><p class="lead" id="exp-lead" style="margin-top:12px"></p><div id="exp-bars"></div><p class="hint" id="exp-cap"></p></div></div>
+        <br>
+        <button class="disclose caps" data-for="heat" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="net.weights"></span></button>
+        <div class="reveal" id="heat"><div>
+          <div class="fig-head" style="margin-top:14px"><div class="switch caps" id="w-switch" role="group" data-t-aria="net.weights.aria"><button class="on" data-w="map" data-t="net.weights.map"></button><button data-w="layers" data-t="net.weights.layers"></button></div></div>
+          <div id="w-map"></div>
+          <div id="w-layers" hidden></div>
+        </div></div>
+        <br><button class="code-link caps" data-code="dense"><span data-t="app.code_link"></span> &rarr;</button>
+      </div>
+    </section>
+
+    <!-- 3 · try one -->
+    <section class="view" data-view="try" hidden>
+      <div class="col">
+        <div class="progress" data-progress></div>
+        <div class="try">
+          <div class="presets" id="presets"><div class="caps muted" data-t="try.choose"></div></div>
+          <div>
+            <p id="try-empty" class="lead" data-t="try.empty"></p>
+            <div id="try-out" hidden>
+              <div class="caps muted" id="try-desc-title"></div>
+              <p class="fg2" id="try-desc"></p>
+              <div class="fig-head" style="margin:10px 0 4px"><div class="switch caps" id="try-switch" role="group" data-t-aria="net.detail.aria"><button class="on" data-mode="simple" data-t="net.detail.simple"></button><button data-mode="detail" data-t="net.detail.every"></button></div></div>
+              <canvas class="net" id="net-try" style="height:340px;cursor:default"></canvas>
+              <p class="hint" id="try-read"></p>
+              <div class="verdict" id="try-verdict"></div>
+              <div class="agree" id="try-agree"></div>
+              <div id="try-warn"></div>
+              <div class="bars" id="try-probs"></div>
+              <p class="hint" data-t="try.scores_note"></p>
+              <div class="rule"></div>
+              <button class="disclose caps" data-for="why" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="try.why"></span></button>
+              <div class="reveal" id="why"><div><p class="hint" id="why-lead" style="margin-top:10px"></p><div class="bars diverge" id="why-bars"></div></div></div>
+              <br>
+              <button class="disclose caps" data-for="edit" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="try.edit"></span></button>
+              <div class="reveal" id="edit"><div>
+                <p class="hint" style="margin-top:10px" data-t="try.hint.nonfinite"></p>
+                <div class="form" id="form"></div>
+                <button class="action caps" id="try-run"><span data-t="try.run"></span> <span class="arrow">&rarr;</span></button>
+                <div class="err" id="try-err"></div>
+              </div></div>
+              <div id="how-box" hidden>
+                <br>
+                <button class="disclose caps" data-for="how" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="try.how"></span></button>
+                <div class="reveal" id="how"><div>
+                  <div class="wmodes caps" id="how-tabs" role="tablist" data-t-aria="try.how.tabs"></div>
+                  <div id="how-body"></div>
+                  <div class="how-nav"><span class="caps muted" id="how-n"></span><button class="caps muted" id="how-back">&larr; <span data-t="app.back"></span></button><button class="caps acc" id="how-next"></button><button class="caps code-link" id="how-code" style="margin:0 0 0 auto"><span data-t="try.how.code"></span> &rarr;</button></div>
+                </div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · many at once -->
+    <section class="view" data-view="many" hidden>
+      <div class="col">
+        <div class="progress" data-progress></div>
+        <p class="lead" data-t="many.lead"></p>
+        <div class="sources">
+          <button id="src-demo"><span class="caps" data-t="many.src.demo"></span><small data-t="many.src.demo_note"></small></button>
+          <button id="src-test"><span class="caps" data-t="many.src.test"></span><small data-t="many.src.test_note"></small></button>
+          <label><span class="caps" data-t="many.src.csv"></span><small data-t="many.src.csv_note"></small><input id="csv" type="file" accept=".csv,text/csv"></label>
+        </div>
+        <div class="busy" id="many-busy" hidden data-t="many.busy"></div>
+        <div class="err" id="many-err"></div>
+        <div id="many-out" hidden>
+          <h1 class="big" id="many-sentence"></h1>
+          <div class="split">
+            <div><div class="caps muted" id="many-bars-title"></div><div class="bars" id="many-classes"></div><p class="hint" id="many-bars-cap"></p></div>
+            <div id="many-mix-box"><div class="caps muted" data-t="many.mix"></div><div class="mix" id="many-mix"></div></div>
+          </div>
+          <div class="rule"></div>
+          <button class="disclose caps" data-for="many-table" aria-expanded="false"><span class="chev">&rsaquo;</span><span id="many-table-title" data-t="many.table"></span></button>
+          <div class="reveal" id="many-table"><div><p class="hint" style="margin-top:10px" data-t="many.table.hint"></p><div class="scroll"><table><thead><tr><th>#</th><th data-t="many.col.truth"></th><th data-t="many.col.predicted"></th><th data-t="many.col.score"></th><th data-t="many.col.warnings"></th></tr></thead><tbody id="many-rows"></tbody></table></div></div></div>
+          <br>
+          <button class="disclose caps" data-for="many-mon" aria-expanded="false"><span class="chev">&rsaquo;</span><span id="many-mon-title" data-t="many.monitor"></span></button>
+          <div class="reveal" id="many-mon"><div><p class="hint" style="margin-top:10px"><span data-t="many.monitor.lead"></span> <span id="many-mon-note"></span></p><div class="scroll"><table><thead><tr><th data-t="many.monitor.col.check"></th><th data-t="many.monitor.col.measure"></th><th data-t="many.monitor.col.value"></th><th data-t="many.monitor.col.verdict"></th><th data-t="many.monitor.col.detail"></th></tr></thead><tbody id="many-monitor"></tbody></table></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · results -->
+    <section class="view" data-view="results" hidden>
+      <div class="col">
+        <div class="progress" data-progress></div>
+        <h1 class="big" id="res-headline"></h1>
+        <div class="bars" id="res-models"></div>
+        <p class="hint" id="res-ci-note" data-t="results.ci_note.no_level"></p>
+        <p id="res-verdict" hidden></p>
+        <div class="facts" id="res-facts"></div>
+        <button class="disclose caps" data-for="res-class" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="results.by_target"></span></button>
+        <div class="reveal" id="res-class"><div><p class="hint" id="res-class-cap" style="margin-top:10px"></p><div class="bars" id="res-per-class"></div></div></div>
+        <br>
+        <button class="disclose caps" data-for="res-lim" aria-expanded="false"><span class="chev">&rsaquo;</span><span data-t="results.limits"></span></button>
+        <div class="reveal" id="res-lim"><div><div class="limits" id="res-limits"></div></div></div>
+      </div>
+    </section>
+    <!-- the code · not on the tour: opened with c, from the index, or a "see it in the code" link -->
+    <section class="view" data-view="code" hidden>
+      <div class="col">
+        <div class="code-top caps"><button class="muted" id="code-back">&larr; <span data-t="app.back"></span></button><span class="muted" id="code-verified"></span></div>
+        <h1 class="big" style="margin-top:22px" data-t="code.title"></h1>
+        <p class="lead" id="code-lead"></p>
+        <div class="code-wrap">
+          <div class="walk">
+            <div class="caps muted" style="margin-bottom:8px" data-t="code.walk"></div>
+            <ol id="walk"></ol>
+            <div class="caps muted" style="margin:26px 0 8px" data-t="code.files"></div>
+            <div class="code-files" id="code-files"></div>
+          </div>
+          <div>
+            <div class="code-step" id="code-step"></div>
+            <div class="code-head" id="code-head"></div>
+            <div class="src" id="src" tabindex="0" data-t-aria="code.source"></div>
+            <div class="how-nav" id="code-nav"><span class="caps muted" id="code-n"></span><button class="caps muted" id="code-prev">&larr; <span data-t="app.back"></span></button><button class="caps acc" id="code-next"></button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="index caps" id="tabs"></nav>
+</div>
+<button class="next caps" id="next"></button>
+<div class="wtip" id="wtip"></div>
+<div class="overlay" id="index-overlay"><div class="sheet"><div class="caps muted" style="margin-bottom:14px" data-t="app.index"></div><div id="index-list"></div></div></div>
+</body>
+</html>

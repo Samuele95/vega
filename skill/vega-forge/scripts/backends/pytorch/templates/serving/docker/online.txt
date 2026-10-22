@@ -1,0 +1,5 @@
+# Run:  docker run --rm -p {port}:{port} {dist}
+EXPOSE {port}
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD python -c "import sys,urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:{port}/health').status == 200 else 1)"
+CMD ["python", "-m", "serve.app", "--host", "0.0.0.0", "--port", "{port}"]

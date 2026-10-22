@@ -1,0 +1,21 @@
+/* The stepper area (js/how/**): the parts of "how the network computed it" that today's page did
+   not have — the collapsed steps' picker, the "then …" notes, the recompute rows, the tables of the
+   links, the notes of what the answer did not bring. Only the page's tokens (page.css); today's
+   rules for the tabs, the sums, the bends and the softmax table stay in page.css. */
+.how-terms{margin-top:12px}
+.how-members{margin:0 0 8px}
+.how-then{margin:0 0 6px;color:var(--muted)}
+.how-miss{color:var(--muted);font-style:italic}
+.how-bend{margin:6px 0 0}
+.how-norm{margin:14px 0 4px}
+.how-norm .formula{margin-top:4px}
+.how-lookup{margin:10px 0 0}
+.how-positions{margin:4px 0 0;font-family:var(--mono);overflow-wrap:anywhere}
+.how-link{margin-top:16px}
+.how-next{margin-top:10px}
+.how-code{margin:0 0 0 auto}
+.how-check{margin:10px 0 4px}
+.how-check .how-gap{color:var(--alert)}
+.how-table{margin:10px 0 4px}
+.how-table .win{color:var(--accent)}
+.how-table.how-two{grid-template-columns:minmax(0,1fr) auto}

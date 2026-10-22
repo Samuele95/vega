@@ -1,0 +1,167 @@
+{
+  "schema": "vega/blueprint-map@1",
+  "blueprint": "../pipeline.json",
+  "package": "demo_pipeline",
+  "entries": [
+    {
+      "file": "ingestion/data.py",
+      "module": "ingestion",
+      "port": "DataSource",
+      "role": "DataSource",
+      "source": "blueprint:ports/DataSource",
+      "status": "implemented"
+    },
+    {
+      "file": "features/preprocess.py",
+      "module": "features",
+      "port": "Recipe",
+      "role": "FeatureTransformer",
+      "source": "blueprint:ports/Recipe",
+      "status": "pending: /vega-pack"
+    },
+    {
+      "file": "model/network.py",
+      "module": "model",
+      "port": "Model",
+      "role": "Model",
+      "source": "blueprint:ports/Model",
+      "status": "implemented"
+    },
+    {
+      "file": "model/store.py",
+      "module": "model",
+      "port": "Registry",
+      "role": "ModelStore",
+      "source": "blueprint:ports/Registry",
+      "status": "implemented"
+    },
+    {
+      "file": "training/loop.py",
+      "module": "training",
+      "port": "Trainer",
+      "role": "Trainer",
+      "source": "blueprint:ports/Trainer",
+      "status": "implemented"
+    },
+    {
+      "file": "evaluation/evaluate.py",
+      "module": "evaluation",
+      "port": "Evaluator",
+      "role": "Evaluator",
+      "source": "blueprint:ports/Evaluator",
+      "status": "implemented"
+    },
+    {
+      "file": "serving/predict.py",
+      "module": "serving",
+      "port": "Predictor",
+      "role": "Predictor",
+      "source": "blueprint:ports/Predictor",
+      "status": "pending: /vega-pack"
+    },
+    {
+      "file": "serving/monitor.py",
+      "module": "serving",
+      "port": "Monitor",
+      "role": "Monitor",
+      "source": "blueprint:ports/Monitor",
+      "status": "pending: /vega-pack"
+    },
+    {
+      "file": "model/baselines.py",
+      "module": "model",
+      "port": "Model",
+      "role": "baseline",
+      "source": "blueprint:ports/Model",
+      "status": "implemented"
+    },
+    {
+      "file": "domain.py",
+      "module": "domain",
+      "kind": "support",
+      "source": "code-contract \u00a72",
+      "artifacts": [
+        "NetSpec",
+        "Metrics"
+      ],
+      "backend_artifacts": [
+        "Part",
+        "RunContext"
+      ],
+      "backend_artifacts_source": "backend-contract \u00a71"
+    },
+    {
+      "file": "ports.py",
+      "module": "domain",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "model/metrics.py",
+      "module": "model",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "__init__.py",
+      "module": "domain",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "evaluation/__init__.py",
+      "module": "evaluation",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "features/__init__.py",
+      "module": "features",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "ingestion/__init__.py",
+      "module": "ingestion",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "model/__init__.py",
+      "module": "model",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "serving/__init__.py",
+      "module": "serving",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    },
+    {
+      "file": "training/__init__.py",
+      "module": "training",
+      "kind": "support",
+      "source": "code-contract \u00a72"
+    }
+  ],
+  "entrypoints": [
+    {
+      "file": "predict.py",
+      "calls": "Predictor",
+      "stage": "/vega-pack"
+    },
+    {
+      "file": "serve/app.py",
+      "calls": "Predictor",
+      "stage": "/vega-pack"
+    },
+    {
+      "file": "tests/test_roundtrip.py",
+      "calls": "Predictor",
+      "stage": "/vega-pack"
+    }
+  ],
+  "external_artifacts": [],
+  "unmapped": []
+}

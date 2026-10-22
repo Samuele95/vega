@@ -1,0 +1,4 @@
+# Run:  docker run --rm -i {dist} < rows.jsonl > answers.jsonl
+# The consumer reads JSON lines on its standard input and writes one answer line per batch on
+# its standard output; wire those streams to the queue, or replace serve/consumer.py's source.
+CMD ["python", "-m", "serve.consumer"]

@@ -1,0 +1,12 @@
+**/__pycache__
+*.pyc
+.pytest_cache
+predict.ipynb
+records/
+tests/
+Dockerfile
+.dockerignore
+showcase.prev/
+showcase.building/
+showcase/.smoke/
+showcase/.work/

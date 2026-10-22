@@ -1,0 +1,91 @@
+/* dataset-shaper `shape` layer — scoped styles. Every rule is prefixed .layer-shape so nothing
+   bleeds into the host or another layer. Tokens fall back to the domain-forge template variables. */
+.layer-shape { --s-ink: var(--ink, #1a1814); --s-muted: var(--muted, #6d685b);
+  --s-border: var(--border, #e6e1d5); --s-surface: var(--surface, #fff); --s-panel: var(--panel, #f8f6f1);
+  --s-accent: var(--accent, #1b3a73); --s-soft: var(--accent-soft, #eaeef6);
+  --s-ok: #2e6b3f; --s-bad: #9a3a2c; --s-geo: #2c6570; --s-ana: #7a3c77; --s-user: #8a6420;
+  padding: 1.25rem; color: var(--s-ink); font: 14px/1.55 var(--sans, system-ui, sans-serif); }
+@media (prefers-color-scheme: dark) {
+  .layer-shape { --s-ink: var(--ink, #e8e4da); --s-muted: var(--muted, #a39d8e);
+    --s-border: var(--border, #3a362d); --s-surface: var(--surface, #1e1c18); --s-panel: var(--panel, #26231e);
+    --s-accent: var(--accent, #8fb0ea); --s-soft: var(--accent-soft, #2b3550);
+    --s-ok: #7fc98f; --s-bad: #e07a66; --s-geo: #7fc0c9; --s-ana: #c99ad0; --s-user: #d8b26a; }
+}
+.layer-shape h2 { margin: 0 0 .2rem; font-size: 1.35rem; }
+.layer-shape h3 { margin: 1.1rem 0 .5rem; font-size: 1rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--s-border); }
+.layer-shape h4 { margin: .8rem 0 .35rem; font-size: .84rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--s-muted); }
+.layer-shape h5 { margin: .5rem 0 .15rem; font-size: .82rem; }
+.layer-shape .s-prose { margin: .4rem 0; max-width: 62em; }
+.layer-shape .s-muted, .layer-shape .s-alt { color: var(--s-muted); font-size: .85rem; margin: .2rem 0; }
+.layer-shape .s-empty { padding: .8rem 1rem; border: 1px dashed var(--s-border); border-radius: 6px;
+  color: var(--s-muted); background: var(--s-panel); }
+.layer-shape .s-mono { font-family: var(--mono, ui-monospace, monospace); font-size: .8rem; }
+
+.layer-shape .s-ba { display: flex; flex-wrap: wrap; gap: .8rem; margin: .5rem 0 .8rem; }
+.layer-shape .s-stat { border: 1px solid var(--s-border); border-radius: 6px; padding: .45rem .8rem;
+  background: var(--s-panel); min-width: 7rem; }
+.layer-shape .s-statv { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.layer-shape .s-statl { font-size: .74rem; color: var(--s-muted); text-transform: uppercase;
+  letter-spacing: .04em; }
+.layer-shape .s-statn { font-size: .74rem; color: var(--s-muted); max-width: 16rem;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; }
+
+.layer-shape .s-chip { display: inline-block; padding: .05rem .55rem; border: 1px solid var(--s-border);
+  border-radius: 999px; font-size: .74rem; color: var(--s-muted); background: var(--s-surface); }
+.layer-shape .s-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: .3rem 0 .6rem; }
+.layer-shape .s-id { font-family: var(--mono, ui-monospace, monospace); border-color: var(--s-accent);
+  color: var(--s-accent); }
+.layer-shape .s-src-geometry { border-color: var(--s-geo); color: var(--s-geo); }
+.layer-shape .s-src-analysis { border-color: var(--s-ana); color: var(--s-ana); }
+.layer-shape .s-src-user { border-color: var(--s-user); color: var(--s-user); }
+.layer-shape .s-src-default { border-style: dashed; }
+.layer-shape .s-ok { border-color: var(--s-ok); color: var(--s-ok); }
+.layer-shape .s-bad { border-color: var(--s-bad); color: var(--s-bad); }
+.layer-shape .s-na { border-style: dashed; }
+.layer-shape .s-fit { border-color: var(--s-accent); color: var(--s-accent); background: var(--s-soft); }
+.layer-shape .s-irrev { border-style: dotted; }
+
+.layer-shape .s-phase { margin: .5rem 0 1rem; }
+.layer-shape .s-step { border: 1px solid var(--s-border); border-left-width: 3px;
+  border-left-color: var(--s-accent); border-radius: 6px; padding: .55rem .8rem; margin: .4rem 0;
+  background: var(--s-surface); }
+.layer-shape .s-stephead { display: flex; flex-wrap: wrap; gap: .4rem; align-items: baseline; }
+.layer-shape .s-op { font-weight: 600; font-family: var(--mono, ui-monospace, monospace); }
+.layer-shape .s-cols { color: var(--s-muted); }
+.layer-shape .s-rat { margin: .3rem 0; font-size: .9rem; }
+.layer-shape .s-params { font-family: var(--mono, ui-monospace, monospace); font-size: .76rem;
+  background: var(--s-panel); border: 1px solid var(--s-border); border-radius: 4px;
+  padding: .3rem .5rem; margin: .25rem 0; white-space: pre-wrap; }
+.layer-shape .s-cons { display: grid; grid-template-columns: max-content 1fr; gap: .1rem .7rem;
+  margin: .35rem 0 .1rem; font-size: .84rem; }
+.layer-shape .s-cons dt { color: var(--s-muted); text-transform: capitalize; }
+.layer-shape .s-cons dd { margin: 0; }
+.layer-shape .s-delta { color: var(--s-muted); margin: .25rem 0 0; }
+.layer-shape .s-det { border: 1px solid var(--s-border); border-radius: 5px; padding: .3rem .6rem;
+  margin: .35rem 0; background: var(--s-panel); }
+.layer-shape .s-det > summary { cursor: pointer; font-size: .82rem; color: var(--s-accent); }
+
+.layer-shape .s-table { border-collapse: collapse; font-size: .8rem; margin: .4rem 0; width: 100%; }
+.layer-shape .s-table th { text-align: left; font-weight: 600; padding: .12rem .6rem .12rem 0;
+  border-bottom: 1px solid var(--s-border); white-space: nowrap; }
+.layer-shape .s-table td { padding: .12rem .6rem .12rem 0; border-bottom: 1px solid var(--s-border);
+  font-variant-numeric: tabular-nums; }
+.layer-shape .s-dig { color: var(--s-muted); }
+
+.layer-shape .s-svg { max-width: 100%; height: auto; border: 1px solid var(--s-border);
+  border-radius: 6px; background: var(--s-surface); }
+.layer-shape .s-lname { font: 11px var(--mono, ui-monospace, monospace); fill: var(--s-ink); }
+.layer-shape .s-lname.s-dead { fill: var(--s-muted); text-decoration: line-through; }
+.layer-shape .s-lline { stroke: var(--s-accent); stroke-width: 1.2; }
+.layer-shape .s-lline.s-dead { stroke: var(--s-muted); stroke-dasharray: 3 3; }
+.layer-shape .s-lnode { fill: var(--s-surface); stroke: var(--s-accent); stroke-width: 1.2; }
+.layer-shape .s-lstep { font: 8px var(--mono, ui-monospace, monospace); fill: var(--s-muted); }
+.layer-shape .s-lout { font: 10px var(--sans, system-ui, sans-serif); fill: var(--s-ok); }
+.layer-shape .s-ldrop { font: 10px var(--sans, system-ui, sans-serif); fill: var(--s-muted); }
+.layer-shape .s-fork { font-size: .85rem; margin: .15rem 0; }
+.layer-shape .s-marker { font-family: var(--mono, ui-monospace, monospace); font-size: .78rem;
+  color: var(--s-muted); margin: .1rem 0; }
+.layer-shape-noscript { padding: 1rem; }

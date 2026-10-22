@@ -1,0 +1,459 @@
+{
+ "schema": "vega/code-room-fixture@1",
+ "name": "row-linked",
+ "page": {
+  "walk": [
+   {
+    "id": "root",
+    "title": "Start-up: the composition root",
+    "text": "The one function that picks the concrete pieces and wires them. It checks the data files against the manifest, reads the spec, loads the weights through the store, and hands the network and the preprocessing to the predictor. Nothing further down imports its neighbours; each piece is given what it needs, here.",
+    "code": {
+     "file": "^predict\\.py$",
+     "at": [
+      "^def load\\("
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "store",
+    "title": "The weights, trusted by digest",
+    "text": "The store recomputes the digest of the weights inside the file and refuses to load them if it differs from the one the evaluation recorded, so the network that answers is the one that was measured. Then it builds the network from the spec and pours the weights in.",
+    "code": {
+     "file": "(^|/)store\\.py$",
+     "at": [
+      "^\\s+def load\\("
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "build",
+    "title": "The network, built from its spec",
+    "text": "Nothing about the layers is written out by hand: the builder reads the spec shipped beside the code, block by block, and instantiates each one. The drawing on the network page is read from the same modules, so the two cannot disagree.",
+    "code": {
+     "file": "(^|/)network\\.py$",
+     "at": [
+      "^build_model = "
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "dense",
+    "title": "A dense layer: z = W·x + b",
+    "text": "One matrix product plus a bias. W is the grid of weights the network page draws as edges; one row of it times the inputs, plus one bias, is the z that the stepper adds up term by term.",
+    "code": {
+     "file": "(^|/)blocks_core\\.py$",
+     "at": [
+      "^class Dense\\b"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "activation",
+    "title": "The non-linearity",
+    "text": "A function chosen by name from a table in this file bends each z. Without it the layers would multiply out into a single matrix — that single matrix is the effective linear reading the page gives for a unit, and the bend is why that reading is only an approximation.",
+    "code": {
+     "file": "(^|/)blocks_core\\.py$",
+     "at": [
+      "^class Activation\\b"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "dropout",
+    "title": "Dropout, off while answering",
+    "text": "While the network trains, dropout silences a random share of units so that none can lean on another. While it answers, it does nothing: the predictor puts the model in evaluation mode, so the same {row.one} always gets the same answer.",
+    "code": {
+     "file": "(^|/)blocks_core\\.py$",
+     "at": [
+      "^class Dropout\\b"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "head",
+    "title": "The head: raw scores",
+    "text": "The last layer, with one output per score the task needs. These raw numbers, the logits, are what the stepper's output step shows before the link turns them into the answer.",
+    "code": {
+     "file": "(^|/)blocks_core\\.py$",
+     "at": [
+      "^class Head\\b"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "forward",
+    "title": "The forward pass",
+    "text": "The blocks applied in the order the spec lists them, each one reading what the one before it produced, or the nominal inputs or the graph it needs. Nothing else happens between the shaped numbers and the head's raw scores.",
+    "code": {
+     "file": "(^|/)network\\.py$",
+     "at": [
+      "^\\s+def forward\\("
+     ],
+     "after": "^class Network\\b",
+     "to": null
+    }
+   },
+   {
+    "id": "link",
+    "title": "Raw scores to the answer",
+    "text": "The link function of the task, applied once: it turns the head's raw scores into the answer, here and nowhere else, the same way the evaluation did.",
+    "code": {
+     "file": "(^|/)network\\.py$",
+     "at": [
+      "^\\s+def predict_proba\\("
+     ],
+     "after": "^class Network\\b",
+     "to": null
+    }
+   },
+   {
+    "id": "shape",
+    "title": "A raw {row.one}, shaped",
+    "text": "Before any of that, the recipe the data stage fitted on the training part is replayed with the parameters stored beside it — these are the x₁ … xₙ of the stepper's first step. This file was generated from the recipe, not written by hand, so it cannot drift from what the network was trained on.",
+    "code": {
+     "file": "(^|/)preprocess\\.py$",
+     "at": [
+      "^def transform\\("
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "run",
+    "title": "Answering a request",
+    "text": "The predictor assembles the shaped table into the batch the network reads, puts the network in evaluation mode, switches gradients off, and reads the head's output through the same readout the evaluation used.",
+    "code": {
+     "file": "/predict\\.py$",
+     "at": [
+      "^\\s+def _forward\\("
+     ],
+     "after": "^class Predictor\\b",
+     "to": null
+    }
+   },
+   {
+    "id": "explain",
+    "title": "Where the explanation comes from",
+    "text": "Not a second model. The same forward pass runs with hooks, attached once when the service starts, that only read each stage's output; one backward pass from the explained output then gives, for each of them, how far it would move that output — its gradient. No weight is changed. The drawings weigh each edge by weight × activation × gradient; the families' bars are gradient × input.",
+    "code": {
+     "file": "(^|/)inspection/inspector\\.py$",
+     "at": [
+      "^\\s+def explain\\("
+     ],
+     "after": "^class NetworkInspector\\b",
+     "to": null
+    }
+   },
+   {
+    "id": "route",
+    "title": "The HTTP route",
+    "text": "The request is checked against the input contract before any {row.one} reaches the predictor — a malformed {row.one} is refused with a report that names the column — and every answer carries the model's version, the digest of the weights that produced it.",
+    "code": {
+     "file": "(^|/)serve/routes_predict\\.py$",
+     "at": [
+      "^def register\\("
+     ],
+     "after": null,
+     "to": null
+    }
+   }
+  ],
+  "code": {
+   "language": "python",
+   "source": "coverage.json:language"
+  }
+ },
+ "story": {
+  "lexicon": {
+   "schema": "vega/lexicon@1",
+   "row": {
+    "one": "item",
+    "many": "items",
+    "article": "an"
+   },
+   "feature": {
+    "one": "field",
+    "many": "fields",
+    "article": "a"
+   },
+   "source": {
+    "one": "record system",
+    "many": "record systems",
+    "article": "the"
+   },
+   "source_of": {
+    "row": "vega:default",
+    "feature": "vega:default",
+    "source": "vega:default"
+   }
+  },
+  "values": {
+   "report_arch_number": "3.3",
+   "report_arch_page": 24,
+   "report_fig_wiring_number": 15,
+   "report_fig_wiring_page": 25,
+   "report_eq_dense_number": 2,
+   "report_eq_dense_page": 27,
+   "report_tab_blocks_number": 4,
+   "report_tab_blocks_page": 28
+  },
+  "code_notes": {
+   "root": {
+    "note": "one adapter per role, wired in this one place",
+    "link": {
+     "href": "showcase/report/report.pdf#page=25",
+     "kind": "report"
+    },
+    "ref": {
+     "kind": "figure",
+     "number": "report_fig_wiring_number",
+     "page": "report_fig_wiring_page",
+     "title": "Ports and adapters"
+    }
+   },
+   "store": {
+    "note": "the weights are refused if their digest differs",
+    "link": {
+     "href": "showcase/report/report.pdf#page=24",
+     "kind": "report"
+    },
+    "ref": {
+     "kind": "section",
+     "number": "report_arch_number",
+     "page": "report_arch_page",
+     "title": "System architecture"
+    }
+   },
+   "dense": {
+    "note": "W x + b, the affine part of every layer",
+    "link": {
+     "href": "showcase/report/report.pdf#page=27",
+     "kind": "report"
+    },
+    "ref": {
+     "kind": "equation",
+     "number": "report_eq_dense_number",
+     "page": "report_eq_dense_page",
+     "title": "The dense layer"
+    }
+   },
+   "head": {
+    "note": "one raw score per class",
+    "link": {
+     "href": "showcase/report/report.pdf#page=28",
+     "kind": "report"
+    },
+    "ref": {
+     "kind": "table",
+     "number": "report_tab_blocks_number",
+     "page": "report_tab_blocks_page",
+     "title": "The blocks"
+    }
+   },
+   "forward": {
+    "note": "the layers in the order the equation writes them (Equation {report_eq_dense_number})",
+    "link": null,
+    "ref": {
+     "kind": "equation",
+     "number": "report_eq_dense_number",
+     "page": "report_eq_dense_page",
+     "title": "The dense layer"
+    }
+   },
+   "shape": {
+    "note": "the steps this file replays, one per {row.one}",
+    "link": null,
+    "ref": null
+   }
+  },
+  "report": {
+   "status": "linked",
+   "file": "report/report.pdf"
+  }
+ },
+ "code": {
+  "schema": "vega/code-view@2",
+  "verified": true,
+  "language": "python",
+  "files": [
+   {
+    "path": "pkg/model/network.py",
+    "role": "Model",
+    "kind": "adapter",
+    "digest": "sha256:69e996d3d00b22411176d2e779acaec434fc5654703f0ed5f91c2e6621d2ce32",
+    "lines": 44,
+    "text": "\"\"\"pkg.model.network — the Model adapter: the stages the spec lists, built by the builder.\"\"\"\nfrom __future__ import annotations\n\nimport torch\nfrom torch import nn\n\n\nclass Scale(nn.Module):\n    \"\"\"A fixed rescaling.\"\"\"\n\n    def __init__(self, factor=1.0):\n        super().__init__()\n        self.factor = factor\n\n    def forward(self, x):\n        return x * self.factor\n\n\nclass Network(nn.Module):\n    \"\"\"The stages in the spec's order, then the readout.\"\"\"\n\n    def __init__(self, stages, readout):\n        super().__init__()\n        self.stages = nn.ModuleList(stages)\n        self.readout = readout\n\n    def forward(self, batch):\n        x = batch[\"x_num\"]\n        for stage in self.stages:\n            x = stage(x)\n        return x\n\n    @torch.no_grad()\n    def predict_proba(self, batch):\n        return self.readout.proba(self.forward(batch))\n\n    @classmethod\n    def build(cls, spec, run_dir=None):\n        from .builder import NetworkBuilder\n        return NetworkBuilder(spec).network(cls)\n\n\nbuild_model = Network.build\n"
+   },
+   {
+    "path": "pkg/model/blocks_core.py",
+    "role": "Model",
+    "kind": "support",
+    "digest": "sha256:9df2bf8f903c90a908e973a48315ce83e4087883612099ca316bc3bfc925135c",
+    "lines": 45,
+    "text": "\"\"\"pkg.model.blocks_core — the core blocks, one class each.\"\"\"\nfrom __future__ import annotations\n\nimport torch\nfrom torch import nn\n\nACTIVATIONS = {\"relu\": nn.ReLU, \"gelu\": nn.GELU, \"none\": nn.Identity}\n\n\nclass Dense(nn.Module):\n    '''z = W x + b, then the block's own activation.\n\n    The weights are the grid the network view draws.'''\n\n    def __init__(self, n_in, units, activation=\"none\"):\n        super().__init__()\n        self.linear = nn.Linear(n_in, units)\n        self.act = ACTIVATIONS[activation]()\n\n    def forward(self, x):\n        return self.act(self.linear(x))\n\n\nclass Activation(nn.Module):\n    def __init__(self, name=\"relu\"):\n        super().__init__()\n        self.fn = ACTIVATIONS[name]()\n\n    def forward(self, x):\n        return self.fn(x)\n\n\nclass Dropout(nn.Dropout):\n    \"\"\"Silent while answering: the predictor puts the model in evaluation mode.\"\"\"\n\n\nclass Head(nn.Module):\n    def __init__(self, n_in, out, bias=True):\n        super().__init__()\n        self.linear = nn.Linear(n_in, out, bias=bias)\n        self.scale = 1e-3\n\n    def forward(self, x):\n        return self.linear(x)  # the raw scores: the readout reads them\n"
+   },
+   {
+    "path": "pkg/features/preprocess.py",
+    "role": "FeatureTransformer",
+    "kind": "adapter",
+    "digest": "sha256:28a75907fc6cf647bb5ce242786271cce575d03fdc5dd68bb5a0a34c816950cb",
+    "lines": 12,
+    "text": "\"\"\"pkg.features.preprocess — the recipe, transform only, with its fitted parameters.\"\"\"\nfrom __future__ import annotations\n\nFITTED = {\"x0\": {\"median\": 0.5, \"scale\": 2.0}}\n\n\ndef transform(frame, history=None):\n    out = frame.copy()\n    for column, p in FITTED.items():\n        out[column] = (out[column] - p[\"median\"]) / p[\"scale\"]\n    return out\n"
+   },
+   {
+    "path": "pkg/serving/predict.py",
+    "role": "Predictor",
+    "kind": "adapter",
+    "digest": "sha256:a59b85fb3e62abc87a446e5451de38bb7e0ed39b355c03db15692608ef9dd59b",
+    "lines": 24,
+    "text": "\"\"\"pkg.serving.predict — the Predictor adapter.\"\"\"\nfrom __future__ import annotations\n\nimport torch\n\n\ndef _forward(model, batch):\n    return model(batch)\n\n\nclass Predictor:\n    def __init__(self, model, manifest):\n        if model.training:\n            raise ValueError(\"the model is in training mode\")\n        self.model, self.manifest = model, manifest\n\n    def predict(self, rows):\n        return self._forward(rows)\n\n    @torch.no_grad()\n    def _forward(self, prepared):\n        out = self.model(prepared)\n        return out\n"
+   },
+   {
+    "path": "pkg/model/store.py",
+    "role": "ModelStore",
+    "kind": "adapter",
+    "digest": "sha256:3bb545f3705d0da2c93e5d3e484a23a7cef6344c47e4b05353bb276caa8700fd",
+    "lines": 24,
+    "text": "\"\"\"pkg.model.store — the ModelStore adapter.\"\"\"\nfrom __future__ import annotations\n\nimport hashlib\n\nimport torch\n\n\nclass ModelRegistry:\n    \"\"\"Saves and loads the weights, each checked against its recorded digest.\"\"\"\n\n    def save(self, model, path, spec=None, epoch=None):\n        torch.save({\"state\": model.state_dict(), \"epoch\": epoch}, path)\n\n    def load(self, checkpoint, spec=None, build=None):\n        blob = torch.load(checkpoint, weights_only=True)\n        digest = hashlib.sha256(repr(sorted(blob[\"state\"])).encode()).hexdigest()\n        model = build(spec)\n        model.load_state_dict(blob[\"state\"])\n        return model.eval()\n\n    def version(self, path):\n        return hashlib.sha256(open(path, \"rb\").read()).hexdigest()\n"
+   },
+   {
+    "path": "pkg/serving/inspection/inspector.py",
+    "role": "Inspection",
+    "kind": "support",
+    "digest": "sha256:56490ea292a2e12f160b57073a804476f29703be305bb61f6ab85815de207ae9",
+    "lines": 12,
+    "text": "\"\"\"pkg.serving.inspection.inspector — the read-only view of the network the page draws.\"\"\"\nfrom __future__ import annotations\n\n\nclass NetworkInspector:\n    def __init__(self, model, graph):\n        self.model, self.graph = model, graph\n\n    def explain(self, request):\n        batch = request.batch()\n        return self.graph.capture(self.model, batch)\n"
+   },
+   {
+    "path": "predict.py",
+    "role": "composition_root",
+    "kind": "entrypoint",
+    "digest": "sha256:682df4aa519c9637fbc0b9f31c7d50116e2b6bfbcdf4ead120948f75457e3f62",
+    "lines": 28,
+    "text": "\"\"\"The bundle's composition root: load() wires the adapters; the command line calls it.\"\"\"\nfrom __future__ import annotations\n\nimport json\nfrom pathlib import Path\n\nfrom pkg.model.network import build_model\nfrom pkg.model.store import ModelRegistry\nfrom pkg.serving.predict import Predictor\n\n\ndef bundle_root(bundle_dir=None) -> Path:\n    return Path(bundle_dir or Path(__file__).parent)\n\n\ndef load(bundle_dir=None) -> Predictor:\n    \"\"\"Checks the files against the manifest, then wires the predictor.\"\"\"\n    root = bundle_root(bundle_dir)\n    manifest = json.loads((root / \"MANIFEST.json\").read_text())\n\n    spec = json.loads((root / \"netspec.json\").read_text())\n    model = ModelRegistry().load(root / \"weights.pt\", spec=spec, build=build_model)\n    return Predictor(model, manifest)\n\n\ndef main(argv=None) -> int:\n    return 0 if load() else 1\n"
+   },
+   {
+    "path": "serve/routes_predict.py",
+    "role": "http_entry",
+    "kind": "entrypoint",
+    "digest": "sha256:9aa85288256391aa2cea84839a175730fed2d7e2084c65fd551ec7c335d919c3",
+    "lines": 16,
+    "text": "\"\"\"serve/routes_predict.py — POST /v1/predict and /v1/predict/csv.\"\"\"\nfrom __future__ import annotations\n\nENDPOINTS = ((\"POST\", \"/v1/predict\"), (\"POST\", \"/v1/predict/csv\"))\nCAPABILITY = \"core\"\n\n\ndef register(app, state):\n    @app.post(\"/v1/predict\")\n    def predict(body: dict):\n        return state.answer(body)\n\n    @app.post(\"/v1/predict/csv\")\n    def predict_csv(body: bytes):\n        return state.answer_table(body)\n"
+   },
+   {
+    "path": "pkg/ports.py",
+    "role": "ports",
+    "kind": "support",
+    "digest": "sha256:339d0faf52edaf2bfdeb9cf131b35243d5bfcb06af1613b3e1e767b719f9bfd3",
+    "lines": 7,
+    "text": "\"\"\"pkg.ports — the ports: the interfaces the adapters implement.\"\"\"\nfrom typing import Protocol\n\n\nclass Predictor(Protocol):\n    def predict(self, rows): ...\n"
+   },
+   {
+    "path": "pkg/domain.py",
+    "role": "domain",
+    "kind": "support",
+    "digest": "sha256:3341b65f101af61ffeadf10ea21d2e8e0187fe2d23f49952b1cd127761fab415",
+    "lines": 8,
+    "text": "\"\"\"pkg.domain — the value objects.\"\"\"\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Task:\n    kind: str\n"
+   }
+  ]
+ },
+ "expected": {
+  "steps": [
+   {
+    "id": "root",
+    "path": "predict.py",
+    "from": 16,
+    "to": 23
+   },
+   {
+    "id": "store",
+    "path": "pkg/model/store.py",
+    "from": 15,
+    "to": 20
+   },
+   {
+    "id": "build",
+    "path": "pkg/model/network.py",
+    "from": 43,
+    "to": 43
+   },
+   {
+    "id": "dense",
+    "path": "pkg/model/blocks_core.py",
+    "from": 10,
+    "to": 21
+   },
+   {
+    "id": "activation",
+    "path": "pkg/model/blocks_core.py",
+    "from": 24,
+    "to": 30
+   },
+   {
+    "id": "dropout",
+    "path": "pkg/model/blocks_core.py",
+    "from": 33,
+    "to": 34
+   },
+   {
+    "id": "head",
+    "path": "pkg/model/blocks_core.py",
+    "from": 37,
+    "to": 44
+   },
+   {
+    "id": "forward",
+    "path": "pkg/model/network.py",
+    "from": 27,
+    "to": 31
+   },
+   {
+    "id": "link",
+    "path": "pkg/model/network.py",
+    "from": 33,
+    "to": 35
+   },
+   {
+    "id": "shape",
+    "path": "pkg/features/preprocess.py",
+    "from": 7,
+    "to": 11
+   },
+   {
+    "id": "run",
+    "path": "pkg/serving/predict.py",
+    "from": 20,
+    "to": 23
+   },
+   {
+    "id": "explain",
+    "path": "pkg/serving/inspection/inspector.py",
+    "from": 9,
+    "to": 11
+   },
+   {
+    "id": "route",
+    "path": "serve/routes_predict.py",
+    "from": 8,
+    "to": 15
+   }
+  ],
+  "missing": []
+ }
+}

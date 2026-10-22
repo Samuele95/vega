@@ -1,0 +1,37 @@
+{
+  "schema": "vega/training@1",
+  "from_campaign": ".",
+  "forks": [
+    {
+      "asked": "the ladder as planned (R0, the linear floor, four default-test rungs, the spec's own alternatives, two capacity rungs and a 5-trial H1 study) under 6 minutes",
+      "or": "default ladder applied (unattended)"
+    },
+    {
+      "asked": "the selection: the ladder/selection rule, or a run picked by hand",
+      "answer": "the rule (R0, on a tie with R6 broken by neither parameters nor the metric)"
+    }
+  ],
+  "markers": [
+    "OK: ladder.json — 14 rungs and one study; 3 rungs dropped (two duplicates, one blocked by a recorded loss stance)",
+    "OK: every run recompiled before it ran; the architecture rungs re-emitted and passed conformance",
+    "OK: replay of the selected run matches its records at tolerance 0",
+    "WARN: the campaign's 6-minute budget ran out before the diagnostic rungs D3 proposed could run"
+  ],
+  "diagnostics": null,
+  "readings": {
+    "abstract": "Fourteen rungs were planned and nine ran inside six minutes: the baseline, the linear floor, a weight-decay ablation and a five-trial search. What the campaign established is narrower than what it tested. The floor settled the architecture question outright — a linear head on the same features reaches PR-AUC 0.84 against the network's 0.86, so the non-linearity F5 predicted is real and the residual blocks are paying for themselves. The objective was never in doubt and was never tested: the loss rung the ladder proposed was refused by the compiler because a recorded stance declares bce_with_logits, which is the memory doing its job rather than a gap. The optimisation family is where the campaign is thinnest: the search moved the learning rate, the width, the dropout and the weight decay together and found nothing that beat the baseline, which is a weak result on five trials and should not be read as 'the defaults are right'. The one clear finding beyond the floor is that weight decay at 1e-4 is inert — R6 reproduced R0 bit for bit. The selection is the baseline, by the rule, with a margin of zero over itself; the honest summary is that this campaign proved the network is worth building and proved almost nothing about how to tune it.",
+    "per_run": {
+      "R0": "It learned, and quickly: valid PR-AUC reached 0.864 at epoch 13 of 23, and early stopping ended it rather than the budget — so this number is the spec's, not the clock's. The train/valid loss gap at the best epoch is 0.0949, which is narrow enough that the 500 rows are not obviously overwhelmed by 64 wide at depth 2. What it does not settle is whether that width is *needed*; the capacity rungs and the floor are what answer that. Diagnostics: no diagnostic fired.",
+      "R1": "The floor did its job. A linear head on the same embedded features reaches valid PR-AUC 0.351 against the baseline's 0.864 — a gap of 0.51, which is not a margin the network could have got by accident. F5's claim that the importance is non-linear survives its first real test, and the residual blocks have earned their parameters. It also took 61 epochs to get there against the baseline's 23, which is what a model with nothing to fit looks like: it wanders for a long time and arrives somewhere worse.",
+      "R6": "This rung answered its question, and the answer is that the default was inert: removing the 1e-4 weight decay reproduced the baseline's curves *exactly* — same best epoch, same valid PR-AUC to six figures. The forge's own observation for this entry said a train/valid gap under 0.05 would mean 1e-4 is doing nothing; what actually happened is stronger than that, because the two runs are bit-identical. Weight decay at this scale is not regularising this network, and a future spec can drop it or raise it, but should not leave it where it is and call it a choice.",
+      "H1-6": "A trial of the H1 search. It was pruned at epoch 3, so its partial history is what exists and it is ineligible for selection by the rule. Its ledger row carries the same digests and diagnostics any rung's does — a trial is a run, not a lesser thing.",
+      "H1-1": "A trial of the H1 search. It completed at valid PR-AUC 0.840 over 24 epochs. Its ledger row carries the same digests and diagnostics any rung's does — a trial is a run, not a lesser thing.",
+      "H1-2": "A trial of the H1 search. It completed at valid PR-AUC 0.847 over 21 epochs. Its ledger row carries the same digests and diagnostics any rung's does — a trial is a run, not a lesser thing.",
+      "H1-3": "A trial of the H1 search. It completed at valid PR-AUC 0.801 over 17 epochs. Its ledger row carries the same digests and diagnostics any rung's does — a trial is a run, not a lesser thing.",
+      "H1-4": "A trial of the H1 search. It was pruned at epoch 6, so its partial history is what exists and it is ineligible for selection by the rule. Its ledger row carries the same digests and diagnostics any rung's does — a trial is a run, not a lesser thing.",
+      "H1-5": "A trial of the H1 search. It completed at valid PR-AUC 0.838 over 13 epochs. Its ledger row carries the same digests and diagnostics any rung's does — a trial is a run, not a lesser thing."
+    },
+    "hpo": "Five trials, one pruned, on a five-dimensional space around the baseline. fANOVA puts weight decay (0.32), learning rate (0.29) and dropout (0.28) almost level, with width (0.09) and residual depth (0.02) far behind — but with four completed trials that ranking is a hint, not a measurement, and the near-tie across the top three is what a search this short looks like when nothing dominates. The result worth carrying forward is negative: no trial beat the baseline, and the best one (H1-2, PR-AUC 0.847) got there with 36,724 parameters against the baseline's 10,705 — more capacity buying less metric. If a longer study is run, the thing to fix first is the budget, not the space.",
+    "selection": "The rule picks R0, and the interesting part is the tie it had to break. R0 and R6 reach the same valid PR-AUC to six figures with the same 10,705 parameters, because R6's only change — weight decay to zero — turned out to change nothing at all. The tie-break on parameters cannot separate them, so the rule keeps the run that came first, which is the spec as engineered. The margin over the baseline is therefore zero by construction: nothing in this campaign beat the specification the forge produced. That is a real result about the ladder, not a failure of it — the floor established that the architecture is right, and the search established that six minutes is not enough to improve on it. What the selection does not settle is whether a longer search would; the H1 importances suggest the learning rate and the regularisation are where to look, and both were moved together rather than separately."
+  }
+}

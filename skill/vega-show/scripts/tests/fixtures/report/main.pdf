@@ -1,0 +1,164 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R 20 0 R] /Count 9 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 185 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Stub report of lane L01) Tj
+T* (Written by lanekit's report_stub for the vega-show report binding \(R-E7\).) Tj
+T* (23 report roles on pages 2 to 9.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 218 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 2) Tj
+T* (Figure 3.1: intro.lane \(vega:intro.lane\)) Tj
+T* (Section 3.2: chapter.forge-data \(vega:chapter.forge-data\)) Tj
+T* (Section 3.3: chapter.lens \(vega:chapter.lens\)) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 221 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 3) Tj
+T* (Section 3.4: chapter.shape \(vega:chapter.shape\)) Tj
+T* (Section 3.5: chapter.blueprint \(vega:chapter.blueprint\)) Tj
+T* (Section 3.6: chapter.net \(vega:chapter.net\)) Tj
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 213 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 4) Tj
+T* (Section 3.7: chapter.train \(vega:chapter.train\)) Tj
+T* (Section 3.8: chapter.eval \(vega:chapter.eval\)) Tj
+T* (Section 3.9: chapter.pack \(vega:chapter.pack\)) Tj
+ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 219 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 5) Tj
+T* (Figure 3.10: shape.lineage \(vega:shape.lineage\)) Tj
+T* (Figure 3.11: blueprint.modules \(vega:blueprint.modules\)) Tj
+T* (Figure 3.12: net.blocks \(vega:net.blocks\)) Tj
+ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 206 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 6) Tj
+T* (Table 3.13: net.decisions \(vega:net.decisions\)) Tj
+T* (Equation 3.14: net.forward \(vega:net.forward\)) Tj
+T* (Equation 3.15: net.loss \(vega:net.loss\)) Tj
+ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 17 0 R >>
+endobj
+17 0 obj
+<< /Length 209 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 7) Tj
+T* (Equation 3.16: net.update \(vega:net.update\)) Tj
+T* (Figure 3.17: train.ladder \(vega:train.ladder\)) Tj
+T* (Figure 3.18: train.curves \(vega:train.curves\)) Tj
+ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 19 0 R >>
+endobj
+19 0 obj
+<< /Length 216 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 8) Tj
+T* (Table 3.19: eval.metrics \(vega:eval.metrics\)) Tj
+T* (Figure 3.20: eval.calibration \(vega:eval.calibration\)) Tj
+T* (Figure 3.21: pack.layout \(vega:pack.layout\)) Tj
+ET
+endstream
+endobj
+20 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 21 0 R >>
+endobj
+21 0 obj
+<< /Length 148 >>
+stream
+BT /F1 12 Tf 16 TL 72 720 Td
+(Page 9) Tj
+T* (Figure 3.22: pack.slice \(vega:pack.slice\)) Tj
+T* (Section 3.23: conclusion \(vega:conclusion\)) Tj
+ET
+endstream
+endobj
+xref
+0 22
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000175 00000 n 
+0000000272 00000 n 
+0000000398 00000 n 
+0000000634 00000 n 
+0000000760 00000 n 
+0000001029 00000 n 
+0000001155 00000 n 
+0000001427 00000 n 
+0000001555 00000 n 
+0000001820 00000 n 
+0000001948 00000 n 
+0000002219 00000 n 
+0000002347 00000 n 
+0000002605 00000 n 
+0000002733 00000 n 
+0000002994 00000 n 
+0000003122 00000 n 
+0000003390 00000 n 
+0000003518 00000 n 
+trailer
+<< /Size 22 /Root 1 0 R >>
+startxref
+3718
+%%EOF

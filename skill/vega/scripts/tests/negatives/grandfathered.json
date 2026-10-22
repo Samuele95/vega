@@ -1,0 +1,220 @@
+{
+  "vega-forge/compile_spec.py#P1": [
+    "P1  an untraced choice is refused",
+    "P1  a source that does not resolve is refused",
+    "P1  a non-structural choice with no alternative is refused"
+  ],
+  "vega-forge/compile_spec.py#C1": [
+    "C1  a vega:default citing a catalog row that does not exist"
+  ],
+  "vega-forge/compile_spec.py#S1": [
+    "S1  a named test part is refused",
+    "S1  a metric monitored on the test part is refused"
+  ],
+  "vega-forge/compile_spec.py#T1": [
+    "T1  a monitor on train is refused",
+    "T1  a monitor naming an undeclared metric is refused",
+    "T1  mse on a binary label is refused",
+    "T1  a sigmoid head under bce_with_logits is refused",
+    "T1  a head whose width contradicts the task is refused"
+  ],
+  "vega-forge/compile_spec.py#D2": [
+    "D2  an input_dim that disagrees with the manifest is refused",
+    "D2  a nominal neither embedded nor one-hot is refused",
+    "D2  an embedded cardinality that is not unseen_id + 1 is refused"
+  ],
+  "vega-forge/compile_spec.py#G1": [
+    "G1  an unknown block type is refused, with the nearest known named",
+    "G1  a residual that changes width without a projection is refused"
+  ],
+  "vega-forge/compile_spec.py#B2": [
+    "B2  a metric the backend does not implement is refused"
+  ],
+  "vega-forge/compile_spec.py#R1": [
+    "R1  a batch larger than the training rows is refused",
+    "R1  a spec with no wall-clock budget is refused"
+  ],
+  "vega-forge/compile_spec.py#W1": [
+    "W1  a sequence family on a row sample is refused"
+  ],
+  "vega-forge/compile_spec.py#D1": [
+    "D1  a run with no blueprint is refused",
+    "D1  a feature contract that disagrees is refused",
+    "D1  a posture of 'tree' overruled without saying so",
+    "D1  serving.mode 'stream' without a windowed sample",
+    "D1  a heavy family under an online latency, unquoted"
+  ],
+  "vega-forge/compile_spec.py#K1": [
+    "K1  a blueprint missing a port this stage needs"
+  ],
+  "vega-forge/compile_spec.py#M2": [
+    "M2  a loss contradicting a declared Network stance",
+    "M2  a family the user declined, used without saying they changed their mind"
+  ],
+  "vega-forge/conformance.py#C3": [
+    "C3  a file with no map entry is refused",
+    "C3  a non-empty `unmapped` is refused"
+  ],
+  "vega-forge/conformance.py#C5": [
+    "C5  an adapter importing another adapter is refused"
+  ],
+  "vega-forge/conformance.py#C8": [
+    "C8  a DataSource that does not raise on the test part is refused"
+  ],
+  "vega-forge/conformance.py#C6": [
+    "C6  a mutable artifact in domain.py is refused"
+  ],
+  "vega-forge/emit_backend.py#K1": [
+    "K1  a port the blueprint did not draw is not invented"
+  ],
+  "vega-forge/emit_backend.py#V1": [
+    "V1  a spec that does not build fails the smoke pass"
+  ],
+  "vega-forge/apply_architecture_layer.py#V1": [
+    "V1  a layer whose smoke failed is refused"
+  ],
+  "vega-forge/apply_architecture_layer.py#K1": [
+    "K1  a layer whose mechanical gate did not pass is refused",
+    "K1  a structural architect finding may not be published"
+  ],
+  "vega-forge/apply_architecture_layer.py#F1": [
+    "F1  a fork carrying both an answer and an `or` is refused"
+  ],
+  "vega-forge/apply_architecture_layer.py#R1": [
+    "R1  a layer with no mechanics reading is refused"
+  ],
+  "vega-forge/apply_architecture_layer.py#S1": [
+    "S1  a layer whose spec no longer compiles is refused"
+  ],
+  "vega-forge/apply_architecture_layer.py#N1": [
+    "N1  an unexecuted notebook is published with its WARN"
+  ],
+  "vega-forge/nb_emit.py#N1": [
+    "N1  --stage pack on a directory that is not a bundle is refused",
+    "N1  --stage train on a run directory that is not a campaign is refused",
+    "N1  --stage eval on a directory that is not a campaign is refused"
+  ],
+  "vega-pack/pack.py": [
+    "an unearned verdict without --ship-anyway is refused",
+    "...and no bundle was written for it",
+    "a checkpoint that is not the one the chain recorded is refused",
+    "a resolved spec that is not the one the chain recorded is refused",
+    "packing a campaign whose test part was never opened is refused",
+    "packing without the evaluation's records is refused",
+    "packing without the shaper's transform-only emitter is refused",
+    "a fitted parameter that no longer matches what was shaped is refused",
+    "an unearned verdict under --unattended stops with WARN and no bundle",
+    "...and no bundle was written under --unattended",
+    "the bundle carries no ingestion/ package",
+    "the bundle carries no training/ package",
+    "the bundle carries no evaluation/ package",
+    "a freshly packed bundle ships source, not bytecode",
+    "the example rows carry no label and no leakage column",
+    "the bundle reproduces itself from a clean shell",
+    "the published layer never carries the seal's token"
+  ],
+  "vega-pack/model_card.py": [
+    "a digit in the hand-written section is refused",
+    "...and no card was written",
+    "a card with an empty required section is refused"
+  ],
+  "vega-forge/nb_emit.py": [
+    "a notebook for a bundle whose round trip failed is refused",
+    "a notebook for a bundle with no examples is refused",
+    "a campaign with no selection cannot have a train notebook",
+    "an eval notebook with no seal is refused",
+    "an eval notebook with no stored predictions is refused"
+  ],
+  "vega-pack/apply_bundle_layer.py": [
+    "a layer for a bundle whose round trip failed is refused",
+    "a layer whose twin check failed is refused",
+    "a layer whose conformance gate did not run is refused",
+    "a layer with a structural architect finding is refused",
+    "a layer claiming the full shape without its entry points is refused",
+    "an unrecorded architect absence is refused",
+    "a layer with no model card is refused",
+    "a digit in readings.intended_use is refused",
+    "a missing reading is refused",
+    "a layer with no notebook is refused",
+    "an authoring file with no from_bundle is refused",
+    "writing the layer over its own input is refused",
+    "a missing platform writer is refused, and never worked around"
+  ],
+  "vega-train/plan_ladder.py": [
+    "a replan over an existing ladder is refused",
+    "planning in a campaign whose test was opened is refused"
+  ],
+  "vega-train/trainer.py": [
+    "a delta on `backend` is refused outright",
+    "an ablation spanning two decision families is refused",
+    "a delta path that addresses nothing is refused",
+    "a delta whose `from` disagrees with the spec is refused",
+    "a rung source outside the closed set is refused",
+    "a rung that produces an uncompilable spec is refused before it runs",
+    "training in a campaign whose test was opened is refused",
+    "re-running a finished run without --resume is refused"
+  ],
+  "vega-train/hpo.py": [
+    "re-running a study under the same id is refused",
+    "a study with an empty space is refused"
+  ],
+  "vega-train/select.py": [
+    "an override without a user: source is refused",
+    "an override whose source is not a user: source is refused",
+    "an override naming a run that is not in the ledger is refused",
+    "a campaign whose every run diverged has no selection by the rule"
+  ],
+  "vega-train/apply_training_layer.py": [
+    "an ineligible selection with no override is refused",
+    "a layer with no notebook is refused",
+    "a layer with no selection reading is refused",
+    "a fork carrying both an answer and an `or` is refused",
+    "a ledger run with no history is refused",
+    "a layer whose notebook replay failed is refused"
+  ],
+  "vega-eval/evaluate.py": [
+    "a second look with no --again is refused",
+    "--again with an empty reason is refused",
+    "a threshold value chosen after a look is refused",
+    "a slice named after a look is refused",
+    "a baseline set narrower than the last exposure's is refused",
+    "a baseline set without the trivial floor is refused",
+    "a baseline set with neither linear nor tree is refused",
+    "deleting the seal does not reset the exposure count",
+    "a run that is not in the ledger is refused",
+    "a checkpoint whose digest is not the ledger's is refused before the seal",
+    "...and no seal was written for it",
+    "a selected run with no checkpoint is refused before the seal",
+    "...and no seal was written for it",
+    "an unreadable shaped manifest is refused before the seal",
+    "a test part the manifest names but that does not exist is refused",
+    "a test part that does not hash to the manifest's digest is refused",
+    "...and the seal stands, with the exposure spent",
+    "...recording the mismatch rather than a passed check",
+    "a manifest with no digest is evaluated, with the gap on the record",
+    "...and the seal records `null`, not a passed check",
+    "a malformed seal is refused rather than replaced"
+  ],
+  "vega-eval/apply_evaluation_layer.py": [
+    "a reading that says earned when the record says not earned is refused",
+    "a verdict reading with no interval bounds is refused",
+    "a retyped digit no record supports is refused",
+    "a slices reading that does not name the worst slice is refused",
+    "a slices reading that names the worst slice without its n is refused",
+    "a missing reading is refused",
+    "a layer with no notebook is refused",
+    "a metric published without its confidence interval is refused",
+    "a threshold chosen on the test part is refused",
+    "a user threshold on a second exposure is refused",
+    "a published baseline set without the trivial floor is refused",
+    "a layer whose from_eval holds no records is refused",
+    "writing the layer over its own input is refused",
+    "publishing test numbers with no seal beside them is refused",
+    "a layer whose seal records a digest mismatch is refused",
+    "an authoring file with no from_eval is refused",
+    "a render script over the contract's cap is refused",
+    "a missing platform writer is refused, and never worked around",
+    "the token is not in the published model",
+    "\"token\" is not a key in the layer data"
+  ]
+}

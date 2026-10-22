@@ -1,0 +1,15 @@
+{
+ "schema": "vega/verifier-run@1",
+ "skill": "dataset-forge",
+ "verdict": "SHIP",
+ "blocking": 0,
+ "non_blocking": 0,
+ "inconclusive": 0,
+ "audited": {
+  "SKILL.md": "sha256:214885be35b5978ba7d1bcb8c6fd40d74b6dd7a0d9bc79930072b66f028f5b11",
+  "references/report-contract.md": "sha256:f4351f2f09f693a278fd72c17cfa0414d1124ad3cadc55514164391fbeaed5b0",
+  "verifiers/static-verifier.md": "sha256:d97ba7978da2fec8e3001c5c63aeb133f7f0f759fc7ff884bec3f9e9a58091d2"
+ },
+ "run_at": "2026-10-11T00:12:40Z",
+ "session": "7307a4f7-7c2d-428e-9bc2-10a23a813da7"
+}

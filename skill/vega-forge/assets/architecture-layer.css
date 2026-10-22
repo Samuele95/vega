@@ -1,0 +1,101 @@
+/* /vega-forge `architecture` layer — scoped styles. Every rule is prefixed .layer-architecture so
+   nothing bleeds into the host or another layer. Tokens fall back to the domain-forge template
+   variables, so the layer takes the host page's palette wherever the host defines one. */
+.layer-architecture { --a-ink: var(--ink, #1a1814); --a-muted: var(--muted, #6d685b);
+  --a-border: var(--border, #e6e1d5); --a-surface: var(--surface, #fff); --a-panel: var(--panel, #f8f6f1);
+  --a-accent: var(--accent, #1b3a73); --a-soft: var(--accent-soft, #eaeef6);
+  --a-ok: #2e6b3f; --a-bad: #9a3a2c; --a-warn: #8a6420; --a-geo: #2c6570; --a-ana: #7a3c77;
+  --a-shape: #35634a; --a-blue: #1b3a73; --a-user: #8a6420;
+  padding: 1.25rem; color: var(--a-ink); font: 14px/1.55 var(--sans, system-ui, sans-serif); }
+@media (prefers-color-scheme: dark) {
+  .layer-architecture { --a-ink: var(--ink, #e8e4da); --a-muted: var(--muted, #a39d8e);
+    --a-border: var(--border, #3a362d); --a-surface: var(--surface, #1e1c18); --a-panel: var(--panel, #26231e);
+    --a-accent: var(--accent, #8fb0ea); --a-soft: var(--accent-soft, #2b3550);
+    --a-ok: #7fc98f; --a-bad: #e07a66; --a-warn: #d8b26a; --a-geo: #7fc0c9; --a-ana: #c99ad0;
+    --a-shape: #86c9a2; --a-blue: #8fb0ea; --a-user: #d8b26a; }
+}
+.layer-architecture h2 { margin: 0 0 .2rem; font-size: 1.35rem; }
+.layer-architecture h3 { margin: 1.1rem 0 .5rem; font-size: 1rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--a-border); }
+.layer-architecture h4 { margin: .8rem 0 .35rem; font-size: .84rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--a-muted); }
+.layer-architecture .a-prose { margin: .4rem 0; max-width: 62em; }
+.layer-architecture .a-muted, .layer-architecture .a-alt { color: var(--a-muted); font-size: .85rem;
+  margin: .2rem 0; }
+.layer-architecture .a-warntext { color: var(--a-warn); font-size: .88rem; margin: .35rem 0;
+  max-width: 62em; }
+.layer-architecture .a-empty { padding: .8rem 1rem; border: 1px dashed var(--a-border);
+  border-radius: 6px; color: var(--a-muted); background: var(--a-panel); max-width: 62em; }
+.layer-architecture .a-mono { font-family: var(--mono, ui-monospace, monospace); font-size: .8rem; }
+.layer-architecture .a-abstract { margin: .3rem 0 .6rem; }
+.layer-architecture .a-famread { margin: .2rem 0 .5rem; max-width: 62em; font-size: .9rem; }
+
+.layer-architecture .a-chip { display: inline-block; padding: .05rem .55rem; margin: 0 .25rem .2rem 0;
+  border: 1px solid var(--a-border); border-radius: 999px; font-size: .74rem; color: var(--a-muted);
+  background: var(--a-surface); }
+.layer-architecture .a-chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: .3rem 0 .6rem; }
+.layer-architecture .a-id { font-family: var(--mono, ui-monospace, monospace);
+  border-color: var(--a-accent); color: var(--a-accent); }
+.layer-architecture .a-tag { background: var(--a-panel); }
+.layer-architecture .a-src-geometry { border-color: var(--a-geo); color: var(--a-geo); }
+.layer-architecture .a-src-analysis { border-color: var(--a-ana); color: var(--a-ana); }
+.layer-architecture .a-src-shape { border-color: var(--a-shape); color: var(--a-shape); }
+.layer-architecture .a-src-blueprint { border-color: var(--a-blue); color: var(--a-blue);
+  background: var(--a-soft); }
+.layer-architecture .a-src-user { border-color: var(--a-user); color: var(--a-user); }
+.layer-architecture .a-src-default { border-style: dashed; }
+.layer-architecture .a-cat { font-family: var(--mono, ui-monospace, monospace); font-size: .7rem;
+  border-style: dotted; }
+.layer-architecture .a-anchor { font-family: var(--mono, ui-monospace, monospace);
+  border-color: var(--a-accent); color: var(--a-accent); }
+.layer-architecture .a-ok { border-color: var(--a-ok); color: var(--a-ok); }
+.layer-architecture .a-bad { border-color: var(--a-bad); color: var(--a-bad); }
+.layer-architecture .a-warn { border-color: var(--a-warn); color: var(--a-warn);
+  background: var(--a-panel); }
+.layer-architecture .a-na { border-style: dashed; }
+
+.layer-architecture .a-stats { display: flex; flex-wrap: wrap; gap: .8rem; margin: .5rem 0 .8rem; }
+.layer-architecture .a-stat { border: 1px solid var(--a-border); border-radius: 6px;
+  padding: .45rem .8rem; background: var(--a-panel); min-width: 7rem; }
+.layer-architecture .a-statv { font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.layer-architecture .a-statl { font-size: .74rem; color: var(--a-muted); text-transform: uppercase;
+  letter-spacing: .04em; }
+.layer-architecture .a-statn { font-size: .74rem; color: var(--a-muted); max-width: 16rem; }
+
+.layer-architecture .a-table { border-collapse: collapse; font-size: .8rem; margin: .4rem 0;
+  width: 100%; }
+.layer-architecture .a-table th { text-align: left; font-weight: 600; padding: .12rem .6rem .12rem 0;
+  border-bottom: 1px solid var(--a-border); white-space: nowrap; }
+.layer-architecture .a-table td { padding: .18rem .6rem .18rem 0; border-bottom: 1px solid var(--a-border);
+  vertical-align: top; font-variant-numeric: tabular-nums; }
+.layer-architecture .a-dlabel { font-family: var(--mono, ui-monospace, monospace); white-space: nowrap; }
+.layer-architecture .a-pending td { background: var(--a-panel); }
+.layer-architecture .a-pending td:first-child { box-shadow: inset 2px 0 0 var(--a-warn); }
+.layer-architecture .a-unattended td { background: var(--a-panel); }
+.layer-architecture .a-ftitle { font-weight: 600; }
+.layer-architecture .a-just { color: var(--a-muted); font-size: .78rem; max-width: 34em; }
+
+.layer-architecture .a-det { border: 1px solid var(--a-border); border-radius: 5px;
+  padding: .3rem .6rem; margin: .35rem 0; background: var(--a-panel); }
+.layer-architecture .a-det > summary { cursor: pointer; font-size: .82rem; color: var(--a-accent); }
+.layer-architecture .a-marker { font-family: var(--mono, ui-monospace, monospace); font-size: .78rem;
+  color: var(--a-muted); margin: .1rem 0; }
+.layer-architecture .a-formula { font-family: var(--mono, ui-monospace, monospace); font-size: .82rem;
+  background: var(--a-panel); border: 1px solid var(--a-border); border-radius: 4px;
+  padding: .45rem .6rem; margin: .25rem 0; white-space: pre-wrap; overflow-x: auto; }
+
+.layer-architecture .a-svg { max-width: 100%; height: auto; border: 1px solid var(--a-border);
+  border-radius: 6px; background: var(--a-surface); margin: .4rem 0; }
+.layer-architecture .a-nrect { fill: var(--a-surface); stroke: var(--a-accent); stroke-width: 1.2; }
+.layer-architecture .a-nrect.a-ncomp { fill: var(--a-panel); stroke-dasharray: 4 2; }
+.layer-architecture .a-nid { font: 12px var(--mono, ui-monospace, monospace); fill: var(--a-ink); }
+.layer-architecture .a-nmeta { font: 11px var(--sans, system-ui, sans-serif); fill: var(--a-muted); }
+.layer-architecture .a-nparam { font: 10px var(--mono, ui-monospace, monospace); fill: var(--a-muted); }
+.layer-architecture .a-inner { fill: var(--a-surface); stroke: var(--a-border); stroke-width: 1; }
+.layer-architecture .a-itext { font: 10px var(--mono, ui-monospace, monospace); fill: var(--a-ink); }
+.layer-architecture .a-arrow { stroke: var(--a-accent); stroke-width: 1.4; }
+.layer-architecture .a-arrowhead { fill: var(--a-accent); }
+.layer-architecture .a-axis { stroke: var(--a-border); stroke-width: 1; }
+.layer-architecture .a-line { fill: none; stroke: var(--a-accent); stroke-width: 1.6; }
+.layer-architecture .a-tick { font: 10px var(--sans, system-ui, sans-serif); fill: var(--a-muted); }
+.layer-architecture-noscript { padding: 1rem; }

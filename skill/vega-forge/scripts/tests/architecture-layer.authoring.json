@@ -1,0 +1,45 @@
+{
+  "schema": "vega/architecture@1",
+  "from_run": ".",
+  "conformance": { "mechanical": "pass", "improve": "not installed", "markers": [] },
+  "code_findings": [
+    { "id": "A-1", "next": "/improve backends/pytorch/templates --concern \"fit() carries the epoch record inline\"" },
+    { "id": "A-2", "next": "/improve backends/pytorch/templates --concern \"EpochRecord.of() takes **kw\"" },
+    { "id": "A-3", "next": "/blueprint <model> --mode pipeline --concern \"a campaign context the Evaluator takes instead of three ports\"" }
+  ],
+  "defaults_to_test": [
+    { "path": "blocks[B1]/params/dims/zip", "observation": "a train/valid gap that opens only once the zip embedding is unfrozen would mean dim 12 is too generous for 41 categories on 500 rows" },
+    { "path": "blocks[B2b]/params/units", "observation": "a first run whose train loss plateaus above the linear baseline's would mean width 64 is too narrow, not too wide" },
+    { "path": "optimizer", "observation": "an update ratio above 1e-2 in the first epochs (D5, thrashing) would overturn lr 1e-3" },
+    { "path": "schedule", "observation": "early stopping firing before epoch 30 would mean cosine never reached its horizon and plateau was the right row" },
+    { "path": "regularization[kind=weight_decay]/value", "observation": "a train/valid loss gap under 0.05 at the best epoch would mean 1e-4 is doing nothing" },
+    { "path": "regularization[kind=grad_clip]/value", "observation": "a global gradient norm that never approaches 1.0 would mean the clip is inert and can be dropped" },
+    { "path": "early_stopping", "observation": "a best epoch within 10 of the last would mean patience 10 stopped a run that was still improving" },
+    { "path": "init", "observation": "per-block gradient norms falling by more than 10x from head to B1 in epoch 1 would mean kaiming_uniform is not holding the variance at this depth" },
+    { "path": "training/batch_size", "observation": "batchnorm statistics visibly unstable across epochs at batch 64 would send this to 128" },
+    { "path": "training/max_epochs", "observation": "the budget stopping the run before early stopping does would mean 200 epochs was never reachable in 20 minutes" }
+  ],
+  "forks": [
+    { "family": "architecture", "asked": "mlp-residual vs mlp-plain at depth 2", "answer": "mlp-residual (memory: a recorded Network stance)" },
+    { "family": "objective", "asked": "bce_with_logits with pos_weight 4.9 vs focal(gamma 2)", "or": "default applied (unattended)" },
+    { "family": "optimization", "asked": "adamw 1e-3 vs sgd 1e-2 momentum 0.9", "or": "default applied (unattended)" },
+    { "family": "regularization", "asked": "dropout 0.2 vs 0.4 on B3", "answer": "0.2 (memory: a recorded Network stance)" }
+  ],
+  "markers": [
+    "OK: netspec.json compiles against vega/netspec@1 — 9 blocks, 0 warnings",
+    "OK: smoke forward pass on a real train batch — 10,705 parameters, 9,728 MAdds/sample",
+    "OK: mechanical conformance passed (9 checks, 0 warnings)",
+    "OK: /architect --baseline recorded 3 findings, 0 structural, 0 divergence",
+    "WARN: improve not installed — conformance judged mechanically only for the method-level half (the fixture records an architect run, no improve run)"
+  ],
+  "readings": {
+    "abstract": "A residual MLP of 10,705 parameters on nine shaped features, two of them nominal ids the network embeds rather than reads as numbers. The architecture family was not chosen here — the blueprint bet on a neural posture and the analysis found importance that a linear model cannot reach (F5), so what this stage decided was the width, the depth and the objective. Width 64 at depth 2 is the catalog's sizing rule for nine inputs and 500 training rows, raised one step for the non-linearity; the objective is the one thing the data forced rather than the catalog, because 17 % positives (F2) makes accuracy a lie and PR-AUC the only metric worth monitoring. The first training run has one job: show whether 64 wide by 2 deep is capacity the 500 rows can actually fill, or whether the train/valid gap opens before the metric does.",
+    "per_family": {
+      "architecture": "The family came from the blueprint's posture and a recorded stance, so it was not re-asked. What was open was sizing: clip(2 x 9, 32, 256) is 32, and F5's non-linear importance is the only reason it is 64 instead — that step is the least defended number in this spec, and the capacity rung is where it gets tested. The two nominals are embedded rather than one-hot because zip carries 41 categories and one-hot would have made the input wider than the network; region at 6 categories is a genuine toss-up the catalog resolves by rule rather than by argument.",
+      "objective": "F2 is the whole objective. A 17 % positive share makes bce_with_logits with pos_weight the inverse ratio the default the catalog names, and PR-AUC rather than ROC-AUC the primary — ROC-AUC would flatter a model that ranks the majority well. focal(gamma 2) was weighed and not taken: it addresses easy negatives dominating the gradient, which is a symptom the first run has not shown yet, and adopting it now would be treating a problem before it appears.",
+      "optimization": "Entirely the catalog's: AdamW at 1e-3 with decoupled decay, cosine with three warmup epochs because max_epochs is 200 and cosine needs a known horizon. Nothing in the chain's state argued for anything else, which is why every row here carries a vega:default source and an observation that would overturn it. SGD is the named ablation, not because it is likely better but because a generalisation gap is the one thing AdamW is suspected of and the ladder should be able to test it.",
+      "regularization": "Dropout 0.2 on the residual block is F4's, not the catalog's: 500 rows against 64-wide layers is the shape of an overfitting problem, and the stance already recorded 0.2. Weight decay and the gradient clip are both defaults doing insurance work — the clip in particular may well be inert, and its defaults_to_test entry says exactly what would prove it."
+    },
+    "mechanics": "The loss is L = -mean[ 4.9 * y * log s(z) + (1-y) * log(1-s(z)) ], where z is the head's single logit and s is the logistic function the loss applies — the head's activation is `none`, so the sigmoid appears exactly once in the graph. AdamW's update is m <- 0.9m + 0.1g; v <- 0.999v + 0.001g^2; th <- th - 0.001 * (m_hat/(sqrt(v_hat) + 1e-8) + 1e-4 * th), with the decay term acting on the weights directly rather than through the gradient — which is what makes it decoupled and why the weight decay here is not the same knob as an L2 penalty added to the loss. On the first step the bias correction divides m and v back out, so the update reduces to -lr * g/|g| elementwise: every weight moves by exactly the learning rate, in the direction of its own gradient's sign. The notebook computes that step by hand and compares it with optimizer.step(); they agree to 1e-6. The schedule spends its first three epochs climbing from near zero to 1e-3 and then follows a cosine to zero over the remaining 197, so the learning rate the diagnostics read in epoch 1 is not the learning rate the spec names."
+  }
+}

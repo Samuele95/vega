@@ -1,0 +1,26 @@
+{
+  "schema": "vega/known-flakes@1",
+  "policy": "A command is retried once, and only when it matches command_regex and its output matches output_regex of an entry below. Every retry is reported (the retry notice on stderr, observed.json flakes[], summary.json). A second failure, or a failure outside every signature, fails. The list only shrinks: an entry whose upstream fix has landed is deleted, and an entry without an upstream reference fails the static tier (D6 §6.12).",
+  "retry_notice": "WARN: flake {id} fired; retrying once: {command}",
+  "never_retried": [
+    "run_negatives[A-Za-z_]*\\.py",
+    "page_smoke\\.py",
+    "smoke_page\\.py",
+    "inspect_check\\.py",
+    "serving_check\\.py",
+    "test_roundtrip\\.py",
+    "predict\\.py\\S*\\s+(?:.*\\s)?--check\\b",
+    "pack\\.py"
+  ],
+  "warn_share": 0.05,
+  "flakes": [
+    {
+      "id": "df-profile-race",
+      "command_regex": "validate_model\\.py",
+      "output_regex": "(?s)tempfile.*OSError: \\[Errno 39\\] Directory not empty: '[^'\\n]*Default'",
+      "owner": "domain-forge",
+      "upstream": "patches/domain-forge/README.md (X1: validate_model-tempdir.patch, TemporaryDirectory(ignore_cleanup_errors=True); D6 §18 G17)",
+      "evidence": "validate_model.py:760 check_projector_round_trip keeps the headless Chromium's --user-data-dir in a tempfile.TemporaryDirectory; its cleanup races a Chromium child still writing profile/Default after --dump-dom returned (3 of 5 calls in the acceptance context, 0 of 30 isolated; D6 §1.2)"
+    }
+  ]
+}

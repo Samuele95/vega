@@ -1,0 +1,125 @@
+{
+  "cases": [
+    {
+      "effective": "multiclass",
+      "extra": null,
+      "family": "gcn",
+      "files": {
+        "explain": "gcn__graph-node__multiclass__inductive-full/explain.json",
+        "network": "gcn__graph-node__multiclass__inductive-full/network.json"
+      },
+      "id": "gcn/graph-node/multiclass/inductive-full",
+      "level": "node",
+      "reading": "multiclass",
+      "shape": "graph",
+      "slug": "gcn__graph-node__multiclass__inductive-full",
+      "target": "logit",
+      "task": "multiclass",
+      "variant": "inductive-full"
+    },
+    {
+      "effective": "binary",
+      "extra": null,
+      "family": "graphsage",
+      "files": {
+        "explain": "graphsage__graph-node__binary__inductive-full/explain.json",
+        "network": "graphsage__graph-node__binary__inductive-full/network.json"
+      },
+      "id": "graphsage/graph-node/binary/inductive-full",
+      "level": "node",
+      "reading": "binary",
+      "shape": "graph",
+      "slug": "graphsage__graph-node__binary__inductive-full",
+      "target": "binary_logit",
+      "task": "binary",
+      "variant": "inductive-full"
+    },
+    {
+      "effective": "binary",
+      "extra": null,
+      "family": "gat",
+      "files": {
+        "explain": "gat__graph-node__binary__inductive-full/explain.json",
+        "network": "gat__graph-node__binary__inductive-full/network.json"
+      },
+      "id": "gat/graph-node/binary/inductive-full",
+      "level": "node",
+      "reading": "binary",
+      "shape": "graph",
+      "slug": "gat__graph-node__binary__inductive-full",
+      "target": "binary_logit",
+      "task": "binary",
+      "variant": "inductive-full"
+    },
+    {
+      "effective": "regression",
+      "extra": null,
+      "family": "gcn",
+      "files": {
+        "explain": "gcn__graph-node__regression__inductive-full/explain.json",
+        "network": "gcn__graph-node__regression__inductive-full/network.json"
+      },
+      "id": "gcn/graph-node/regression/inductive-full",
+      "level": "node",
+      "reading": "regression",
+      "shape": "graph",
+      "slug": "gcn__graph-node__regression__inductive-full",
+      "target": "value",
+      "task": "regression",
+      "variant": "inductive-full"
+    },
+    {
+      "effective": "binary",
+      "extra": null,
+      "family": "linear",
+      "files": {
+        "explain": "linear__graph-node__binary__inductive-full/explain.json",
+        "network": "linear__graph-node__binary__inductive-full/network.json"
+      },
+      "id": "linear/graph-node/binary/inductive-full",
+      "level": "node",
+      "reading": "binary",
+      "shape": "graph",
+      "slug": "linear__graph-node__binary__inductive-full",
+      "target": "binary_logit",
+      "task": "binary",
+      "variant": "inductive-full"
+    },
+    {
+      "effective": "multiclass",
+      "extra": null,
+      "family": "gin",
+      "files": {
+        "explain": "gin__graph-graph__multiclass__graphs/explain.json",
+        "network": "gin__graph-graph__multiclass__graphs/network.json"
+      },
+      "id": "gin/graph-graph/multiclass/graphs",
+      "level": "graph",
+      "reading": "multiclass",
+      "shape": "graph",
+      "slug": "gin__graph-graph__multiclass__graphs",
+      "target": "logit",
+      "task": "multiclass",
+      "variant": "graphs"
+    },
+    {
+      "effective": "regression",
+      "extra": null,
+      "family": "gcn",
+      "files": {
+        "explain": "gcn__graph-graph__regression__graphs/explain.json",
+        "network": "gcn__graph-graph__regression__graphs/network.json"
+      },
+      "id": "gcn/graph-graph/regression/graphs",
+      "level": "graph",
+      "reading": "regression",
+      "shape": "graph",
+      "slug": "gcn__graph-graph__regression__graphs",
+      "target": "value",
+      "task": "regression",
+      "variant": "graphs"
+    }
+  ],
+  "schema": "vega/inspect-zoo@1",
+  "source": "tests/fixtures/graph-shape/make_graph_fixtures.py"
+}

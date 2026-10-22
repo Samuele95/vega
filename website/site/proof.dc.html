@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — the proof</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.72);--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:4px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/vega-panel.css">
+<style>
+/* shell placement (template: notes/page-template.md) */
+[data-brand]{position:fixed;z-index:10;top:calc(24px + 12px);left:calc(24px + 18px + 6px)}
+[data-pagebar]{position:fixed;z-index:9;top:24px;left:50%;transform:translate(-50%,-50%);width:min(340px,42vw);max-width:none!important;margin:0!important;padding:0 10px!important;background:var(--bg)}
+[data-stop-card]{min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;justify-content:flex-end;align-items:flex-start;padding:18vh calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-stop-card] > .vp{width:min(600px,42vw)}
+[data-stop-card] .vp h1{font-size:clamp(46px,5.4vw,78px)!important;line-height:1.02!important}
+[data-stop-card] .vp h2{font-size:clamp(34px,3.6vw,52px)!important;line-height:1.08!important}
+/* a stop with sub-stops: its block stays pinned while the camera flies through them (≥900px) */
+[data-stop-card][data-subs]{flex-direction:column;align-items:flex-end;justify-content:flex-start}
+[data-subs] > [data-sub]{width:100%;height:70vh;flex:none}
+[data-subs] > [data-sub]:last-child{height:92vh} /* the pinned block stays clear of the top as the last sub-stop comes to rest */
+@media (min-width:900px){[data-subs] > .vp{position:sticky;top:18vh}}
+/* phones: the release block is taller than the screen, so it isn't pinned; each metric sub-stop rests where its metric
+   sits in the lower part of the screen with its planet framed above (offsets in setupCamera), and the empty spacers
+   collapse (verifier G4 r4: text and orbits alternated over ~2,400px of scroll) */
+@media (max-width:899px){[data-stop="6"] > [data-sub]{height:0!important}
+[data-metric]{transition:box-shadow .4s,padding .4s}[data-metric][data-on]{box-shadow:inset 0 1px 0 var(--acc);padding-left:0}
+[data-metric][data-on] dd{color:var(--acc)}
+[data-tail]{display:flex;justify-content:flex-end;align-items:flex-end;box-sizing:border-box;min-height:44vh;padding:0 calc(24px + 56px) 8vh 0;pointer-events:none} /* room for the last sub-stop to come to rest */
+[data-tail] > .vp{width:min(600px,42vw)}
+@media (max-width:899px){[data-stop-card]{justify-content:center;padding:52vh 24px 8vh}[data-stop-card] > .vp{width:100%}[data-stop-card][data-subs]{align-items:stretch}[data-tail]{padding:0 24px 8vh}[data-tail] > .vp{width:100%}}
+@media (max-width:600px){[data-brand]{top:calc(12px + 12px);left:calc(12px + 12px + 6px)}[data-pagebar]{top:12px;width:44vw}}
+</style>
+</helmet>
+<div style="position:relative;color:var(--fg)">
+  <div data-stage="1" style="position:fixed;inset:0;z-index:0;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)"></div>
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="59" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0;pointer-events:none"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:var(--bg);opacity:.38"></div>
+    <div data-fig="net" style="position:absolute;inset:0">
+      <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="Schematic: a row enters the input layer and travels layer by layer through two hidden layers to the output." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <div data-orb="rel" style="position:absolute;inset:0">
+      <x-import component-from-global-scope="vega-orbits" from="../assets/vega-orbits.js" label="The release as orbits: five measured counts, each a planet around Vega with one moon per item — 9 skills, 127 unit tests, 23 test lanes, 10 negative suites, 127 backend cells." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+  </div>
+
+  <header>
+    <a data-brand="1" href="index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg)">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span>THE PROOF</span></span>
+    </a>
+  </header>
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="proof" brand="page"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters" room="320"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+
+  <div data-pagebar="1" aria-label="Page 4 of 6" style="max-width:1200px;margin:0 auto;padding:4px clamp(20px,4vw,48px) 0;display:flex;align-items:center;gap:6px">
+    <a href="chain.dc.html" title="The chain" aria-label="The chain" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="data.dc.html" title="The data lane" aria-label="The data lane" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="promise.dc.html" title="The rules" aria-label="The rules" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="proof.dc.html" aria-current="page" title="The proof" aria-label="The proof" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--fg)"></span></a>
+    <a href="coverage.dc.html" title="Coverage" aria-label="Coverage" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <a href="install.dc.html" title="Install" aria-label="Install" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <span style="margin-left:14px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);white-space:nowrap">04 / 06</span>
+  </div>
+
+  <main style="position:relative;pointer-events:none">
+
+    <section aria-labelledby="h-proof-top" data-stop="0" data-rail="Measured, not claimed" data-rail-full="Measured, not claimed." data-stop-card="1">
+      <div class="vp">
+        <h1 id="h-proof-top" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">Measured, not claimed.</h1>
+        <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">One row through the network, four verdicts, one release.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-row" data-stop="1" data-rail="A row goes in" data-rail-full="A row goes in. A prediction comes out." data-stop-card="1">
+      <div class="vp" style="--vp-edge:var(--acc)">
+        <h2 id="h-row" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">A row goes in. A prediction comes out.</h2>
+        <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">One row lights the network layer by layer.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-verd" data-stop="2" data-rail="Every verdict" data-rail-full="Every verdict is one of four — never softened." data-stop-card="1">
+      <div class="vp" style="--vp-edge:var(--cy)">
+        <h2 id="h-verd" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">Every verdict is one of four — never softened.</h2>
+        <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty;display:flex;flex-wrap:wrap;gap:6px 0">
+          <sc-for list="{{ verdicts }}" as="v" hint-placeholder-count="4"><span style="color:{{ v.tc }};transition:color .4s">{{ v.label }}<span aria-hidden="true" style="color:var(--dim);padding:0 10px;display:{{ v.sep }}">·</span></span></sc-for>
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-proof" data-stop="3" data-rail="The release, measured" data-rail-full="The release, measured." data-stop-card="1" data-rail-compact="1">
+      <div class="vp">
+        <h2 id="h-proof" data-decode="1" style="margin:0;font-weight:300;line-height:1.1;font-family:'Newsreader',Georgia,serif">The release, measured.</h2>
+        <p style="margin:18px 0 0;max-width:34em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty"><span style="color:var(--fg)">9</span> skills · <span style="color:var(--fg)">127/127</span> unit tests · <span style="color:var(--fg)">23/23</span> test lanes · <span style="color:var(--fg)">10/10</span> negative suites · <span style="color:var(--fg)">127</span> backend cells.</p>
+        <p style="margin:12px 0 0;max-width:34em;font-size:15px;line-height:1.6;color:var(--dim)">One real unattended run passed every check.</p>
+      </div>
+    </section>
+
+    <div data-tail="1">
+      <div class="vp" style="pointer-events:auto">
+        <footer style="display:flex;justify-content:center;padding:24px 0 34px">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PAGES = [
+  { num: '00', label: 'Threshold', href: 'index.dc.html', note: '' },
+  { num: '01', label: 'The chain', href: 'chain.dc.html', note: '' },
+  { num: '02', label: 'The data lane', href: 'data.dc.html', note: '' },
+  { num: '03', label: 'The rules', href: 'promise.dc.html', note: '' },
+  { num: '04', label: 'The proof', href: 'proof.dc.html', note: 'HERE' },
+  { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: '' },
+  { num: '06', label: 'Install', href: 'install.dc.html', note: '' },
+  { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+  { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+];
+
+class Component extends DCLogic {
+  state = { indexOpen: false, narrow: false, layer: 0, stop: 0 };
+  closeRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  componentDidMount() {
+    const go = (u) => { if (window.VegaFly) window.VegaFly.go(u); else location.href = u; };
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 'n' || e.key === 'N') go('coverage.dc.html');
+      else if (e.key === 'p' || e.key === 'P') go('promise.dc.html');
+      else if (/^[0-6]$/.test(e.key)) go(PAGES[+e.key].href);
+    };
+    addEventListener('keydown', this.onKey);
+    this.sync3d();
+    this.onResize = () => { const n = innerWidth < 900; if (n !== this.state.narrow) this.setState({ narrow: n }); requestAnimationFrame(() => this.orbFrame()); };
+    this.onResize(); addEventListener('resize', this.onResize);
+    // the camera owns the active stop: 1–4 are the layers (scroll picks the card and pins the wave), 6–10 the metrics
+    this.onStop = (e) => { const k = e.detail.index; this.setState({ stop: k }); this.applyStop(k); requestAnimationFrame(() => this.orbFrame()); };
+    addEventListener('vegastop', this.onStop);
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!rm) this.vT = setInterval(() => this.setState(s => ({ vi: ((s.vi || 0) + 1) % 4 })), 1700);
+    // outside the row stop the wave timer runs as before (the cards follow the light's own clock)
+    if (!rm) this.wT = setInterval(() => { const w = ((performance.now() / 1000 / 0.85) % 4.8) - 0.4; const l = Math.max(0, Math.min(3, Math.round(w))); if (l !== this.state.layer) this.setState({ layer: l }); }, 90);
+  }
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); removeEventListener('vegastop', this.onStop); removeEventListener('vegaindex', this.onIndex); removeEventListener('resize', this.onResize); clearTimeout(this.t3); clearTimeout(this.tR); clearTimeout(this.tcam); clearInterval(this.wT); clearInterval(this.vT); }
+  syncRel() {
+    const el = document.querySelector('[data-orb="rel"] vega-orbits');
+    if (!el || !el.setData) { clearTimeout(this.tR); this.tR = setTimeout(() => this.syncRel(), 150); return; }
+    if (el === this.cRel) return; this.cRel = el;
+    const mk = (n, lab) => Array.from({ length: n }, (_, i) => ({ label: n <= 23 ? lab + ' ' + String(i + 1).padStart(2, '0') : '' }));
+    el.setData({ center: 'v2.3.0', moonSize: 1.1, moonLabels: false, planets: [
+      { label: '9 skills', sub: 'SHIP', moons: mk(9, 'skill') },
+      { label: '127 / 127 unit tests', sub: 'PASS', moons: mk(127, '') },
+      { label: '23 / 23 test lanes', sub: 'END TO END', moons: mk(23, 'lane') },
+      { label: '10 / 10 negative suites', sub: 'DEFECTS CAUGHT', moons: mk(10, 'suite') },
+      { label: '127 backend cells', sub: 'GREEN', moons: mk(127, '') }
+    ] });
+  }
+  sync3d() {
+    this.syncRel();
+    clearTimeout(this.t3);
+    const net = document.querySelector('[data-fig="net"] vega-constellation');
+    if (!net || !net.setData) { this.t3 = setTimeout(() => this.sync3d(), 150); return; }
+    if (net !== this.cN) {
+      this.cN = net;
+      const L = [[2, 3], [3, 3], [3, 3], [1, 2]], N = [], E = [], idx = [];
+      L.forEach((g, li) => { const ids = []; for (let a = 0; a < g[0]; a++) for (let b = 0; b < g[1]; b++) { ids.push(N.length); N.push({ x: -300 + li * 200, y: (a - (g[0] - 1) / 2) * 95, z: (b - (g[1] - 1) / 2) * 80, size: li === 0 || li === 3 ? 3.4 : 2.8, layer: li, pick: false, glow: li === 3 ? 'cy' : 'acc', delay: li * 220 }); } idx.push(ids); });
+      for (let li = 0; li < 3; li++) idx[li].forEach(a => idx[li + 1].forEach(b => E.push({ a, b, alpha: 0.14, w: 0.7 })));
+      net.setData({ nodes: N, edges: E, radius: 320, zoom: 0.55, autoRotate: 0.05, yaw: 0.5, pitch: -0.12, wave: { layers: 3, period: 0.85 },
+        labels: [{ x: -300, y: -150, z: 0, text: 'A ROW', color: 'mut' }, { x: -100, y: -190, z: 0, text: 'LAYER 1' }, { x: 100, y: -190, z: 0, text: 'LAYER 2' }, { x: 300, y: -140, z: 0, text: 'PREDICTION', color: 'cy' }] });
+      this.layerIdx = idx;
+    }
+    this.setupCamera();
+  }
+  // the camera's stops (spec §3, proof): 0 the whole network; 1–4 one layer each (sub-stops of "A row goes in");
+  // 5 the prediction, close; 6–10 the release orbits, one metric each (sub-stops of "The release, measured")
+  setupCamera() {
+    if (this.camOn) return; clearTimeout(this.tcam);
+    const net = this.cN, orb = this.cRel, cam = document.querySelector('vega-camera');
+    const sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    if (!net || !net.d || !net.d.nodes.length || !orb || !cam || !cam.configure || sections.length !== 4) { this.tcam = setTimeout(() => this.setupCamera(), 150); return; }
+    this.camOn = true;
+    const at = (W, H) => [W * 0.5, H * 0.5], LX = [-300, -100, 100, 300], LAB = net.d.labels.map(l => [l.x, l.y, l.z]), idx = this.layerIdx;
+    const stops = [{ el: sections[0], focus: [0, 0, 0], yaw: 0.5, pitch: -0.12, zoom: 0.55, at, fit: true, fitPts: LAB }];
+    // each layer framed with the one feeding it (the light arrives from the left); then the prediction alone, close
+    // 1 the whole network, the wave running through it; 2 the prediction node, close; 3 the release orbits
+    stops.push({ el: sections[1], focus: [0, 0, 0], yaw: 0.6, pitch: -0.2, zoom: 0.62, at, fit: true, fitPts: LAB });
+    const pn = net.d.nodes[idx[3][0]]; // §3: the prediction node, close — focused on the node itself, selected (its ring)
+    /* G7: the verdict is read off the prediction: it sits selected with the last layer that feeds it in frame (alone and close, it read as a lone node at the frame's edge) */
+    stops.push({ el: sections[2], focus: [pn.x, pn.y, pn.z], yaw: 1.0, pitch: -0.16, zoom: 1.2, at, fit: idx[2].concat(idx[3]), select: idx[3][0] });
+    stops.push({ el: sections[3], focus: [300, 0, 0], yaw: 0.95, pitch: -0.16, zoom: 0.6, at, cross: 1 });
+    cam.configure({ scene: net, alt: orb, sky: document.querySelector('vega-sky-lab'), stops, free: true, home: 3 });
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters (G2)
+    this.orbFrame();
+  }
+  // a stop's own state: the wave pinned to the row stop's layer and its annotation lit; the metric's planet focused
+  applyStop(k) {
+    const net = this.cN, orb = this.cRel; if (!net || !net.d) return;
+    // the wave runs on its own clock; under reduced motion it rests on the prediction at the row's chapter
+    if (net.d.wave) { if (matchMedia('(prefers-reduced-motion: reduce)').matches && k === 1) net.d.wave.at = 3; else delete net.d.wave.at; }
+    if (orb && orb.focus) orb.focus(-1);
+  }
+  // the release orbits sit in the stage area the release text leaves free, at its rest
+  orbFrame() {
+    const orb = this.cRel, cam = document.querySelector('vega-camera'); if (!orb || !cam || !cam.fitBoxes || !cam.o) return;
+    const b = cam.fitBoxes(3).sort((x, y) => (y.R - y.L) * (y.B - y.T) - (x.R - x.L) * (x.B - x.T))[0]; if (!b) return;
+    orb.frameBox = { x: b.L, y: b.T + 24, w: b.R - b.L, h: Math.max(80, b.B - b.T - 48) };
+  }
+  componentDidUpdate() {
+    this.sync3d();
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+  }
+
+  renderVals() {
+    return {
+      closeRef: this.setClose,
+      verdicts: ['earned', 'not earned', 'beaten by a baseline', 'not assessable'].map((l, i) => { const on = (this.state.vi || 0) === i; return { label: l, sep: i < 3 ? 'inline' : 'none', bc: on ? 'var(--cy)' : 'var(--line)', tc: on ? 'var(--cy)' : 'var(--fg)', bg: on ? 'var(--hi)' : 'transparent', sh: on ? '0 0 28px -8px rgba(111,224,220,.55)' : 'none', tf: on ? 'translateY(-2px)' : 'none' }; }),
+      rowSteps: [
+        { title: 'A ROW', text: 'One row enters the input layer.' },
+        { title: 'LAYER 1', text: 'Its activations light the first hidden layer.' },
+        { title: 'LAYER 2', text: 'Then the second.' },
+        { title: 'PREDICTION', text: 'The output the shipped bundle returns.' }
+      ].map((r, i) => { const on = this.state.layer === i; return Object.assign(r, { bc: on ? (i === 3 ? 'var(--cy)' : 'var(--acc)') : 'var(--line)', bg: on ? 'var(--hi)' : 'transparent', tc: on ? (i === 3 ? 'var(--cy)' : 'var(--acc)') : 'var(--dim)', sh: on ? '0 0 30px -12px rgba(156,200,255,.6)' : 'none', dot: on ? '0 0 8px currentColor' : 'none' }); }),
+      indexOpen: this.state.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES
+    };
+  }
+}
+</script>
+</body>
+</html>

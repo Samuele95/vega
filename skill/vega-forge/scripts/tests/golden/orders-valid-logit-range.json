@@ -1,0 +1,63 @@
+{
+  "schema": "vega/golden-logit-range@1",
+  "rule": "E18: at the capture commit, metrics.py read a binary score whose values all lie in [0, 1] as a probability. The valid probability metrics (log_loss, brier, ece, the threshold metrics) of an epoch whose logits all lie in [0, 1] are expected to differ once logits are read as logits (E18 fixed); they are compared only where outside_unit_interval is true (D1 §17.3).",
+  "epochs": [
+    {
+      "epoch": 1,
+      "min": -4.626791477203369,
+      "max": 3.5079216957092285,
+      "n": 119,
+      "outside_unit_interval": true
+    },
+    {
+      "epoch": 2,
+      "min": -3.9245169162750244,
+      "max": 2.7638890743255615,
+      "n": 119,
+      "outside_unit_interval": true
+    },
+    {
+      "epoch": 3,
+      "min": -3.806504249572754,
+      "max": 1.575529932975769,
+      "n": 119,
+      "outside_unit_interval": true
+    }
+  ],
+  "expected_to_differ_e18": [],
+  "fit": {
+    "epochs_run": 3,
+    "best_epoch": 3,
+    "best_value": 0.12538227153381787,
+    "stopped_by": "max_epochs"
+  },
+  "capture": {
+    "schema": "vega/golden-capture@1",
+    "commit": "c849f8b9b5213716c656e08ebb0880697f0659b7",
+    "tool": "vega-forge/scripts/tests/capture_golden.py",
+    "device": "cpu",
+    "environment": {
+      "python": "3.12.3",
+      "machine": "aarch64",
+      "torch": "2.14.0+cu130",
+      "numpy": "2.5.3",
+      "pandas": "3.0.5",
+      "pyarrow": "25.0.1",
+      "torch_threads": 20
+    },
+    "spec": "the orders fixture's netspec.json (make_fixture.py), run R0: no delta",
+    "spec_overrides": {
+      "training.max_epochs": 3,
+      "training.device": "cpu"
+    },
+    "fit_call": "fit(model, spec, data, callbacks) with every other argument at its default: no budget, no checkpoint, grad_sample_every 0",
+    "dropped_fields": [
+      "time_s"
+    ],
+    "parts": {
+      "train": "sha256:665d10babad12eb73258a6e297d24bcc652fafac2cbc404b7753df415102a2eb",
+      "valid": "sha256:4ab97e8928b394c3872e80c53d00d3ed2aff1f214434ecb5d93039d9e2f8224b"
+    },
+    "control": "a second fit without the logit probe wrote identical records"
+  }
+}

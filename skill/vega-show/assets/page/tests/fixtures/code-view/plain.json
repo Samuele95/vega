@@ -1,0 +1,169 @@
+{
+ "schema": "vega/code-room-fixture@1",
+ "name": "plain",
+ "page": {
+  "walk": [
+   {
+    "id": "root",
+    "title": "Start-up",
+    "text": "The service reads its model once.",
+    "code": {
+     "file": "(^|/)main\\.txt$",
+     "at": [
+      "^start <- function"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "store",
+    "title": "The weights",
+    "text": "Read from the bundle.",
+    "code": {
+     "file": "(^|/)model\\.txt$",
+     "at": [
+      "^read_model <- function"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "build",
+    "title": "The network",
+    "text": "Not in these files.",
+    "code": {
+     "file": "(^|/)model\\.txt$",
+     "at": [
+      "^build <- function"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "route",
+    "title": "The route",
+    "text": "Not served.",
+    "code": {
+     "file": "(^|/)routes\\.txt$",
+     "at": [
+      "^route"
+     ],
+     "after": null,
+     "to": null
+    }
+   },
+   {
+    "id": "run",
+    "title": "Answering",
+    "text": "The scores, from the rows.",
+    "code": {
+     "file": "(^|/)main\\.txt$",
+     "at": [
+      "^answer <- function"
+     ],
+     "after": null,
+     "to": null
+    }
+   }
+  ],
+  "code": {
+   "language": "text",
+   "source": "coverage.json:language"
+  }
+ },
+ "story": {
+  "lexicon": {
+   "schema": "vega/lexicon@1",
+   "row": {
+    "one": "item",
+    "many": "items",
+    "article": "an"
+   },
+   "feature": {
+    "one": "field",
+    "many": "fields",
+    "article": "a"
+   },
+   "source": {
+    "one": "record system",
+    "many": "record systems",
+    "article": "the"
+   },
+   "source_of": {
+    "row": "vega:default",
+    "feature": "vega:default",
+    "source": "vega:default"
+   }
+  },
+  "values": {},
+  "code_notes": {
+   "run": {
+    "note": "the scores the page reads",
+    "link": null,
+    "ref": null
+   }
+  },
+  "report": {
+   "status": "brief-links",
+   "file": null
+  }
+ },
+ "code": {
+  "schema": "vega/code-view@2",
+  "verified": true,
+  "language": "text",
+  "files": [
+   {
+    "path": "app/main.txt",
+    "role": "composition_root",
+    "kind": "entrypoint",
+    "digest": "sha256:70a23d7d51239db714a82b184ec01d224d00f1ace32c2352d9feaf24fa34397c",
+    "lines": 11,
+    "text": "# the entry point of a service written in another language\nstart <- function(dir) {\n  model <- read_model(dir)\n  serve(model)\n}\n\nanswer <- function(model, rows) {\n  scores <- model %*% rows\n  scores\n}\n"
+   },
+   {
+    "path": "app/model.txt",
+    "role": "Model",
+    "kind": "adapter",
+    "digest": "sha256:02e24c5c83cfbedef175432f25a285753e8b948dadaf576dac69de306216060f",
+    "lines": 6,
+    "text": "# the model, read once\nread_model <- function(dir) {\n  weights <- read_weights(dir)\n  weights\n}\n"
+   }
+  ]
+ },
+ "expected": {
+  "steps": [
+   {
+    "id": "root",
+    "path": "app/main.txt",
+    "from": 2,
+    "to": 5
+   },
+   {
+    "id": "store",
+    "path": "app/model.txt",
+    "from": 2,
+    "to": 5
+   },
+   {
+    "id": "run",
+    "path": "app/main.txt",
+    "from": 7,
+    "to": 10
+   }
+  ],
+  "missing": [
+   {
+    "id": "build",
+    "why": "anchor"
+   },
+   {
+    "id": "route",
+    "why": "file"
+   }
+  ]
+ }
+}

@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:page-probe:1",
+  "title": "vega/page-probe@1 — what the page writes into <pre id=\"showcase-probe\"> under ?probe=<views|all>",
+  "description": "Written by the template's js/core/probe.js (W01 v0, the union API from W15), inert unless ?probe is present; read by smoke_page.py (fixtures and bundles), serve_probe.py (smoke_show.py --serve) and vega/scripts/tests/page_smoke.py (the lanes). It is the union of D4 §17.5, D5 §6.7.3 and D6 §10: the probe walks every tour view (and the network view's tried and weights disclosures), and reports what it found. The named fields are what the smokes check; a probe may add fields, which the smokes ignore.",
+  "type": "object",
+  "required": ["schema", "version", "views", "page_errors", "placeholders_unresolved", "missing_keys", "fetched", "lane",
+               "motif", "palette"],
+  "properties": {
+    "schema": { "const": "vega/page-probe@1" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "locale": { "enum": ["en", "qps-ploc"] },
+    "theme": { "enum": ["night", "day"] },
+    "ready_ms": { "type": "number", "minimum": 0 },
+    "current": { "$ref": "#/$defs/view_id" },
+    "views": {
+      "type": "object", "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/view_id" },
+      "additionalProperties": {
+        "type": "object", "required": ["rendered", "errors"],
+        "properties": {
+          "rendered": { "type": "boolean" },
+          "visible_text": { "type": "integer", "minimum": 0 },
+          "off": { "type": ["string", "null"] },
+          "errors": { "type": "array", "items": { "type": "string" } },
+          "bad_text": { "type": "array", "items": { "type": "string" }, "description": "Words the code failed to turn into text, and placeholder tokens ({row.many}) left unresolved, in the view's visible text." },
+          "cut": { "type": "array", "items": { "type": "string" }, "description": "The bars' values the view cuts off at the viewport's width (wider than their box, or past its right edge)." }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "description": "The verdict the results view says (#res-verdict: shown, its data-verdict state, its text) beside the one the story records (results.verdict; null without one).",
+      "properties": {
+        "shown": { "type": "boolean" },
+        "state": { "enum": ["earned", "not_earned", "beaten", "not_assessable", null] },
+        "text": { "type": "string" },
+        "expected": { "enum": ["earned", "not_earned", "beaten", "not_assessable", null] }
+      }
+    },
+    "page_errors": { "type": "array", "items": { "type": "string" } },
+    "placeholders_unresolved": { "type": "array", "items": { "type": "string" } },
+    "missing_keys": { "type": "array", "items": { "type": "string" } },
+    "fetched": {
+      "type": "array",
+      "items": { "type": "object", "required": ["url", "status"],
+                 "properties": { "url": { "type": "string", "pattern": "^(health|v1/|showcase/)" },
+                                 "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+                                 "schema": { "type": ["string", "null"] } } }
+    },
+    "lane": {
+      "type": "object", "required": ["ok"],
+      "properties": { "ok": { "type": "boolean" },
+                      "view_key": { "enum": ["classes", "binary", "labels", "value", "ordinal", "reconstruction", "anomaly", "horizon"] },
+                      "shape": { "enum": ["row", "window", "graph"] },
+                      "level": { "enum": ["node", "graph", null] },
+                      "link": { "enum": ["softmax", "sigmoid", "sigmoid_each", "identity", "cumulative", "reconstruction", "distance", "horizon"] },
+                      "mismatch": { "type": ["string", "null"] } }
+    },
+    "motif": {
+      "type": "object", "required": ["id", "data_motif"],
+      "properties": { "id": { "$ref": "#/$defs/motif" }, "data_motif": { "$ref": "#/$defs/motif" },
+                      "alert_marks": { "type": "boolean" } }
+    },
+    "palette": {
+      "type": "object", "required": ["alert_used", "alert_roles"],
+      "properties": { "alert_used": { "type": "boolean" }, "alert_roles": { "type": "integer", "minimum": 0 } }
+    },
+    "network": {
+      "type": "object", "required": ["available"],
+      "properties": { "available": { "type": "boolean" }, "why": { "type": ["string", "null"] },
+                      "stages": { "type": "integer", "minimum": 0 }, "segments_drawn": { "type": "integer", "minimum": 0 } }
+    },
+    "explain": {
+      "type": "object", "required": ["ok"],
+      "properties": { "ok": { "type": "boolean" }, "family": { "type": "string" }, "degraded": { "type": "boolean" } }
+    },
+    "stepper": {
+      "type": "object", "required": ["steps", "max_gap"],
+      "properties": { "steps": { "type": "integer", "minimum": 0 }, "max_gap": { "type": ["number", "null"] },
+                      "failed": { "type": "array", "items": { "type": "string" } } }
+    },
+    "links": {
+      "type": "array",
+      "items": { "type": "object", "required": ["step", "href", "status"],
+                 "properties": { "step": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }, "href": { "type": "string" },
+                                 "status": { "type": "integer" },
+                                 "digest": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" } } }
+    },
+    "story_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "$defs": {
+    "view_id": { "enum": ["start", "context", "network", "try", "many", "results", "code", "tried", "weights"] },
+    "motif": { "enum": ["grid", "points", "traces", "lanes", "links", "contours"] }
+  },
+  "examples": [
+    {
+      "schema": "vega/page-probe@1", "version": "2.3.0", "locale": "en", "theme": "night", "ready_ms": 812, "current": "code",
+      "views": { "start": { "rendered": true, "visible_text": 212, "errors": [] },
+                 "context": { "rendered": true, "visible_text": 1450, "errors": [] },
+                 "network": { "rendered": true, "visible_text": 980, "errors": [] },
+                 "tried": { "rendered": true, "visible_text": 301, "errors": [] },
+                 "weights": { "rendered": true, "visible_text": 402, "errors": [] },
+                 "try": { "rendered": true, "visible_text": 655, "errors": [] },
+                 "many": { "rendered": true, "visible_text": 540, "errors": [] },
+                 "results": { "rendered": true, "visible_text": 733, "errors": [] },
+                 "code": { "rendered": true, "visible_text": 2210, "errors": [] } },
+      "page_errors": [], "placeholders_unresolved": [], "missing_keys": [],
+      "fetched": [ { "url": "health", "status": 200 }, { "url": "v1/network", "status": 200, "schema": "vega/network-view@2" },
+                   { "url": "showcase/story.json", "status": 200, "schema": "vega/story@2" },
+                   { "url": "showcase/page.json", "status": 200, "schema": "vega/page@1" } ],
+      "lane": { "ok": true, "view_key": "binary", "shape": "row", "level": null, "link": "sigmoid", "mismatch": null },
+      "motif": { "id": "points", "data_motif": "points", "alert_marks": true },
+      "palette": { "alert_used": true, "alert_roles": 1 },
+      "network": { "available": true, "why": null, "stages": 7, "segments_drawn": 4 },
+      "explain": { "ok": true, "family": "mlp-residual", "degraded": false },
+      "stepper": { "steps": 9, "max_gap": 0.00002, "failed": [] },
+      "links": [ { "step": "dense", "href": "showcase/briefs/net-brief.md", "status": 200,
+                   "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555" } ],
+      "story_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ]
+}

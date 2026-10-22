@@ -1,0 +1,171 @@
+{
+ "schema": "dataset-shaper/recipe@1",
+ "input": {
+  "path": "dataset-shaper/fixtures/graph-knn.csv",
+  "digest": "sha256:a957c39ccd9fd9f1dab7ca024b96d93c5dafb35f7779bed43d6c659236c34828",
+  "rows": 600,
+  "columns": 8,
+  "layers_read": []
+ },
+ "seed": 7,
+ "goal": "custom",
+ "target": "mean_speed",
+ "outputs": {
+  "dir": "shaped/",
+  "format": "parquet",
+  "files": [],
+  "recipe": "shaped/recipe.json",
+  "manifest": "shaped/manifest.json",
+  "lineage": "shaped/lineage.json",
+  "reproduce": "shaped/reproduce_graph-knn.py"
+ },
+ "steps": [
+  {
+   "id": "S1",
+   "op": "drop_identity",
+   "columns": [
+    "sensor_id"
+   ],
+   "params": {},
+   "source": "geometry:typing/sensor_id",
+   "rationale": "unique per sensor: an identifier",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "-1",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S2",
+   "op": "select_partition",
+   "columns": [
+    "mean_speed"
+   ],
+   "params": {
+    "label": "mean_speed",
+    "task": "regression"
+   },
+   "source": "geometry:partitions/mean_speed",
+   "rationale": "the quantity the road network predicts",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S3",
+   "op": "split",
+   "columns": [],
+   "params": {
+    "kind": "random",
+    "test": 0.2,
+    "valid": 0.1
+   },
+   "source": "shaper:default",
+   "rationale": "no time column and a continuous label: a random split",
+   "alternatives": [
+    {
+     "op": "split",
+     "params": {
+      "kind": "group",
+      "by": "lanes"
+     },
+     "when": "if a road class must be unseen at test time"
+    }
+   ],
+   "consequences": {
+    "rows": "600 -> 420 / 60 / 120",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S4",
+   "op": "scale",
+   "columns": [],
+   "params": {
+    "kind": "standard",
+    "columns": [
+     "lat",
+     "lon",
+     "lanes",
+     "speed_limit",
+     "flow_vph",
+     "occupancy"
+    ]
+   },
+   "source": "shaper:default",
+   "rationale": "the neighbourhood below is measured on standardised coordinates, so a degree of latitude and one of longitude weigh the same",
+   "alternatives": [
+    {
+     "op": "scale",
+     "params": {
+      "kind": "none"
+     },
+     "when": "if the raw degrees should define the neighbourhood"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "leakage": "fitted on train alone"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S5",
+   "op": "graph_edges",
+   "columns": [
+    "lat",
+    "lon"
+   ],
+   "params": {
+    "method": "knn",
+    "k": 6,
+    "features": [
+     "lat",
+     "lon"
+    ],
+    "metric": "euclidean",
+    "symmetric": false,
+    "self_loops": false,
+    "weight": "distance"
+   },
+   "source": "analysis:F3/T2",
+   "rationale": "F3 — speed is spatially autocorrelated: a sensor reads like its six nearest training sensors; the index is fitted on train, so a new sensor looks only there",
+   "alternatives": [
+    {
+     "op": "graph_edges",
+     "params": {
+      "method": "spatial",
+      "radius_m": 1500
+     },
+     "when": "if a fixed physical radius matters more than a fixed count"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "graph": "six directed edges per node, all into train nodes",
+     "leakage": "the index holds train rows only"
+    }
+   },
+   "reversible": true
+  }
+ ]
+}

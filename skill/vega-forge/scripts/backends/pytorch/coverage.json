@@ -1,0 +1,381 @@
+{
+  "schema": "vega/backend-coverage@1",
+  "name": "pytorch",
+  "min_version": "2.2",
+  "language": "python",
+  "source": "vega-forge/references/backend-contract.md §2",
+  "blocks": [
+    "dense",
+    "embedding",
+    "concat",
+    "batchnorm",
+    "layernorm",
+    "dropout",
+    "activation",
+    "residual",
+    "sequential",
+    "parallel",
+    "conv1d",
+    "pool1d",
+    "rnn",
+    "gru",
+    "lstm",
+    "attention",
+    "attention_pool",
+    "transformer_encoder",
+    "feature_tokenizer",
+    "positional",
+    "flatten",
+    "reshape",
+    "pool",
+    "gcn_conv",
+    "sage_conv",
+    "gat_conv",
+    "gin_conv",
+    "graph_pool",
+    "edge_dropout",
+    "head",
+    "decoder",
+    "reparameterize",
+    "custom"
+  ],
+  "losses": [
+    "bce_with_logits",
+    "cross_entropy",
+    "focal",
+    "mse",
+    "mae",
+    "huber",
+    "quantile",
+    "cumulative_link",
+    "reconstruction",
+    "vae",
+    "svdd"
+  ],
+  "loss_params": {
+    "bce_with_logits": ["pos_weight"],
+    "cross_entropy": ["weight", "label_smoothing"],
+    "focal": ["gamma", "alpha", "multiclass"],
+    "mse": [],
+    "mae": [],
+    "huber": ["delta"],
+    "quantile": ["quantiles", "horizon"],
+    "cumulative_link": [],
+    "reconstruction": ["n_numeric", "cat_cardinalities"],
+    "vae": ["beta", "n_numeric", "cat_cardinalities"],
+    "svdd": []
+  },
+  "optimizers": [
+    "adamw",
+    "adam",
+    "sgd",
+    "radam",
+    "rmsprop"
+  ],
+  "schedules": [
+    "cosine",
+    "plateau",
+    "onecycle",
+    "none"
+  ],
+  "metrics": [
+    "roc_auc",
+    "pr_auc",
+    "log_loss",
+    "brier",
+    "ece",
+    "accuracy",
+    "balanced_accuracy",
+    "precision",
+    "recall",
+    "f1",
+    "f1_macro",
+    "f1_micro",
+    "f1_weighted",
+    "f1_per_class",
+    "mcc",
+    "specificity",
+    "top_k",
+    "hamming",
+    "subset_accuracy",
+    "pr_auc_macro",
+    "rmse",
+    "mae",
+    "median_ae",
+    "r2",
+    "mape",
+    "spearman",
+    "residual_quantiles",
+    "mae_ordinal",
+    "qwk",
+    "reconstruction_error",
+    "per_feature_error",
+    "precision_at_k",
+    "recall_at_k",
+    "smape",
+    "mase",
+    "per_horizon_error",
+    "anomaly_score_mean"
+  ],
+  "activations": [
+    "none",
+    "relu",
+    "gelu",
+    "silu",
+    "tanh",
+    "sigmoid",
+    "leaky_relu"
+  ],
+  "sample_shapes": [
+    "row",
+    "window",
+    "graph"
+  ],
+  "graph_batching": [
+    "full",
+    "sampled",
+    "graphs"
+  ],
+  "recurrent_returns": [
+    "last",
+    "all",
+    "mean",
+    "max"
+  ],
+  "init_schemes": [
+    "kaiming_uniform",
+    "kaiming_normal",
+    "xavier_uniform",
+    "xavier_normal",
+    "orthogonal"
+  ],
+  "exports": [
+    "onnx",
+    "torchscript"
+  ],
+  "precision": [
+    "fp32",
+    "bf16"
+  ],
+  "determinism": {
+    "cpu": {
+      "tolerance": 0.0,
+      "how": "torch.use_deterministic_algorithms(True), seeded loaders"
+    },
+    "cuda": {
+      "tolerance": 1e-05,
+      "how": "seeded, deterministic algorithms where available; reductions on GPU are not bit-exact across runs"
+    },
+    "mps": {
+      "tolerance": 1e-05,
+      "how": "seeded; Metal reductions are not bit-exact"
+    }
+  },
+  "requirements": {
+    "torch": ">=2.2",
+    "numpy": ">=1.23",
+    "pandas": ">=1.5",
+    "scikit-learn": ">=1.2",
+    "pyarrow": ">=10"
+  },
+  "inspection": {
+    "source": "vega-forge/references/backend-contract.md §2.1; vega-forge/references/inspect-contract.md §3",
+    "blocks": [
+      "dense",
+      "embedding",
+      "concat",
+      "batchnorm",
+      "layernorm",
+      "dropout",
+      "activation",
+      "residual",
+      "sequential",
+      "parallel",
+      "conv1d",
+      "pool1d",
+      "rnn",
+      "gru",
+      "lstm",
+      "attention",
+      "attention_pool",
+      "transformer_encoder",
+      "feature_tokenizer",
+      "positional",
+      "flatten",
+      "reshape",
+      "pool",
+      "head",
+      "decoder",
+      "reparameterize",
+      "gcn_conv",
+      "sage_conv",
+      "gat_conv",
+      "gin_conv",
+      "graph_pool",
+      "edge_dropout",
+      "custom"
+    ],
+    "synthetic": [
+      "input",
+      "output",
+      "residual_add",
+      "parallel_merge",
+      "encoder_layer"
+    ],
+    "surface": {
+      "dense": [
+        "linear",
+        "act"
+      ],
+      "embedding": [
+        "columns",
+        "embeddings",
+        "out_features"
+      ],
+      "concat": [],
+      "batchnorm": [
+        "bn"
+      ],
+      "layernorm": [
+        "ln"
+      ],
+      "dropout": [
+        "drop"
+      ],
+      "activation": [
+        "act"
+      ],
+      "residual": [
+        "repeats",
+        "projections"
+      ],
+      "sequential": [
+        "inner"
+      ],
+      "parallel": [
+        "branches",
+        "merge"
+      ],
+      "conv1d": [
+        "conv"
+      ],
+      "pool1d": [
+        "pool"
+      ],
+      "rnn": [
+        "rnn",
+        "ret"
+      ],
+      "gru": [
+        "rnn",
+        "ret"
+      ],
+      "lstm": [
+        "rnn",
+        "ret"
+      ],
+      "attention": [
+        "attn",
+        "pool"
+      ],
+      "attention_pool": [
+        "score",
+        "query",
+        "weights"
+      ],
+      "transformer_encoder": [
+        "enc"
+      ],
+      "feature_tokenizer": [
+        "weight",
+        "bias",
+        "cls"
+      ],
+      "positional": [
+        "kind",
+        "pe"
+      ],
+      "flatten": [],
+      "reshape": [
+        "shape"
+      ],
+      "pool": [
+        "kind"
+      ],
+      "head": [
+        "linear",
+        "act"
+      ],
+      "decoder": [
+        "net"
+      ],
+      "reparameterize": [
+        "z"
+      ],
+      "gcn_conv": [
+        "lin",
+        "bias",
+        "normalize",
+        "self_loops",
+        "coefficients"
+      ],
+      "sage_conv": [
+        "lin_root",
+        "lin_neigh",
+        "aggregator",
+        "normalize",
+        "coefficients"
+      ],
+      "gat_conv": [
+        "lin",
+        "att_src",
+        "att_dst",
+        "heads",
+        "concat",
+        "negative_slope",
+        "coefficients"
+      ],
+      "gin_conv": [
+        "mlp",
+        "eps",
+        "coefficients"
+      ],
+      "graph_pool": [
+        "readout"
+      ],
+      "edge_dropout": [
+        "p"
+      ],
+      "custom": []
+    },
+    "surface_variants": {
+      "head": {
+        "cumulative": {
+          "when": "the effective task is ordinal: the rank-consistent cumulative head",
+          "attributes": [
+            "score",
+            "first",
+            "gaps"
+          ]
+        }
+      }
+    },
+    "surface_optional": {
+      "feature_tokenizer": {
+        "attributes": [
+          "embeddings"
+        ],
+        "when": "the data contract has nominal columns: one table per nominal, in contract order"
+      }
+    }
+  },
+  "planned": {
+    "note": "Nothing is planned. Build obligation B-graph-recurrent is built (WP B03, closed at gate A by WP B14): the eight blocks rnn, attention_pool, gcn_conv, sage_conv, gat_conv, gin_conv, graph_pool, edge_dropout are in `blocks`, in pure PyTorch (torch.nn.RNN; message passing over index_add_ / scatter_reduce), and the nine families that needed them compile. torch_geometric stays declared below as an optional accelerated path the backend does not use. The collapsed-binary metrics (mcc_binary, roc_auc_binary, pr_auc_binary; build obligation C9) are neither built nor planned here: a spec that names one is refused by B2 as not implemented by this backend's metrics.py.",
+    "blocks": [],
+    "families": [],
+    "optional_requirements": {
+      "torch_geometric": ">=2.4"
+    },
+    "metrics": []
+  }
+}

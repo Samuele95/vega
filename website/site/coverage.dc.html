@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — coverage and the showcase</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<style>
+html,body{margin:0}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--panel:rgba(8,18,28,.78);--hi:rgba(156,200,255,.08);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:3px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/vega-panel.css">
+<style>
+/* shell placement (template: notes/page-template.md) */
+[data-brand]{position:fixed;z-index:10;top:calc(24px + 12px);left:calc(24px + 18px + 6px)}
+[data-pagebar]{position:fixed;z-index:9;top:24px;left:50%;transform:translate(-50%,-50%);width:min(340px,42vw);max-width:none!important;margin:0!important;padding:0 10px!important;background:var(--bg)}
+[data-stop-card]{min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;justify-content:flex-end;align-items:flex-start;padding:18vh calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-stop-card] > .vp{width:min(600px,42vw)}
+[data-stop-card] .vp h1{font-size:clamp(46px,5.4vw,78px)!important;line-height:1.02!important}
+[data-stop-card] .vp h2#h-show,[data-stop-card] .vp h2#h-insp{font-size:clamp(34px,3.6vw,52px)!important;line-height:1.08!important}
+/* the map: the title block, then the controls sub-stop as its own card below it */
+[data-stop-card][data-subs]{flex-direction:column;align-items:flex-end;justify-content:flex-start;padding-bottom:0}
+[data-subs] > [data-sub][data-stop-card]{width:100%;padding-right:0}
+/* the controls card holds the figure's controls, the GRID (scrolls sideways when it needs room) and the detail aside */
+[data-mapcard] > .vp{width:min(600px,42vw)} /* the same column as every block: the stage's free area has one edge */
+[data-mapcard] aside,[data-mapcard] figure[data-cov-fig]{max-width:none!important;flex:none!important} /* their flex bases were widths in the old row */
+/* below 900px each showcase figure (a sub-stop) rests at 52vh with open stage above it, where the camera shows its cell */
+[data-figs]{width:min(600px,42vw);margin-top:28px;pointer-events:auto}[data-figs] > figure.vp{width:auto}[data-figs] > .vp::after{display:none}
+@media (max-width:899px){[data-figs]{width:100%}section[aria-labelledby="h-show"] figure[data-sub]{margin-top:44vh!important}}
+[data-tail]{display:flex;justify-content:flex-end;align-items:flex-end;box-sizing:border-box;min-height:40vh;padding:0 calc(24px + 56px) 8vh 0;pointer-events:none}
+[data-tail] > .vp{width:min(600px,42vw)}
+@media (max-width:899px){[data-stop-card]{justify-content:center;padding:52vh 24px 8vh}[data-stop-card] > .vp,[data-mapcard] > .vp{width:100%}[data-stop-card][data-subs]{align-items:stretch}[data-subs] > [data-sub][data-stop-card]{padding-left:0;padding-right:0}[data-tail]{padding:0 24px 8vh}[data-tail] > .vp{width:100%}}
+@media (max-width:600px){[data-brand]{top:calc(12px + 12px);left:calc(12px + 12px + 6px)}[data-pagebar]{top:12px;width:44vw}}
+</style>
+</helmet>
+<div style="position:relative;color:var(--fg)">
+  <div data-stage="1" style="position:fixed;inset:0;z-index:0;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)"></div>
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="61" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0;pointer-events:none"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:var(--bg);opacity:.38"></div>
+    <div data-fig="cov" style="position:absolute;inset:0">
+      <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" label="Coverage in 3D: four stacked layers, one per sample shape; families run left to right, tasks front to back; each bright star is an admitted cell." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <div data-orb="cov" style="position:absolute;inset:0">
+      <x-import component-from-global-scope="vega-orbits" from="../assets/vega-orbits.js" label="Coverage as orbits: each sample shape is a planet around Vega, its families are moons, and each family's admitted tasks are satellites. Choose a planet, then a moon, then a task." hint-size="100%,100%" style="position:absolute;inset:0"></x-import>
+    </div>
+    <x-import component-from-global-scope="vega-readouts" from="../assets/vega-readouts.js"></x-import>
+  </div>
+
+  <header>
+    <a data-brand="1" href="index.dc.html" aria-label="Vega — threshold" style="display:flex;align-items:center;gap:14px;color:var(--fg)">
+      <svg viewBox="0 0 64 64" width="24" height="24" aria-hidden="true" style="display:block;color:var(--fg)"><polygon fill="currentColor" points="32,5 33.5,32 32,59 30.5,32"></polygon><polygon fill="currentColor" points="9,32 32,30.6 55,32 32,33.4"></polygon><g stroke="var(--acc)" stroke-width="1.4"><line x1="27.8" y1="27.8" x2="18" y2="18"></line><line x1="36.2" y1="27.8" x2="46" y2="18"></line><line x1="27.8" y1="36.2" x2="18" y2="46"></line><line x1="36.2" y1="36.2" x2="46" y2="46"></line></g><g fill="var(--acc)"><circle cx="18" cy="18" r="2.4"></circle><circle cx="46" cy="18" r="2.4"></circle><circle cx="18" cy="46" r="2.4"></circle><circle cx="46" cy="46" r="2.4"></circle></g><g fill="currentColor"><circle cx="32" cy="5" r="3.2"></circle><circle cx="32" cy="59" r="3.2"></circle><circle cx="9" cy="32" r="3.2"></circle><circle cx="55" cy="32" r="3.2"></circle></g><circle cx="32" cy="32" r="6" fill="currentColor"></circle></svg>
+      <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.24em;display:flex;gap:12px"><span style="color:var(--dim)">VEGA</span><span style="color:var(--dim)">/</span><span>COVERAGE</span></span>
+    </a>
+  </header>
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="coverage" brand="page"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters" room="420"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+
+  <div data-pagebar="1" aria-label="Page 5 of 6" style="max-width:1200px;margin:0 auto;padding:4px clamp(20px,4vw,48px) 0;display:flex;align-items:center;gap:6px">
+    <a href="chain.dc.html" title="The chain" aria-label="The chain" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="data.dc.html" title="The data lane" aria-label="The data lane" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="promise.dc.html" title="The rules" aria-label="The rules" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="proof.dc.html" title="The proof" aria-label="The proof" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--acc)"></span></a>
+    <a href="coverage.dc.html" aria-current="page" title="Coverage" aria-label="Coverage" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--fg)"></span></a>
+    <a href="install.dc.html" title="Install" aria-label="Install" style="flex:1;height:12px;display:flex;align-items:center"><span style="width:100%;height:1px;background:var(--line)"></span></a>
+    <span style="margin-left:14px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);white-space:nowrap">05 / 06</span>
+  </div>
+
+  <main style="position:relative;pointer-events:none">
+
+    <section aria-labelledby="h-cov" data-stop="0" data-rail="The map" data-rail-full="The map, and nothing beyond it." data-stop-card="1" data-subs="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:22px">
+      <h1 id="h-cov" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(32px,4.6vw,52px);line-height:1.08;letter-spacing:-.01em;font-family:'Newsreader',Georgia,serif">The map, and nothing beyond it.</h1>
+      <p style="margin:0;max-width:40em;font-size:17px;line-height:1.6;color:var(--mut);text-wrap:pretty">Every family, shape and task here builds, trains, evaluates, packs and serves — 23 test lanes prove it end to end. Not every family fits every shape and task: below is the list Vega admits, and only that list.</p>
+      <dl style="margin:6px 0 0;display:flex;flex-wrap:wrap;gap:20px 48px">
+        <div style="display:flex;flex-direction:column-reverse;gap:6px"><dt style="font:500 10.5px/1.4 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">NETWORK FAMILIES</dt><dd style="margin:0;font-weight:300;font-size:34px;line-height:1;font-family:'Newsreader',Georgia,serif">21</dd></div>
+        <div style="display:flex;flex-direction:column-reverse;gap:6px"><dt style="font:500 10.5px/1.4 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">SAMPLE SHAPES</dt><dd style="margin:0;font-weight:300;font-size:34px;line-height:1;font-family:'Newsreader',Georgia,serif">4</dd></div>
+        <div style="display:flex;flex-direction:column-reverse;gap:6px"><dt style="font:500 10.5px/1.4 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">TASKS</dt><dd style="margin:0;font-weight:300;font-size:34px;line-height:1;font-family:'Newsreader',Georgia,serif">10</dd></div>
+        <div style="display:flex;flex-direction:column-reverse;gap:6px"><dt style="font:500 10.5px/1.4 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--dim)">GOALS — PREDICT, RECONSTRUCT, ANOMALY</dt><dd style="margin:0;font-weight:300;font-size:34px;line-height:1;font-family:'Newsreader',Georgia,serif">3</dd></div>
+      </dl>
+      </div>
+      <div data-stop="1" data-sub="1" data-stop-card="1" data-mapcard="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:28px;--vp-edge:var(--acc)">
+        <figure data-cov-fig="1" style="margin:0;flex:1 1 700px;min-width:0;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px">
+            <span style="font:500 11px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim)">124 COMBINATIONS + 3 TESTED VARIANTS = 127 ADMITTED CELLS</span>
+            <span style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:12px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--mut)">{{ filterText }}<sc-if value="{{ hasFilter }}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{ clearFilter }}" style="appearance:none;background:none;border:1px solid var(--line);border-radius:999px;color:var(--fg);font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;padding:6px 10px;cursor:pointer" style-hover="border-color:var(--acc)">CLEAR</button></sc-if></span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px">
+            <div role="group" aria-label="Filter by shape" style="display:flex;flex-wrap:wrap;gap:6px">
+              <button type="button" onClick="{{ sh.row.pick }}" style="appearance:none;background:none;border:1px solid {{ sh.row.bc }};border-radius:999px;cursor:pointer;color:{{ sh.row.tc }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;padding:8px 12px">ROW</button>
+              <button type="button" onClick="{{ sh.window.pick }}" style="appearance:none;background:none;border:1px solid {{ sh.window.bc }};border-radius:999px;cursor:pointer;color:{{ sh.window.tc }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;padding:8px 12px">WINDOW</button>
+              <button type="button" onClick="{{ sh.node.pick }}" style="appearance:none;background:none;border:1px solid {{ sh.node.bc }};border-radius:999px;cursor:pointer;color:{{ sh.node.tc }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;padding:8px 12px">GRAPH · NODE</button>
+              <button type="button" onClick="{{ sh.graph.pick }}" style="appearance:none;background:none;border:1px solid {{ sh.graph.bc }};border-radius:999px;cursor:pointer;color:{{ sh.graph.tc }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;padding:8px 12px">GRAPH · GRAPH</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+            <sc-if value="{{ isThree }}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{ toggleTour }}" aria-pressed="{{ tourPressed }}" title="Fly past the five combinations with a showcase screenshot" style="appearance:none;cursor:pointer;border:1px solid {{ tourBc }};background:transparent;border-radius:999px;padding:9px 14px;font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;color:var(--fg);display:flex;align-items:center;gap:8px"><span aria-hidden="true" style="color:var(--acc)">{{ tourIcon }}</span>{{ tourLabel }}</button></sc-if>
+            <div role="group" aria-label="Figure view" style="display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px">
+              <button type="button" onClick="{{ view3d }}" aria-pressed="{{ p3d }}" style="appearance:none;border:0;cursor:pointer;border-radius:999px;padding:8px 14px;font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;background:{{ b3d }};color:{{ c3d }}">3D</button>
+              <button type="button" onClick="{{ viewFlat }}" aria-pressed="{{ pFlat }}" style="appearance:none;border:0;cursor:pointer;border-radius:999px;padding:8px 14px;font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;background:{{ bFlat }};color:{{ cFlat }}">GRID</button>
+              <button type="button" onClick="{{ viewOrb }}" aria-pressed="{{ pOrb }}" style="appearance:none;border:0;cursor:pointer;border-radius:999px;padding:8px 14px;font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;background:{{ bOrb }};color:{{ cOrb }}">ORBITS</button>
+            </div>
+            </div>
+          </div>
+          <sc-if value="{{ isOrb }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div aria-hidden="true" style="display:flex;justify-content:space-between;gap:12px;pointer-events:none">
+                <span style="font:500 10.5px/1.5 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim)">{{ orbCrumb }}</span>
+              </div>
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim);pointer-events:none">PLANET · SHAPE   ·   MOON · FAMILY   ·   SATELLITE · TASK   ·   CLICK EMPTY SPACE TO ZOOM OUT</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isThree }}" hint-placeholder-val="{{ true }}">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim);pointer-events:none">DRAG TO ORBIT · CLICK A STAR · DOUBLE-CLICK TO RESET</span>
+          </sc-if>
+          <sc-if value="{{ isFlat }}" hint-placeholder-val="{{ false }}">
+          <div style="overflow-x:auto;overflow-y:hidden;padding-bottom:6px">
+            <div ref="{{ matRef }}" tabindex="0" role="grid" aria-label="Coverage figure: families by task, grouped by sample shape. Arrow keys move between cells." onKeyDown="{{ onMatKey }}" style="width:max-content;display:flex;flex-direction:column;padding:4px">
+              <div style="display:grid;grid-template-columns:132px repeat(8,24px) 14px repeat(6,24px) 14px repeat(5,24px) 14px repeat(3,24px);align-items:end;padding-bottom:8px">
+                <span style="grid-column:1"></span>
+                <button type="button" onClick="{{ sh.row.pick }}" style="grid-column:2 / span 8;appearance:none;background:none;border:0;border-bottom:1px solid {{ sh.row.bc }};cursor:pointer;color:{{ sh.row.tc }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;padding:8px 0;text-align:left">ROW</button>
+                <button type="button" onClick="{{ sh.window.pick }}" style="grid-column:11 / span 6;appearance:none;background:none;border:0;border-bottom:1px solid {{ sh.window.bc }};cursor:pointer;color:{{ sh.window.tc }};font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.18em;padding:8px 0;text-align:left">WINDOW</button>
+                <button type="button" onClick="{{ sh.node.pick }}" style="grid-column:18 / span 5;appearance:none;background:none;border:0;border-bottom:1px solid {{ sh.node.bc }};cursor:pointer;color:{{ sh.node.tc }};font:500 10.5px/1.25 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;padding:8px 0;text-align:left">GRAPH<br>NODE LEVEL</button>
+                <button type="button" onClick="{{ sh.graph.pick }}" style="grid-column:24 / span 3;appearance:none;background:none;border:0;border-bottom:1px solid {{ sh.graph.bc }};cursor:pointer;color:{{ sh.graph.tc }};font:500 10.5px/1.25 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;padding:8px 0;text-align:left">GRAPH<br>LEVEL</button>
+              </div>
+              <div style="display:grid;grid-template-columns:132px repeat(8,24px) 14px repeat(6,24px) 14px repeat(5,24px) 14px repeat(3,24px);align-items:end;padding-bottom:6px">
+                <span style="font:500 10px/1.3 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;color:var(--dim);padding:0 12px 4px 0;text-align:right">FAMILY ↓</span>
+                <sc-for list="{{ heads }}" as="h" hint-placeholder-count="25">
+                  <sc-if value="{{ h.sp }}" hint-placeholder-val="{{ false }}"><span></span></sc-if>
+                  <sc-if value="{{ h.col }}" hint-placeholder-val="{{ false }}">
+                    <button type="button" onClick="{{ h.pick }}" title="{{ h.task }}" style="appearance:none;background:none;border:0;padding:0 0 4px;cursor:pointer;display:flex;justify-content:center;color:{{ h.tc }}" style-hover="color:var(--acc)"><span style="writing-mode:vertical-rl;transform:rotate(180deg);font:11px/24px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;white-space:nowrap">{{ h.task }}</span></button>
+                  </sc-if>
+                </sc-for>
+              </div>
+              <sc-for list="{{ rows }}" as="r" hint-placeholder-count="21">
+                <div role="row" style="display:grid;grid-template-columns:132px repeat(8,24px) 14px repeat(6,24px) 14px repeat(5,24px) 14px repeat(3,24px);align-items:center;background:{{ r.bg }}">
+                  <button type="button" onClick="{{ r.pick }}" style="appearance:none;background:none;border:0;cursor:pointer;text-align:right;padding:0 12px 0 0;height:24px;font:12.5px/24px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:{{ r.tc }}" style-hover="color:var(--acc)">{{ r.fam }}</button>
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="25">
+                    <sc-if value="{{ c.sp }}" hint-placeholder-val="{{ false }}"><span style="height:24px"></span></sc-if>
+                    <sc-if value="{{ c.cell }}" hint-placeholder-val="{{ false }}">
+                      <button type="button" role="gridcell" tabindex="-1" onClick="{{ c.pick }}" title="{{ c.title }}" aria-label="{{ c.title }}" aria-selected="{{ c.ariaSel }}" style="appearance:none;width:24px;height:24px;padding:0;margin:0;border:0;background:transparent;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center">
+                        <span aria-hidden="true" style="position:absolute;left:11.5px;top:1px;width:1px;height:22px;background:var(--fg);opacity:{{ c.spk }}"></span>
+                        <span aria-hidden="true" style="position:absolute;top:11.5px;left:3px;width:18px;height:1px;background:var(--fg);opacity:{{ c.spk }}"></span>
+                        <span aria-hidden="true" style="position:absolute;width:15px;height:15px;border-radius:50%;box-sizing:border-box;border:1px {{ c.ringStyle }} {{ c.ringCol }};opacity:{{ c.op }}"></span>
+                        <span aria-hidden="true" style="width:{{ c.d }}px;height:{{ c.d }}px;border-radius:50%;background:{{ c.col }};opacity:{{ c.op }};box-shadow:{{ c.glow }}"></span>
+                      </button>
+                    </sc-if>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <figcaption style="display:flex;flex-direction:column;gap:12px">
+            <span style="display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12.5px;color:var(--mut)">
+              <span style="display:flex;align-items:center;gap:8px;flex:0 0 auto;white-space:nowrap"><span aria-hidden="true" style="width:6px;height:6px;border-radius:50%;background:var(--fg)"></span>admitted</span>
+              <span style="display:flex;align-items:center;gap:8px;flex:0 0 auto;white-space:nowrap"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;border:1px solid var(--acc);box-sizing:border-box;display:flex;align-items:center;justify-content:center"><span style="width:5px;height:5px;border-radius:50%;background:var(--fg)"></span></span>with a showcase screenshot</span>
+              <span style="display:flex;align-items:center;gap:8px;flex:0 0 auto;white-space:nowrap"><span aria-hidden="true" style="width:13px;height:13px;border-radius:50%;border:1px dashed var(--cy);box-sizing:border-box;display:flex;align-items:center;justify-content:center"><span style="width:5px;height:5px;border-radius:50%;background:var(--fg)"></span></span>plus a tested variant</span>
+              <span style="display:flex;align-items:center;gap:8px;flex:0 0 auto;white-space:nowrap"><span aria-hidden="true" style="width:2px;height:2px;border-radius:50%;background:var(--dim)"></span>not admitted</span>
+            </span>
+            <span style="font-size:13px;line-height:1.6;color:var(--dim);max-width:52em">Pick a cell, or focus the figure and use the arrow keys. Click a family, task or shape heading to filter by it.</span>
+          </figcaption>
+        </figure>
+
+        <aside aria-live="polite" style="flex:1 1 320px;min-width:0;max-width:440px;box-sizing:border-box;padding:24px 24px 26px;background:var(--panel);border:1px solid var(--line);border-radius:6px;backdrop-filter:blur(4px);display:flex;flex-direction:column;gap:16px">
+          <div style="font:500 11px/1.5 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.14em;color:var(--dim)">{{ d.shape }} · {{ d.fam }}</div>
+          <h2 style="margin:0;font:300 24px/1.25 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:-.01em;word-break:break-word">{{ d.task }}</h2>
+          <span style="align-self:flex-start;white-space:nowrap;padding:6px 11px;border:1px solid {{ d.stc }};border-radius:999px;font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:{{ d.stc }}">{{ d.status }}</span>
+          <p style="margin:0;font-size:15px;line-height:1.6;color:var(--fg);text-wrap:pretty">{{ d.desc }}</p>
+          <sc-if value="{{ d.hasNote }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:13.5px;line-height:1.55;color:var(--mut)">{{ d.note }}</p></sc-if>
+          <sc-if value="{{ d.hasVar }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px">
+              <span style="font:500 10.5px/1 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;color:var(--cy)">TESTED VARIANT</span>
+              <span style="font-size:14.5px;line-height:1.5"><code style="font-family:'Martian Mono',ui-monospace,Menlo,Consolas,monospace">{{ d.variant }}</code> — an extra tested configuration of this combination.</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ d.hasImg }}" hint-placeholder-val="{{ false }}">
+            <figure style="margin:0;display:flex;flex-direction:column;gap:8px">
+              <a href="{{ d.img }}" target="_blank" rel="noopener" aria-label="Open the screenshot full size" style="display:block;aspect-ratio:16/10;overflow:hidden;border:1px solid var(--line);border-radius:4px;background:#04080E">
+                <img ref="{{ imgRef }}" alt="{{ d.cap }}" style="display:block;width:{{ d.iw }};height:100%;object-fit:{{ d.fit }};object-position:left top">
+              </a>
+              <figcaption style="font-size:12.5px;line-height:1.5;color:var(--mut)">{{ d.cap }}</figcaption>
+            </figure>
+          </sc-if>
+        </aside>
+      </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-show" data-stop="2" data-rail="Every shipped network" data-rail-full="Every shipped network gets its own page." data-stop-card="1" data-subs="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:18px">
+      <span style="font:500 11px/1.6 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">02 · THE SHOWCASE</span>
+      <h2 id="h-show" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(26px,3.2vw,36px);line-height:1.15;font-family:'Newsreader',Georgia,serif">Every shipped network gets its own page.</h2>
+      <p style="margin:0;max-width:40em;font-size:16px;line-height:1.65;color:var(--mut);text-wrap:pretty">A guided, step-by-step page served by the bundle’s own service. Its imagery, words and views adapt to the dataset, network family, data shape and task.</p>
+          <ol style="margin:4px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:0 28px">
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">01</span>the problem and the data</li>
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">02</span>the network, drawn with its weights and the decisions that shaped it</li>
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">03</span>what was tried</li>
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">04</span>one row followed through the network — how the network computed it</li>
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">05</span>many rows at once</li>
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">06</span>the results against honest baselines</li>
+            <li style="border-top:1px solid var(--line);padding:12px 0;display:flex;gap:12px;font-size:14.5px;line-height:1.5"><span style="font:12px/1.7 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">07</span>the code that answers, with notes into the written report</li>
+          </ol>
+      </div>
+      <div data-figs="1" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:20px">
+        <figure class="vp" data-stop="3" data-sub="1" style="margin:0;display:flex;flex-direction:column;gap:10px">
+          <button type="button" onClick="{{ shot1 }}" aria-label="Show this combination in the coverage figure" style="appearance:none;padding:0;border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:16/10;background:#04080E;display:block" style-hover="border-color:var(--acc)"><img src="../assets/showcase/panel-network-detail-night.png" alt="A generated showcase's network view, night theme" style="display:block;width:201.4%;height:100%"></button>
+          <figcaption style="display:flex;flex-direction:column;gap:4px"><code style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--acc)">row · mlp-plain · multiclass</code><span style="font-size:13.5px;line-height:1.5;color:var(--mut)">Network view of a network-flow classifier: every weight drawn, the decisions that shaped it beside them.</span></figcaption>
+        </figure>
+        <figure class="vp" data-stop="4" data-sub="1" style="margin:0;display:flex;flex-direction:column;gap:10px">
+          <button type="button" onClick="{{ shot2 }}" aria-label="Show this combination in the coverage figure" style="appearance:none;padding:0;border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:16/10;background:#04080E;display:block" style-hover="border-color:var(--acc)"><img src="../assets/showcase/L05-mlp-regression-results-1440-night.png" alt="A generated showcase's results view" style="display:block;width:100%;height:100%;object-fit:cover;object-position:left top"></button>
+          <figcaption style="display:flex;flex-direction:column;gap:4px"><code style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--acc)">row · mlp-plain · regression</code><span style="font-size:13.5px;line-height:1.5;color:var(--mut)">Results view of a house-price estimator: the sealed-test score beside the baselines, each with its interval — here, beaten by a baseline.</span></figcaption>
+        </figure>
+        <figure class="vp" data-stop="5" data-sub="1" style="margin:0;display:flex;flex-direction:column;gap:10px">
+          <button type="button" onClick="{{ shot3 }}" aria-label="Show this combination in the coverage figure" style="appearance:none;padding:0;border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:16/10;background:#04080E;display:block" style-hover="border-color:var(--acc)"><img src="../assets/showcase/L10-gru-forecast-try-one-1440-night.png" alt="A generated showcase's try-one view for a forecast" style="display:block;width:100%;height:100%;object-fit:cover;object-position:left top"></button>
+          <figcaption style="display:flex;flex-direction:column;gap:4px"><code style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--acc)">window · gru · forecast</code><span style="font-size:13.5px;line-height:1.5;color:var(--mut)">Try-one view of a bike-share demand forecast: one window followed through the network, an unseen category answered with a warning.</span></figcaption>
+        </figure>
+        <figure class="vp" data-stop="6" data-sub="1" style="margin:0;display:flex;flex-direction:column;gap:10px">
+          <button type="button" onClick="{{ shot4 }}" aria-label="Show this combination in the coverage figure" style="appearance:none;padding:0;border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:16/10;background:#EEF2F5;display:block" style-hover="border-color:var(--acc)"><img src="../assets/showcase/L13-bi-gru-network-390-day.png" alt="A generated showcase's network view on a phone, day theme" style="display:block;width:100%;height:100%;object-fit:contain"></button>
+          <figcaption style="display:flex;flex-direction:column;gap:4px"><code style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--acc)">window · bi-gru · sequence-classification/multiclass</code><span style="font-size:13.5px;line-height:1.5;color:var(--mut)">Network view at phone width, day theme: the GRU layer and dropout, each decision opened in turn.</span></figcaption>
+        </figure>
+        <figure class="vp" data-stop="7" data-sub="1" style="margin:0;display:flex;flex-direction:column;gap:10px">
+          <button type="button" onClick="{{ shot5 }}" aria-label="Show this combination in the coverage figure" style="appearance:none;padding:0;border:1px solid var(--line);border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:16/10;background:#04080E;display:block" style-hover="border-color:var(--acc)"><img src="../assets/showcase/L20-gat-graph-network-1440-night.png" alt="A generated showcase's network view for a graph attention network" style="display:block;width:100%;height:100%;object-fit:cover;object-position:left top"></button>
+          <figcaption style="display:flex;flex-direction:column;gap:4px"><code style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--acc)">graph (node level) · gat · multiclass</code><span style="font-size:13.5px;line-height:1.5;color:var(--mut)">Network view of a paper-topic classifier on a graph: attention layers drawn as small graphs, a decision opened.</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-insp" data-stop="8" data-rail="Ask the served network" data-rail-full="Ask the served network what it is." data-stop-card="1" data-rail-compact="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:22px;--vp-edge:var(--cy)">
+      <div style="font:500 11px/1.6 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">03 · MODEL INSPECTION</div>
+      <h2 id="h-insp" data-decode="1" style="margin:0;font-weight:300;font-size:clamp(26px,3.2vw,36px);line-height:1.15;font-family:'Newsreader',Georgia,serif">Ask the served network what it is.</h2>
+      <p style="margin:0;max-width:40em;font-size:16px;line-height:1.65;color:var(--mut)">A served bundle answers two inspection routes beside its predictions.</p>
+        <div style="display:flex;flex-direction:column;border-top:1px solid var(--line)">
+          <div style="border-bottom:1px solid var(--line);padding:18px 0;display:flex;flex-wrap:wrap;gap:8px 28px;align-items:baseline">
+            <code style="flex:0 0 160px;font:16px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">/v1/network</code>
+            <span style="flex:1 1 300px;font-size:15px;line-height:1.55">The network as data: stages, blocks, parameters, weights pinned by digest.</span>
+          </div>
+          <div style="border-bottom:1px solid var(--line);padding:18px 0;display:flex;flex-wrap:wrap;gap:8px 28px;align-items:baseline">
+            <code style="flex:0 0 160px;font:16px 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--acc)">/v1/explain</code>
+            <span style="flex:1 1 300px;font-size:15px;line-height:1.55">One row followed through the network, stage by stage, with exact attributions.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div data-tail="1">
+      <div class="vp" style="display:flex;flex-direction:column;gap:8px;pointer-events:auto">
+    <nav aria-label="Pages" style="padding:40px 0 24px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line)">
+      <a href="proof.dc.html" style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim);padding:10px 0" style-hover="color:var(--fg)">← THE PROOF</a>
+      <a href="install.dc.html" style="display:inline-flex;align-items:center;gap:12px;padding:14px 22px;border:1px solid var(--line);border-radius:999px;font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--fg)" style-hover="border-color:var(--acc);color:var(--fg)">NEXT · INSTALL <span aria-hidden="true" style="color:var(--acc)">→</span></a>
+    </nav>
+  <footer style="display:flex;justify-content:center;padding:24px 0 34px">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const FAMS = ['mlp-plain', 'mlp-residual', 'ft-transformer', 'linear', 'autoencoder', 'vae', 'pca-floor', 'deep-svdd', 'cnn1d', 'gru', 'lstm', 'transformer-seq', 'rnn', 'bi-lstm', 'bi-gru', 'lstm-attention', 'gru-attention', 'gcn', 'graphsage', 'gat', 'gin'];
+const SHAPES = {
+  row: { label: 'row', desc: 'row (tabular)', tasks: ['binary', 'multiclass', 'multilabel', 'regression', 'ordinal', 'unsupervised', 'anomaly/labelled', 'anomaly/unlabelled'] },
+  window: { label: 'window', desc: 'window (time series)', tasks: ['sequence-classification/binary', 'sequence-classification/multiclass', 'sequence-classification/multilabel', 'sequence-regression/regression', 'sequence-regression/ordinal', 'forecast'] },
+  node: { label: 'graph (node level)', desc: 'graph (nodes and edges), node level', tasks: ['binary', 'multiclass', 'multilabel', 'regression', 'ordinal'] },
+  graph: { label: 'graph (graph level)', desc: 'graph (nodes and edges), graph level', tasks: ['binary', 'multiclass', 'regression'] }
+};
+const ORDER = ['row', 'window', 'node', 'graph'];
+const P5 = ['binary', 'multiclass', 'multilabel', 'regression', 'ordinal'];
+const W6 = SHAPES.window.tasks, W5 = W6.slice(0, 5), G3 = ['binary', 'multiclass', 'regression'];
+const RULES = [
+  ['row', ['mlp-plain', 'mlp-residual', 'ft-transformer', 'linear'], P5],
+  ['row', ['autoencoder', 'vae', 'pca-floor'], ['unsupervised', 'anomaly/labelled', 'anomaly/unlabelled']],
+  ['row', ['deep-svdd'], ['anomaly/labelled', 'anomaly/unlabelled']],
+  ['window', ['cnn1d', 'gru', 'lstm', 'transformer-seq', 'rnn', 'lstm-attention', 'gru-attention'], W6],
+  ['window', ['bi-lstm', 'bi-gru'], W5],
+  ['window', ['linear'], W6],
+  ['node', ['gcn', 'graphsage', 'gat'], P5],
+  ['graph', ['gcn', 'graphsage', 'gat', 'gin'], G3],
+  ['node', ['linear'], P5],
+  ['graph', ['linear'], G3]
+];
+const ADMIT = {};
+RULES.forEach(([s, fs, ts]) => fs.forEach(f => ts.forEach(t => { ADMIT[s + '|' + f + '|' + t] = true; })));
+const VARIANTS = { 'window|gru|sequence-classification/binary': 'stride 2', 'node|gcn|multiclass': 'transductive', 'node|graphsage|multiclass': 'sampled' };
+const SHOTS = {
+  'row|mlp-plain|multiclass': { img: '../assets/showcase/panel-network-detail-night.png', cap: 'A generated showcase — network view of a network-flow classifier, night theme.', iw: '201.4%', fit: 'fill' },
+  'row|mlp-plain|regression': { img: '../assets/showcase/L05-mlp-regression-results-1440-night.png', cap: 'A generated showcase — results view of a house-price estimator, night theme.', iw: '100%', fit: 'cover' },
+  'window|gru|forecast': { img: '../assets/showcase/L10-gru-forecast-try-one-1440-night.png', cap: 'A generated showcase — try-one view of a bike-share demand forecast, night theme.', iw: '100%', fit: 'cover' },
+  'window|bi-gru|sequence-classification/multiclass': { img: '../assets/showcase/L13-bi-gru-network-390-day.png', cap: 'A generated showcase — network view at phone width, day theme.', iw: '100%', fit: 'contain' },
+  'node|gat|multiclass': { img: '../assets/showcase/L20-gat-graph-network-1440-night.png', cap: 'A generated showcase — network view of a paper-topic classifier on a graph, night theme.', iw: '100%', fit: 'cover' }
+};
+const COLS = []; ORDER.forEach(s => SHAPES[s].tasks.forEach(t => COLS.push({ s, t })));
+const TASK_NOTE = (t) => {
+  if (t === 'anomaly/labelled') return 'anomaly/labelled is the anomaly goal with labels.';
+  if (t === 'anomaly/unlabelled') return 'anomaly/unlabelled is the anomaly goal without labels.';
+  const m = /^(sequence-classification|sequence-regression)\/(.+)$/.exec(t);
+  if (m) return m[1] + '/… names the base task of a window lane: here, ' + m[2] + '.';
+  return '';
+};
+const PAGES = [
+  { num: '00', label: 'Threshold', href: 'index.dc.html', note: '' },
+  { num: '01', label: 'The chain', href: 'chain.dc.html', note: '' },
+  { num: '02', label: 'The data lane', href: 'data.dc.html', note: '' },
+  { num: '03', label: 'The rules', href: 'promise.dc.html', note: '' },
+  { num: '04', label: 'The proof', href: 'proof.dc.html', note: '' },
+  { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: 'HERE' },
+  { num: '06', label: 'Install', href: 'install.dc.html', note: '' },
+  { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+  { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+];
+
+class Component extends DCLogic {
+  state = { indexOpen: false, fi: 0, ci: 1, fShape: null, fFam: null, fTask: null, view: '3d', touring: false, stop: 0 };
+  closeRef = { current: null }; matRef = { current: null };
+  setClose = (el) => { this.closeRef.current = el; };
+  setMat = (el) => { this.matRef.current = el; };
+  componentDidMount() {
+    const go = (u) => { if (window.VegaFly) window.VegaFly.go(u); else location.href = u; };
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape') { if (this.state.indexOpen) this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if (e.key === 'n' || e.key === 'N') go('install.dc.html');
+      else if (e.key === 'p' || e.key === 'P') go('proof.dc.html');
+      else if (/^[0-6]$/.test(e.key)) go(PAGES[+e.key].href);
+    };
+    addEventListener('keydown', this.onKey);
+    // the camera owns the active stop: the map (0) and its controls (1), the showcase (2) and its five figures (3–7), the served network (8)
+    this.onStop = (e) => { const k = e.detail.index; if (k !== this.state.stop) this.setState({ stop: k }); this.applyStop(k); };
+    addEventListener('vegastop', this.onStop);
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    this.onResize = () => requestAnimationFrame(() => this.orbFrame());
+    addEventListener('resize', this.onResize);
+    this.sync3d();
+  }
+  componentWillUnmount() { removeEventListener('keydown', this.onKey); removeEventListener('vegastop', this.onStop); removeEventListener('vegaindex', this.onIndex); removeEventListener('resize', this.onResize); clearTimeout(this.t3); clearTimeout(this.tO); clearTimeout(this.tcam); }
+  orbData() {
+    if (this._od) return this._od;
+    const planets = ORDER.map(s => { const fams = FAMS.filter(f => SHAPES[s].tasks.some(t => ADMIT[s + '|' + f + '|' + t]));
+      return { key: s, label: SHAPES[s].label, sub: fams.length + ' FAMILIES', moons: fams.map(f => { const ts = SHAPES[s].tasks.filter(t => ADMIT[s + '|' + f + '|' + t]); const shot = ts.some(t => SHOTS[s + '|' + f + '|' + t]), vr = ts.some(t => VARIANTS[s + '|' + f + '|' + t]);
+        return { key: f, label: f, ring: shot ? 'acc' : vr ? 'cy' : null, dash: !shot && vr, sats: ts.map(t => ({ key: t, label: t, ring: SHOTS[s + '|' + f + '|' + t] ? 'acc' : VARIANTS[s + '|' + f + '|' + t] ? 'cy' : null, dash: !!VARIANTS[s + '|' + f + '|' + t] && !SHOTS[s + '|' + f + '|' + t] })) }; }) }; });
+    return (this._od = { planets, center: 'VEGA', moonSize: 1.3 });
+  }
+  orbFocus() {
+    const st = this.state, c = COLS[st.ci], f = FAMS[st.fi], od = this.orbData();
+    const pi = ORDER.indexOf(c.s), mi = od.planets[pi].moons.findIndex(m => m.key === f), si = mi >= 0 ? od.planets[pi].moons[mi].sats.findIndex(x => x.key === c.t) : -1;
+    return [pi, mi, si];
+  }
+  orbCrumb() { if (this.state.view !== 'orb') return ''; const o = this._of || [-1, -1, -1], od = this.orbData(); if (o[0] < 0) return 'FOUR SHAPES · CHOOSE A PLANET'; const p = od.planets[o[0]]; let s = p.label.toUpperCase(); if (o[1] >= 0) { const m = p.moons[o[1]]; s += '  ›  ' + m.label; if (o[2] >= 0) s += '  ›  ' + m.sats[o[2]].label; else s += '  ·  ' + m.sats.length + ' TASKS'; } else s += '  ·  ' + p.moons.length + ' FAMILIES'; return s; }
+  syncOrb() {
+    clearTimeout(this.tO);
+    const el = document.querySelector('[data-orb="cov"] vega-orbits');
+    if (!el || !el.setData) { this.tO = setTimeout(() => this.syncOrb(), 150); return; }
+    if (el !== this.cO) {
+      this.cO = el; el.setData(this.orbData()); this._of = this._of || this.orbFocus().slice(0, 1).concat([-1, -1]); el.focus(this._of[0], this._of[1], this._of[2]);
+      el.addEventListener('pick', (e) => { const d = e.detail, od = this.orbData(); this._of = [d.planet, d.moon, d.sat];
+        if (d.planet >= 0 && d.moon >= 0) { const p = od.planets[d.planet], m = p.moons[d.moon], t = d.sat >= 0 ? m.sats[d.sat].key : m.sats[0].key; this.setState({ fi: FAMS.indexOf(m.key), ci: COLS.findIndex(x => x.s === p.key && x.t === t), fShape: null, fFam: null, fTask: null }); }
+        else this.forceUpdate(); });
+      this.forceUpdate();
+    }
+  }
+  sync3d() {
+    this.syncOrb();
+    clearTimeout(this.t3);
+    const el = document.querySelector('[data-fig="cov"] vega-constellation');
+    if (!el || !el.setData) { this.t3 = setTimeout(() => this.sync3d(), 150); return; }
+    const st = this.state, fk = [st.fShape, st.fFam, st.fTask].join('|');
+    const fresh = el !== this.c3;
+    if (fresh || fk !== this._fk) {
+      this._fk = fk;
+      const nF = FAMS.length, LY = { row: 165, window: 55, node: -55, graph: -165 };
+      const any = !!(st.fShape || st.fFam || st.fTask);
+      const N = [], guides = [], labels = [];
+      ORDER.forEach((s, li) => {
+        const T = SHAPES[s].tasks, hz = (T.length - 1) * 22, y = LY[s];
+        guides.push({ pts: [[-330, y, -hz - 22], [330, y, -hz - 22], [330, y, hz + 22], [-330, y, hz + 22]], close: true, alpha: st.fShape === s ? 0.5 : 0.16, fill: st.fShape === s ? 0.04 : 0.012 });
+        labels.push({ x: -345, y: y + 4, z: hz + 22, text: SHAPES[s].label.toUpperCase(), align: 'right', color: st.fShape === s ? 'acc' : 'dim' });
+      });
+      FAMS.forEach((fm, fi) => COLS.forEach((c, ci) => {
+        const T = SHAPES[c.s].tasks, ti = T.indexOf(c.t), hz = (T.length - 1) * 22;
+        const key = c.s + '|' + fm + '|' + c.t, adm = !!ADMIT[key], m = (!st.fShape || st.fShape === c.s) && (!st.fFam || st.fFam === fm) && (!st.fTask || st.fTask === c.t);
+        N.push({ x: -310 + fi * (620 / (nF - 1)), y: LY[c.s], z: -hz + ti * 44, size: adm ? 2.6 : 0.8, color: adm ? 'fg' : 'dim', alpha: adm ? (any && !m ? 0.16 : 1) : 0.4, glow: adm ? (VARIANTS[key] ? 'cy' : 'acc') : 'dim', ring: adm && VARIANTS[key] ? 'cy' : adm && SHOTS[key] ? 'acc' : null, label: fm, sub: c.t.toUpperCase(), delay: ORDER.indexOf(c.s) * 260 + fi * 30 });
+      }));
+      el.setData({ nodes: N, guides, labels, radius: 380, zoom: 0.36, autoRotate: this.camOn ? false : 0.05, yaw: -0.45, pitch: -0.38 });
+    }
+    if (fresh) { this.c3 = el; el.addEventListener('pick', (e) => { const i = e.detail.index; this.setState({ fi: Math.floor(i / COLS.length), ci: i % COLS.length }); }); el.addEventListener('tourstop', () => { el.tour(null); this.setState({ touring: false }); }); }
+    el.setSelected(this.state.fi * COLS.length + this.state.ci, true);
+    this.setupCamera();
+  }
+  // the camera's stops (spec §3, coverage). The map's two stops follow the figure's view: ORBITS swaps the stage to the
+  // orbits, GRID (in the card) dims it. The showcase flies to the five screenshot cells, one sub-stop per figure.
+  setupCamera() {
+    if (this.camOn) return; clearTimeout(this.tcam);
+    const sc = this.c3, orb = this.cO, cam = document.querySelector('vega-camera'), ro = document.querySelector('vega-readouts');
+    const sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    if (!sc || !sc.d || !sc.d.nodes.length || !orb || !cam || !cam.configure || !ro || !ro.configure || sections.length !== 9) { this.tcam = setTimeout(() => this.setupCamera(), 150); return; }
+    this.camOn = true; sc.d.autoRotate = false;
+    const self = this, sel = () => self.state.fi * COLS.length + self.state.ci, pos = (i) => { const n = sc.d.nodes[i]; return n ? [n.x, n.y, n.z] : [0, 0, 0]; };
+    const at = (W, H) => [W * 0.5, H * 0.5], view = () => self.state.view;
+    const SH = Object.keys(SHOTS).map(k => { const [s, fm, t] = k.split('|'); return FAMS.indexOf(fm) * COLS.length + COLS.findIndex(x => x.s === s && x.t === t); });
+    const stops = [
+      { el: sections[0], focus: [0, 0, 0], yaw: -0.45, pitch: -0.38, zoom: 0.5, at, fit: true, get fitPts() { return sc.d.labels.map(l => [l.x - 300, l.y, l.z]); }, // the plane labels hang left of the planes: keep their width in frame
+        get cross() { return view() === 'orb' ? 1 : 0; }, get opacity() { return view() === 'flat' ? 0.25 : 1; }, get select() { return sel(); } },
+      { el: sections[1], focus: () => pos(sel()), yaw: -0.4, pitch: -0.42, zoom: 0.95, at, get fit() { return [sel()]; },
+        get cross() { return view() === 'orb' ? 1 : 0; }, get opacity() { return view() === 'flat' ? 0.25 : 1; }, get select() { return sel(); } },
+      { el: sections[2], focus: [0, 0, 0], yaw: -0.3, pitch: -0.36, zoom: 0.5, at, fit: SH, get fitPts() { return sc.d.labels.map(l => [l.x - 300, l.y, l.z]); }, select: -1 }
+    ];
+    SH.forEach((n, k) => stops.push({ el: sections[3 + k], focus: pos(n), yaw: -0.5 + k * 0.08, pitch: -0.42, zoom: 0.95, at, fit: [n], select: n, offset: () => innerHeight * (innerWidth < 900 ? 0.52 : 0.18) }));
+    stops.push({ el: sections[8], focus: [0, 0, 0], yaw: -0.3, pitch: -0.36, zoom: 0.5, at, cross: 1 });
+    cam.configure({ scene: sc, alt: orb, sky: document.querySelector('vega-sky-lab'), stops, free: true, home: 4 });
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters (G2)
+    // each figure's caption head (its own copy) pinned to its cell while that figure is the stop
+    const heads = [...document.querySelectorAll('section[aria-labelledby="h-show"] figure figcaption code')].map(c => c.textContent);
+    ro.configure({ scene: sc, activeOnly: true, showAt: (a) => a >= 3 && a <= 7, items: SH.map((n, k) => ({ node: n, text: heads[k] || '', stop: 3 + k })) });
+    this.orbFrame();
+  }
+  // the orbits: centred on VEGA at the served network (8); the figure's own focus while the map shows them
+  applyStop(k) {
+    const orb = this.cO; if (orb && orb.focus) { if (k === 8) orb.focus(-1, -1, -1); else if (this._of) orb.focus(this._of[0], this._of[1], this._of[2]); }
+    requestAnimationFrame(() => this.orbFrame());
+  }
+  // the orbits sit in the stage area the active stop's text leaves free, at its rest
+  orbFrame() {
+    const orb = this.cO, cam = document.querySelector('vega-camera'); if (!orb || !cam || !cam.fitBoxes || !cam.o) return;
+    const k = cam.active === 8 ? 8 : Math.max(0, Math.min(1, cam.active)), b = cam.fitBoxes(k).sort((x, y) => (y.R - y.L) * (y.B - y.T) - (x.R - x.L) * (x.B - x.T))[0]; if (!b) return;
+    orb.frameBox = { x: b.L, y: b.T + 24, w: b.R - b.L, h: Math.max(80, b.B - b.T - 48) };
+  }
+  componentDidUpdate() {
+    this.sync3d();
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+    if (this.state.view !== this._view) { this._view = this.state.view; requestAnimationFrame(() => this.orbFrame()); }
+  }
+  reveal() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    const els = [].slice.call(document.querySelectorAll('[data-reveal]')).filter(el => el.getBoundingClientRect().top > innerHeight);
+    els.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(18px)'; });
+    let left = els.slice();
+    const chk = () => { left = left.filter(el => { if (el.getBoundingClientRect().top < innerHeight * 0.9) { el.style.opacity = '1'; el.style.transform = 'none'; return false; } return true; }); if (!left.length) this.io.disconnect(); };
+    const iv = setInterval(chk, 200); addEventListener('scroll', chk, { passive: true });
+    this.io = { disconnect: () => { clearInterval(iv); removeEventListener('scroll', chk); } };
+  }
+  onMatKey = (e) => {
+    const k = e.key; let { fi, ci } = this.state;
+    if (k === 'ArrowRight') ci = Math.min(COLS.length - 1, ci + 1);
+    else if (k === 'ArrowLeft') ci = Math.max(0, ci - 1);
+    else if (k === 'ArrowDown') fi = Math.min(FAMS.length - 1, fi + 1);
+    else if (k === 'ArrowUp') fi = Math.max(0, fi - 1);
+    else if (k === 'Home') ci = 0;
+    else if (k === 'End') ci = COLS.length - 1;
+    else return;
+    e.preventDefault(); this.setState({ fi, ci });
+  };
+  toggle = (key, v) => this.setState(s => {
+    const n = { [key]: s[key] === v ? null : v };
+    const st = Object.assign({}, s, n);
+    if (st.fFam && st.fTask) {
+      const fi = FAMS.indexOf(st.fFam);
+      let ci = COLS.findIndex(c => (!st.fShape || c.s === st.fShape) && c.t === st.fTask && ADMIT[c.s + '|' + st.fFam + '|' + c.t]);
+      if (ci < 0) ci = COLS.findIndex(c => (!st.fShape || c.s === st.fShape) && c.t === st.fTask);
+      if (ci >= 0) { n.fi = fi; n.ci = ci; }
+    } else if (st.fFam) n.fi = FAMS.indexOf(st.fFam);
+    return n;
+  });
+  jump = (s, f, t) => {
+    if (this.state.view === 'orb' && this.cO) { const od = this.orbData(), pi = ORDER.indexOf(s), mi = od.planets[pi].moons.findIndex(m => m.key === f), si = mi >= 0 ? od.planets[pi].moons[mi].sats.findIndex(x => x.key === t) : -1; this._of = [pi, mi, si]; this.cO.focus(pi, mi, si); }
+    this.setState({ fi: FAMS.indexOf(f), ci: COLS.findIndex(c => c.s === s && c.t === t) });
+    const el = this.matRef.current || document.querySelector('[data-cov-fig]'), stop = document.querySelector('[data-stop="1"]');
+    if (stop) scrollTo({ top: stop.getBoundingClientRect().top + scrollY, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    if (el) setTimeout(() => el.focus({ preventScroll: true }), 300);
+  };
+
+  renderVals() {
+    const st = this.state;
+    const match = (s, f, t) => (!st.fShape || st.fShape === s) && (!st.fFam || st.fFam === f) && (!st.fTask || st.fTask === t);
+    const anyFilter = !!(st.fShape || st.fFam || st.fTask);
+    const heads = []; let prev = null;
+    COLS.forEach((c, i) => {
+      if (prev && prev !== c.s) heads.push({ sp: true, col: false });
+      prev = c.s;
+      const hit = (st.fTask === c.t && (!st.fShape || st.fShape === c.s)) || st.ci === i;
+      heads.push({ sp: false, col: true, task: c.t, tc: hit ? 'var(--fg)' : 'var(--mut)', pick: () => this.toggle('fTask', c.t) });
+    });
+    const rows = FAMS.map((f, fi) => {
+      const cells = []; let pv = null;
+      COLS.forEach((c, ci) => {
+        if (pv && pv !== c.s) cells.push({ sp: true, cell: false });
+        pv = c.s;
+        const key = c.s + '|' + f + '|' + c.t; const adm = !!ADMIT[key]; const on = st.fi === fi && st.ci === ci;
+        const m = match(c.s, f, c.t); const shot = !!SHOTS[key]; const vr = VARIANTS[key];
+        cells.push({
+          sp: false, cell: true, ariaSel: on ? 'true' : 'false',
+          title: SHAPES[c.s].label + ' · ' + f + ' · ' + c.t + (adm ? ' — admitted' : ' — not admitted') + (vr ? ' (tested variant: ' + vr + ')' : '') + (shot ? ' · showcase screenshot' : ''),
+          d: adm ? (on ? 7 : 5) : 2,
+          col: adm ? 'var(--fg)' : 'var(--dim)',
+          op: adm ? (anyFilter && !m ? 0.22 : 1) : (on ? 1 : 0.55),
+          glow: adm && (!anyFilter || m) ? '0 0 6px rgba(156,200,255,.55)' : 'none',
+          ringCol: adm && vr ? 'var(--cy)' : adm && shot ? 'var(--acc)' : 'transparent',
+          ringStyle: vr ? 'dashed' : 'solid',
+          spk: on ? 0.85 : 0,
+          pick: () => this.setState({ fi, ci })
+        });
+      });
+      const hit = st.fFam === f || st.fi === fi;
+      return { fam: f, cells, tc: hit ? 'var(--fg)' : 'var(--mut)', bg: st.fFam === f ? 'var(--hi)' : 'transparent', pick: () => this.toggle('fFam', f) };
+    });
+    const sh = {};
+    ORDER.forEach(s => { const on = st.fShape === s; sh[s] = { tc: on ? 'var(--acc)' : 'var(--mut)', bc: on ? 'var(--acc)' : 'var(--line)', pick: () => this.toggle('fShape', s) }; });
+
+    const f = FAMS[st.fi], c = COLS[st.ci], key = c.s + '|' + f + '|' + c.t, adm = !!ADMIT[key];
+    const shot = SHOTS[key], vr = VARIANTS[key], note = TASK_NOTE(c.t);
+    const d = {
+      shape: SHAPES[c.s].label.toUpperCase(), fam: f, task: c.t,
+      status: adm ? 'ADMITTED' : 'NOT ADMITTED', stc: adm ? 'var(--cy)' : 'var(--dim)',
+      desc: adm
+        ? 'A' + (/^(mlp|ft-|autoencoder|lstm|rnn)/.test(f) ? 'n ' : ' ') + f + ' network on ' + SHAPES[c.s].desc + ' samples, for the ' + c.t + ' task. It builds, trains, evaluates, packs and serves.'
+        : 'Not admitted: Vega does not pair ' + f + ' with ' + c.t + ' on ' + SHAPES[c.s].label + ' samples. Only the listed combinations are supported.',
+      hasNote: adm && !!note, note,
+      hasVar: adm && !!vr, variant: vr || '',
+      hasImg: adm && !!shot, img: shot ? shot.img : '',  cap: shot ? shot.cap : '', iw: shot ? shot.iw : '100%', fit: shot ? shot.fit : 'cover'
+    };
+    const parts = [];
+    if (st.fShape) parts.push('shape ' + SHAPES[st.fShape].label);
+    if (st.fFam) parts.push('family ' + st.fFam);
+    if (st.fTask) parts.push('task ' + st.fTask);
+    return {
+      heads, rows, sh, d, imgRef: (el) => { if (el && d.img && el.getAttribute('src') !== d.img) el.setAttribute('src', d.img); }, matRef: this.setMat, onMatKey: this.onMatKey,
+      isThree: st.view === '3d', isFlat: st.view === 'flat', isOrb: st.view === 'orb',
+      viewOrb: () => { this.c3 && this.c3.tour && this.c3.tour(null); this.setState({ view: 'orb', touring: false }); },
+      pOrb: st.view === 'orb' ? 'true' : 'false', bOrb: st.view === 'orb' ? 'var(--hi)' : 'transparent', cOrb: st.view === 'orb' ? 'var(--fg)' : 'var(--dim)',
+      orbCrumb: this.orbCrumb(),
+      toggleTour: () => { const el = this.c3; if (!el) return; if (st.touring) { el.tour(null); this.setState({ touring: false }); return; }
+        const list = Object.keys(SHOTS).map(k => { const [s, fm, t] = k.split('|'); return FAMS.indexOf(fm) * COLS.length + COLS.findIndex(x => x.s === s && x.t === t); });
+        this.setState({ touring: true, fShape: null, fFam: null, fTask: null }); el.tour(list, 3400, (i) => i < 0 ? this.setState({ touring: false }) : this.setState({ fi: Math.floor(i / COLS.length), ci: i % COLS.length })); },
+      tourPressed: st.touring ? 'true' : 'false', tourLabel: st.touring ? 'STOP' : 'SCREENSHOT TOUR', tourIcon: st.touring ? '■' : '▶', tourBc: st.touring ? 'var(--acc)' : 'var(--line)',
+      view3d: () => this.setState({ view: '3d' }), viewFlat: () => { this.c3 && this.c3.tour(null); this.setState({ view: 'flat', touring: false }); },
+      p3d: st.view === '3d' ? 'true' : 'false', pFlat: st.view === 'flat' ? 'true' : 'false',
+      b3d: st.view === '3d' ? 'var(--hi)' : 'transparent', c3d: st.view === '3d' ? 'var(--fg)' : 'var(--dim)',
+      bFlat: st.view === 'flat' ? 'var(--hi)' : 'transparent', cFlat: st.view === 'flat' ? 'var(--fg)' : 'var(--dim)',
+      filterText: parts.length ? 'Filtered by ' + parts.join(' · ') : 'All families, shapes and tasks',
+      hasFilter: parts.length > 0, clearFilter: () => this.setState({ fShape: null, fFam: null, fTask: null }),
+      shot1: () => this.jump('row', 'mlp-plain', 'multiclass'), shot2: () => this.jump('row', 'mlp-plain', 'regression'), shot3: () => this.jump('window', 'gru', 'forecast'),
+      shot4: () => this.jump('window', 'bi-gru', 'sequence-classification/multiclass'), shot5: () => this.jump('node', 'gat', 'multiclass'),
+      closeRef: this.setClose,
+      indexOpen: st.indexOpen, openIndex: () => this.setState({ indexOpen: true }), closeIndex: () => this.setState({ indexOpen: false }),
+      pages: PAGES
+    };
+  }
+}
+</script>
+</body>
+</html>

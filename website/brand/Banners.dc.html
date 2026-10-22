@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — banners</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<style>
+html,body{margin:0}
+body{background:#04080E;color:#E9F0F8;font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#9CC8FF;text-decoration:none}a:hover{color:#E9F0F8}
+</style>
+</helmet>
+<div style="max-width:1200px;margin:0 auto;padding:64px clamp(20px,4vw,48px) 48px;display:flex;flex-direction:column;gap:48px">
+  <header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:14px;max-width:40em">
+      <span style="font:500 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.22em;color:#8C9EB3">VEGA / BRAND · BANNERS</span>
+      <h1 style="margin:0;font-weight:300;font-size:clamp(28px,4vw,40px);line-height:1.15">Four banners, each at its exact size.</h1>
+      <p style="margin:0;color:#A3B4C7;line-height:1.6">PNG at the exact upload size. Text sits at least 40 px from every edge; on X and LinkedIn it stays in the centre, clear of the profile picture.</p>
+    </div>
+    <button type="button" onClick="{{ toggle }}" aria-pressed="{{ pressed }}" style="appearance:none;flex:0 0 auto;white-space:nowrap;border:1px solid rgba(156,200,255,.3);background:transparent;color:#E9F0F8;border-radius:999px;padding:12px 18px;font:500 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em;cursor:pointer">{{ label }}</button>
+  </header>
+  <sc-for list="{{ banners }}" as="b" hint-placeholder-count="0">
+    <figure style="margin:0;display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:100%;aspect-ratio:{{ b.ar }};border:1px solid rgba(156,200,255,.14)">
+        <img src="{{ b.png }}" alt="{{ b.alt }}" style="display:block;width:100%;height:100%">
+        <sc-if value="{{ showSafe }}" hint-placeholder-val="{{ false }}">
+          <span aria-hidden="true" style="position:absolute;left:{{ b.m }};right:{{ b.m }};top:{{ b.mv }};bottom:{{ b.mv }};border:1px dashed rgba(111,224,220,.8)"></span>
+          <span aria-hidden="true" style="position:absolute;left:{{ b.cl }};right:{{ b.cl }};top:{{ b.mv }};bottom:{{ b.mv }};background:rgba(111,224,220,.08);border-left:1px solid rgba(111,224,220,.6);border-right:1px solid rgba(111,224,220,.6)"></span>
+        </sc-if>
+      </div>
+      <figcaption style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:#8C9EB3">
+        <span><span style="color:#E9F0F8">{{ b.name }}</span> · {{ b.size }} · “{{ b.line }}”</span>
+        <span style="display:flex;gap:16px"><a href="{{ b.png }}" download="">PNG</a></span>
+      </figcaption>
+    </figure>
+  </sc-for>
+  <footer style="display:flex;justify-content:center;padding-top:16px">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:14px;font:500 10px/1 'Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:#8C9EB3;padding:8px">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left,#8C9EB3,transparent)"></span>
+      <span>built with <span style="color:#9CC8FF">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right,#8C9EB3,transparent)"></span>
+    </a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const B = [
+  { name: 'GitHub social preview', file: 'vega-github-social-1280x640', W: 1280, H: 640, line: 'The reference star for neural network engineering and dataset analysis.', centre: 0 },
+  { name: 'README header', file: 'vega-readme-header-1600x400', W: 1600, H: 400, line: 'Measured, not claimed.', centre: 0 },
+  { name: 'X header', file: 'vega-x-header-1500x500', W: 1500, H: 500, line: 'Every number traced. Every verdict honest.', centre: 1100 },
+  { name: 'LinkedIn cover', file: 'vega-linkedin-cover-1584x396', W: 1584, H: 396, line: 'The reference star for neural network engineering and dataset analysis.', centre: 1100 }
+];
+class Component extends DCLogic {
+  state = { safe: false };
+  renderVals() {
+    return {
+      showSafe: this.state.safe, pressed: this.state.safe ? 'true' : 'false',
+      label: this.state.safe ? 'HIDE SAFE AREAS' : 'SHOW SAFE AREAS',
+      toggle: () => this.setState(s => ({ safe: !s.safe })),
+      banners: B.map(b => ({
+        name: b.name, size: b.W + ' × ' + b.H, line: b.line, ar: b.W + ' / ' + b.H,
+        png: '../assets/banners/' + b.file + '.png', svg: '../assets/banners/' + b.file + '.svg', alt: 'Vega ' + b.name + ' banner',
+        m: (40 / b.W * 100) + '%', mv: (40 / b.H * 100) + '%',
+        cl: b.centre ? ((b.W - b.centre) / 2 / b.W * 100) + '%' : (40 / b.W * 100) + '%'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{"run": "2026-09-05T11-20Z", "baseline": "blueprint-runs/2026-09-05T10-12Z/blueprint.md",
+ "findings": [
+  {"id": "A-1", "depth": "surface", "axis": "Abstraction", "file": "training/loop.py",
+   "anchors": ["EJ-15"],
+   "anchor_justification": "fit() is 90 lines with the epoch record built inline; the record's construction is a separable module-private helper, and EJ-15's rule that helpers stay private applies once it is extracted",
+   "title": "Extract the epoch-record construction out of fit()", "tags": []},
+  {"id": "A-2", "depth": "surface", "axis": "Model", "file": "domain.py",
+   "anchors": ["EJ-1"],
+   "anchor_justification": "EpochRecord.of() takes **kw and sorts the fields into two buckets; a static factory whose name says what it validates would take the buckets",
+   "title": "EpochRecord.of() hides its two field groups behind **kw", "tags": []},
+  {"id": "A-3", "depth": "architectural", "axis": "Composition", "file": "evaluation/evaluate.py",
+   "anchors": ["EJ-20", "HEX"],
+   "anchor_justification": "the Evaluator takes data, store and build as three separate parameters; the blueprint's world model would read better with one campaign context object, which is the blueprint's shape to change, not the template's",
+   "title": "The Evaluator's three ports could be one campaign context", "tags": []}
+ ]}

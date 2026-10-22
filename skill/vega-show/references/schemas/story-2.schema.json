@@ -1,0 +1,430 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vega:schema:story:2",
+  "title": "vega/story@2 — showcase/story.json, the page's data document",
+  "description": "Written once by resolve_story.py (H05) from an authored vega/story-plan@2 that passed V1–V15, and pinned in SHOWCASE.json; never edited afterwards. It carries D4 §15's blocks and nothing else about the project the page needs from the story: lexicon@1, class_roles@1, input_groups@2, focus@1, results.breakdown@1, code_notes, the reserved values primary and ci_level. The motif lives only in page.json. values holds only the facts some field references (placeholders plus the structured value/names/values/weak/diff/number/page keys); formats and refs hold the same keys. Text fields carry no digit outside {placeholders} (the digit rule) and their lengths follow the catalog's authored_lengths (show-contract.md §4).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "locale", "task", "lexicon", "class_roles", "polarity", "values", "formats", "refs", "headline", "lead",
+               "sections", "input_groups", "code_notes", "report", "bundle"],
+  "properties": {
+    "schema": { "const": "vega/story@2" },
+    "locale": { "enum": ["en"] },
+    "task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "base", "goal", "sample_shape", "graph_level", "family", "view_key", "classes", "outcomes", "primary", "direction"],
+      "properties": {
+        "kind": { "enum": ["binary", "multiclass", "multilabel", "regression", "ordinal", "unsupervised", "anomaly",
+                           "sequence-classification", "sequence-regression", "forecast"] },
+        "base": { "enum": ["binary", "multiclass", "multilabel", "regression", "ordinal", null] },
+        "goal": { "enum": ["predict", "reconstruct", "anomaly"] },
+        "sample_shape": { "enum": ["row", "window", "graph"] },
+        "graph_level": { "enum": ["node", "graph", null] },
+        "family": { "type": "string", "minLength": 1 },
+        "view_key": { "$ref": "#/$defs/view_key" },
+        "classes": { "type": ["array", "null"], "items": { "type": "string", "minLength": 1 } },
+        "outcomes": { "type": ["array", "null"], "items": { "type": "string", "minLength": 1 } },
+        "primary": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "direction": { "enum": ["max", "min"] }
+      }
+    },
+    "lexicon": { "$ref": "#/$defs/lexicon" },
+    "class_roles": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/class_roles" } ] },
+    "class_names": { "description": "the words each class is shown by on the page (the authored plan's class_names), absent when none",
+                     "type": "object", "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 30 } },
+    "polarity": { "enum": ["neutral-alert", "plain", "diverging", "normal-anomalous"] },
+    "values": {
+      "type": "object",
+      "required": ["primary"],
+      "propertyNames": { "$ref": "#/$defs/key" },
+      "properties": {
+        "primary": { "$ref": "#/$defs/estimate" },
+        "ci_level": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 }
+      },
+      "additionalProperties": { "$ref": "#/$defs/value" }
+    },
+    "formats": {
+      "type": "object", "propertyNames": { "$ref": "#/$defs/key" },
+      "additionalProperties": { "enum": ["count", "metric", "ci", "param", "epoch", "verbatim", "list"] }
+    },
+    "refs": {
+      "type": "object", "propertyNames": { "$ref": "#/$defs/key" },
+      "additionalProperties": { "$ref": "#/$defs/ref" }
+    },
+    "headline": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "lead": { "type": "string", "minLength": 1, "maxLength": 280 },
+    "sections": {
+      "type": "array", "minItems": 4, "maxItems": 5,
+      "prefixItems": [ { "$ref": "#/$defs/section_context" }, { "$ref": "#/$defs/section_network" },
+                       { "$ref": "#/$defs/section_experiments" }, { "$ref": "#/$defs/section_results" } ],
+      "items": { "$ref": "#/$defs/section_many" }
+    },
+    "input_groups": { "$ref": "#/$defs/input_groups" },
+    "code_notes": {
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/walk_id" },
+      "additionalProperties": { "$ref": "#/$defs/code_note" }
+    },
+    "report": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "file", "pdf_digest", "aux_digest", "roles_digest", "roles_source", "briefs"],
+      "properties": {
+        "status": { "enum": ["linked", "brief-links"] },
+        "file": { "enum": ["report/report.pdf", null] },
+        "pdf_digest": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/digest" } ] },
+        "aux_digest": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/digest" } ] },
+        "roles_digest": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/digest" } ] },
+        "roles_source": { "enum": ["document-project", "proposed", null] },
+        "briefs": {
+          "oneOf": [ { "type": "null" },
+                     { "type": "object", "minProperties": 1,
+                       "propertyNames": { "enum": ["shape", "blueprint", "net", "train", "eval", "pack"] },
+                       "additionalProperties": { "type": "string", "pattern": "^briefs/[a-z-]+-brief\\.md$" } } ]
+        }
+      }
+    },
+    "bundle": {
+      "type": "object", "additionalProperties": false, "required": ["manifest_digest", "slug", "run"],
+      "properties": { "manifest_digest": { "$ref": "#/$defs/digest" }, "slug": { "type": "string", "minLength": 1 },
+                      "run": { "type": "string", "minLength": 1 } }
+    }
+  },
+  "$defs": {
+    "key": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "ref": { "type": "string",
+             "pattern": "^((MANIFEST|netspec|schema)\\.json|records/(geometry|analysis|shape|architecture|training|evaluation)\\.json)#[^\\s#]+$|^report:[a-z][a-z0-9.-]*\\.(number|page|title)$" },
+    "walk_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "view_key": { "enum": ["classes", "binary", "labels", "value", "ordinal", "reconstruction", "anomaly", "horizon"] },
+    "estimate": {
+      "type": "object", "additionalProperties": false, "required": ["value", "ci", "n"],
+      "properties": { "value": { "type": "number" },
+                      "ci": { "oneOf": [ { "type": "null" },
+                                         { "type": "array", "prefixItems": [ { "type": "number" }, { "type": "number" } ], "minItems": 2, "maxItems": 2 } ] },
+                      "n": { "type": ["integer", "null"], "minimum": 0 } }
+    },
+    "value": {
+      "oneOf": [
+        { "type": ["number", "string", "boolean"] },
+        { "type": "array", "items": { "type": ["number", "string", "boolean", "null"] } },
+        { "type": "object", "additionalProperties": false, "required": ["value"],
+          "properties": { "value": { "type": "number" },
+                          "ci": { "oneOf": [ { "type": "null" },
+                                             { "type": "array", "prefixItems": [ { "type": "number" }, { "type": "number" } ], "minItems": 2, "maxItems": 2 } ] },
+                          "n": { "type": ["integer", "null"], "minimum": 0 } } }
+      ]
+    },
+    "entry": {
+      "type": "object", "additionalProperties": false, "required": ["one", "many", "article"],
+      "properties": { "one": { "type": "string", "pattern": "^[a-z][a-z' -]{0,30}$" },
+                      "many": { "type": "string", "pattern": "^[a-z][a-z' -]{0,30}$" },
+                      "article": { "enum": ["a", "an"] } }
+    },
+    "source_entry": {
+      "type": "object", "additionalProperties": false, "required": ["one", "many", "article"],
+      "properties": { "one": { "type": "string", "pattern": "^[a-z][a-z' -]{0,30}$" },
+                      "many": { "type": "string", "pattern": "^[a-z][a-z' -]{0,30}$" },
+                      "article": { "enum": ["a", "an", "the"] } }
+    },
+    "lexicon": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "row", "feature", "source"],
+      "properties": {
+        "schema": { "const": "vega/lexicon@1" },
+        "row": { "$ref": "#/$defs/entry" }, "feature": { "$ref": "#/$defs/entry" }, "source": { "$ref": "#/$defs/source_entry" },
+        "step": { "$ref": "#/$defs/entry" }, "window": { "$ref": "#/$defs/entry" }, "node": { "$ref": "#/$defs/entry" },
+        "edge": { "$ref": "#/$defs/entry" }, "graph": { "$ref": "#/$defs/entry" }, "target": { "$ref": "#/$defs/entry" },
+        "source_of": {
+          "type": "object",
+          "propertyNames": { "enum": ["row", "feature", "source", "step", "window", "node", "edge", "graph", "target"] },
+          "additionalProperties": { "type": "string",
+                                    "pattern": "^(user:.+|show:\\d{4}-\\d{2}-\\d{2}|bundle:MANIFEST\\.serve\\.identity\\.(noun|nouns)|vega:default)$" }
+        }
+      }
+    },
+    "role": { "enum": ["neutral", "alert", "plain"] },
+    "basis": { "type": "string", "pattern": "^(structural:(majority|negative)|task:anomaly|user:.+|show:\\d{4}-\\d{2}-\\d{2}|registry:[A-Za-z0-9_-]+|vega:default)$" },
+    "class_roles": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema", "roles", "source", "proposed"],
+      "properties": {
+        "schema": { "const": "vega/class-roles@1" },
+        "roles": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/role" } },
+        "source": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/basis" } },
+        "proposed": {
+          "type": "object", "additionalProperties": false, "required": ["neutral", "rule", "alert", "evidence"],
+          "properties": { "neutral": { "type": ["string", "null"] },
+                          "rule": { "enum": ["structural:majority", "structural:negative", "task:anomaly", "none"] },
+                          "alert": { "type": "array", "items": { "type": "string" } },
+                          "evidence": { "type": "array", "items": { "type": "string", "pattern": "^(domain|spec|user|show|task):.+$" } } }
+        }
+      }
+    },
+    "input_groups": {
+      "type": "array", "minItems": 1, "maxItems": 9,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "label", "text", "members"],
+        "properties": { "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,31}$" },
+                        "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+                        "text": { "type": "string", "maxLength": 160 },
+                        "members": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } } }
+      }
+    },
+    "focus": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["kind", "ref"],
+          "properties": { "kind": { "const": "block" }, "ref": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$" } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "ref"],
+          "properties": { "kind": { "const": "family" }, "ref": { "enum": ["architecture", "objective", "optimization", "regularization"] } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind", "ref"],
+          "properties": { "kind": { "const": "feature" }, "ref": { "type": "string", "minLength": 1 } } },
+        { "type": "object", "additionalProperties": false, "required": ["kind"],
+          "properties": { "kind": { "const": "all" } } }
+      ]
+    },
+    "breakdown": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "metric", "names", "values", "weak", "direction", "caption"],
+      "properties": {
+        "kind": { "enum": ["per_class", "per_label", "per_bin", "per_horizon", "per_feature", "at_k"] },
+        "metric": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "names": { "$ref": "#/$defs/key" },
+        "values": { "$ref": "#/$defs/key" },
+        "weak": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/key" } ] },
+        "direction": { "enum": ["max", "min"] },
+        "caption": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "code_note": {
+      "type": "object", "additionalProperties": false, "required": ["note", "link", "ref"],
+      "properties": {
+        "note": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "link": { "oneOf": [ { "type": "null" },
+                             { "type": "object", "additionalProperties": false, "required": ["href", "kind"],
+                               "properties": { "href": { "type": "string", "pattern": "^showcase/(report/report\\.pdf(#page=\\d+)?|briefs/[a-z-]+-brief\\.md)$" },
+                                               "kind": { "enum": ["report", "file"] } } } ] },
+        "ref": { "oneOf": [ { "type": "null" },
+                            { "type": "object", "additionalProperties": false, "required": ["kind", "number", "page", "title"],
+                              "properties": { "kind": { "enum": ["section", "figure", "table", "equation"] },
+                                              "number": { "$ref": "#/$defs/key" },
+                                              "page": { "$ref": "#/$defs/key" },
+                                              "title": { "type": "string" },
+                                              "chapter": { "type": "object", "additionalProperties": false, "required": ["number", "title"],
+                                                           "description": "the chapter the object sits in (its stage's chapter role), so the page names '§n Title · Figure k'",
+                                                           "properties": { "number": { "$ref": "#/$defs/key" }, "title": { "type": "string" } } } } } ] }
+      }
+    },
+    "section_context": {
+      "type": "object", "additionalProperties": false, "required": ["id", "steps", "facts"],
+      "properties": {
+        "id": { "const": "context" },
+        "steps": { "type": "array", "minItems": 4, "maxItems": 5,
+                   "items": { "type": "object", "additionalProperties": false, "required": ["id", "text"],
+                              "properties": { "id": { "enum": ["problem", "data", "windows", "graph", "cleaning", "split"] },
+                                              "text": { "type": "string", "minLength": 1, "maxLength": 700 } } } },
+        "facts": { "type": "array", "minItems": 2, "maxItems": 6,
+                   "items": { "type": "object", "additionalProperties": false, "required": ["label", "value"],
+                              "properties": { "label": { "type": "string", "minLength": 1, "maxLength": 40 },
+                                              "value": { "$ref": "#/$defs/key" },
+                                              "format": { "enum": ["count", "metric", "ci", "param", "epoch", "verbatim", "list"] } } } }
+      }
+    },
+    "section_network": {
+      "type": "object", "additionalProperties": false, "required": ["id", "lead", "choices"],
+      "properties": {
+        "id": { "const": "network" },
+        "lead": { "type": "string", "minLength": 1, "maxLength": 280 },
+        "choices": { "type": "array", "minItems": 1, "maxItems": 8,
+                     "items": { "type": "object", "additionalProperties": false, "required": ["title", "text", "focus"],
+                                "properties": { "title": { "type": "string", "minLength": 1, "maxLength": 60 },
+                                                "text": { "type": "string", "minLength": 1, "maxLength": 600 },
+                                                "focus": { "$ref": "#/$defs/focus" } } } }
+      }
+    },
+    "section_experiments": {
+      "type": "object", "additionalProperties": false, "required": ["id", "lead", "caption", "metric", "runs"],
+      "properties": {
+        "id": { "const": "experiments" },
+        "lead": { "type": "string", "minLength": 1, "maxLength": 280 },
+        "caption": { "type": "string", "maxLength": 200 },
+        "metric": { "type": "object", "additionalProperties": false, "required": ["name", "direction"],
+                    "properties": { "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }, "direction": { "enum": ["max", "min"] } } },
+        "runs": { "type": "array", "minItems": 1,
+                  "items": { "type": "object", "additionalProperties": false, "required": ["id", "value", "label", "selected", "reference"],
+                             "properties": { "id": { "type": "string", "minLength": 1 }, "value": { "$ref": "#/$defs/key" },
+                                             "label": { "type": "string", "minLength": 1, "maxLength": 60 },
+                                             "selected": { "type": "boolean" }, "reference": { "type": "boolean" } } } }
+      }
+    },
+    "section_results": {
+      "type": "object", "additionalProperties": false, "required": ["id", "headline", "models", "facts", "breakdown", "verdict", "limits"],
+      "properties": {
+        "id": { "const": "results" },
+        "headline": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "models": { "type": "array", "minItems": 1,
+                    "items": { "type": "object", "additionalProperties": false, "required": ["name", "value", "selected"],
+                               "properties": { "name": { "enum": ["network", "trivial", "linear", "tree", "naive", "seasonal-naive",
+                                                                  "graph-linear", "lens", "campaign"] },
+                                               "value": { "$ref": "#/$defs/key" }, "selected": { "type": "boolean" } } } },
+        "facts": { "type": "array",
+                   "items": { "type": "object", "additionalProperties": false, "required": ["metric", "value"],
+                              "properties": { "metric": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+                                              "value": { "$ref": "#/$defs/key" },
+                                              "note": { "type": "string", "maxLength": 160 } } } },
+        "breakdown": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/breakdown" } ] },
+        "verdict": { "type": "object", "additionalProperties": false, "required": ["earned", "beaten_by_baseline", "strongest_baseline", "diff"],
+                     "properties": { "earned": { "type": ["boolean", "null"] }, "beaten_by_baseline": { "type": ["boolean", "null"] },
+                                     "strongest_baseline": { "enum": ["trivial", "linear", "tree", "naive", "seasonal-naive", "graph-linear",
+                                                                      "lens", "campaign", null] },
+                                     "diff": { "oneOf": [ { "type": "null" }, { "$ref": "#/$defs/key" } ] },
+                                     "reason": { "$ref": "#/$defs/key" } },
+                     "$comment": "earned null is the evaluation's 'not assessable' verdict (A30, eval-contract §5): neither a win nor a loss, so no baseline, no difference, beaten_by_baseline null, and the reason's values key; any other verdict has a boolean earned and beaten_by_baseline and no reason",
+                     "if": { "properties": { "earned": { "type": "null" } } },
+                     "then": { "required": ["reason"],
+                               "properties": { "beaten_by_baseline": { "type": "null" }, "strongest_baseline": { "type": "null" },
+                                               "diff": { "type": "null" } } },
+                     "else": { "not": { "required": ["reason"] },
+                               "properties": { "earned": { "type": "boolean" }, "beaten_by_baseline": { "type": "boolean" } } } },
+        "limits": { "type": "array", "minItems": 1,
+                    "items": { "type": "object", "additionalProperties": false, "required": ["id", "title", "text"],
+                               "properties": { "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$" },
+                                               "title": { "type": "string", "minLength": 1, "maxLength": 60 },
+                                               "text": { "type": "string", "minLength": 1, "maxLength": 400 },
+                                               "recorded": { "type": "string", "minLength": 1, "description": "the record's own words the limit cites (facts.groups.limits[].recorded), quoted by the page as data" } } } }
+      }
+    },
+    "section_many": {
+      "type": "object", "additionalProperties": false, "required": ["id", "monitor_note"],
+      "properties": { "id": { "const": "many" }, "monitor_note": { "type": ["string", "null"], "maxLength": 240 } }
+    }
+  },
+  "examples": [
+    {
+      "schema": "vega/story@2",
+      "locale": "en",
+      "task": { "kind": "binary", "base": null, "goal": "predict", "sample_shape": "row", "graph_level": null, "family": "mlp-residual",
+                "view_key": "binary", "classes": ["0", "1"], "outcomes": null, "primary": "pr_auc", "direction": "max" },
+      "lexicon": { "schema": "vega/lexicon@1",
+                   "row": { "one": "order", "many": "orders", "article": "an" },
+                   "feature": { "one": "field", "many": "fields", "article": "a" },
+                   "source": { "one": "order system", "many": "order systems", "article": "the" },
+                   "source_of": { "row": "bundle:MANIFEST.serve.identity.noun", "feature": "user:turn-3", "source": "vega:default" } },
+      "class_roles": { "schema": "vega/class-roles@1", "roles": { "0": "neutral", "1": "alert" },
+                       "source": { "0": "structural:negative", "1": "show:2026-09-29" },
+                       "proposed": { "neutral": "0", "rule": "structural:negative", "alert": ["1"], "evidence": ["show:2026-09-29"] } },
+      "polarity": "neutral-alert",
+      "values": { "primary": { "value": 0.71, "ci": [0.64, 0.78], "n": 148 }, "ci_level": 0.95,
+                  "source_rows": 740, "train_rows": 444, "valid_rows": 148, "test_rows": 148,
+                  "run_r0_primary": 0.62, "run_r6_primary": 0.69,
+                  "eval_network_pr_auc": { "value": 0.71, "ci": [0.64, 0.78], "n": 148 },
+                  "eval_tree_pr_auc": { "value": 0.66, "ci": [0.58, 0.74], "n": 148 },
+                  "eval_diff_tree": { "value": 0.05, "ci": [-0.02, 0.11] },
+                  "eval_network_roc_auc": { "value": 0.8, "ci": [0.73, 0.86], "n": 148 } },
+      "formats": { "primary": "ci", "ci_level": "param", "source_rows": "count", "train_rows": "count", "valid_rows": "count",
+                   "test_rows": "count", "run_r0_primary": "metric", "run_r6_primary": "metric", "eval_network_pr_auc": "ci",
+                   "eval_tree_pr_auc": "ci", "eval_diff_tree": "ci", "eval_network_roc_auc": "ci" },
+      "refs": { "primary": "records/evaluation.json#metrics.models.network.pr_auc", "ci_level": "records/evaluation.json#metrics.ci_level",
+                "source_rows": "records/geometry.json#source.rows", "train_rows": "records/shape.json#manifest.outputs.parts.train.rows",
+                "valid_rows": "records/shape.json#manifest.outputs.parts.valid.rows", "test_rows": "records/shape.json#manifest.outputs.parts.test.rows",
+                "run_r0_primary": "records/training.json#experiments.runs[id=R0].primary",
+                "run_r6_primary": "records/training.json#experiments.runs[id=R6].primary",
+                "eval_network_pr_auc": "records/evaluation.json#metrics.models.network.pr_auc",
+                "eval_tree_pr_auc": "records/evaluation.json#metrics.models.tree.pr_auc",
+                "eval_diff_tree": "records/evaluation.json#metrics.differences.tree",
+                "eval_network_roc_auc": "records/evaluation.json#metrics.models.network.roc_auc" },
+      "headline": "Which {row.many} arrive late, read from {source_rows:count} past {row.many}",
+      "lead": "A residual network scores every {row.one} the {source.one} records, and says how sure it is.",
+      "sections": [
+        { "id": "context",
+          "steps": [ { "id": "problem", "text": "Late {row.many} cost more than early ones." },
+                     { "id": "data", "text": "{source_rows:count} {row.many}, each with its {feature.many}." },
+                     { "id": "cleaning", "text": "Nothing was dropped." },
+                     { "id": "split", "text": "{train_rows:count} to learn from, {valid_rows:count} to choose with, {test_rows:count} sealed." } ],
+          "facts": [ { "label": "orders", "value": "source_rows", "format": "count" }, { "label": "sealed test", "value": "test_rows" } ] },
+        { "id": "network", "lead": "Three choices shaped the network.",
+          "choices": [ { "title": "A residual stack", "text": "Each block adds to what it received.", "focus": { "kind": "block", "ref": "B3" } },
+                       { "title": "A weighted loss", "text": "Late orders are rarer, so they weigh more.", "focus": { "kind": "family", "ref": "objective" } },
+                       { "title": "Cosine schedule", "text": "The step shrinks smoothly.", "focus": { "kind": "family", "ref": "optimization" } } ] },
+        { "id": "experiments", "lead": "Each run changed one thing.", "caption": "Validation score of each run.",
+          "metric": { "name": "pr_auc", "direction": "max" },
+          "runs": [ { "id": "R6", "value": "run_r6_primary", "label": "dropout lowered", "selected": true, "reference": false },
+                    { "id": "R0", "value": "run_r0_primary", "label": "the spec as engineered", "selected": false, "reference": true } ] },
+        { "id": "results", "headline": "The network beats the trees on the sealed test, narrowly.",
+          "models": [ { "name": "network", "value": "eval_network_pr_auc", "selected": true },
+                      { "name": "tree", "value": "eval_tree_pr_auc", "selected": false } ],
+          "facts": [ { "metric": "roc_auc", "value": "eval_network_roc_auc", "note": "ranking quality" } ],
+          "breakdown": null,
+          "verdict": { "earned": true, "beaten_by_baseline": false, "strongest_baseline": "tree", "diff": "eval_diff_tree" },
+          "limits": [ { "id": "split", "title": "One random split", "text": "The test part was drawn at random once." },
+                      { "id": "exposures", "title": "Sealed once", "text": "The test part was opened once." },
+                      { "id": "one_seed", "title": "One seed", "text": "Every run used one seed." } ] }
+      ],
+      "input_groups": [ { "id": "size", "label": "size", "text": "how big the order is", "members": ["amount", "items"] },
+                        { "id": "place", "label": "place", "text": "where it goes", "members": ["region"] },
+                        { "id": "timing", "label": "timing", "text": "when it was placed", "members": ["weekday", "hour"] } ],
+      "code_notes": { "dense": { "note": "The block this note explains.", "link": { "href": "showcase/briefs/net-brief.md", "kind": "file" }, "ref": null },
+                      "root": { "note": "Where the modules meet.", "link": null, "ref": null } },
+      "report": { "status": "brief-links", "file": null, "pdf_digest": null, "aux_digest": null, "roles_digest": null, "roles_source": null,
+                  "briefs": { "net": "briefs/net-brief.md", "pack": "briefs/pack-brief.md" } },
+      "bundle": { "manifest_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111", "slug": "orders-late", "run": "H1-14" }
+    },
+    {
+      "schema": "vega/story@2",
+      "locale": "en",
+      "task": { "kind": "forecast", "base": null, "goal": "predict", "sample_shape": "window", "graph_level": null, "family": "gru",
+                "view_key": "horizon", "classes": null, "outcomes": null, "primary": "mase", "direction": "min" },
+      "lexicon": { "schema": "vega/lexicon@1",
+                   "row": { "one": "hour", "many": "hours", "article": "an" },
+                   "feature": { "one": "reading", "many": "readings", "article": "a" },
+                   "source": { "one": "station log", "many": "station logs", "article": "the" },
+                   "step": { "one": "hour", "many": "hours", "article": "an" },
+                   "window": { "one": "day", "many": "days", "article": "a" },
+                   "target": { "one": "rental count", "many": "rental counts", "article": "a" } },
+      "class_roles": null,
+      "polarity": "diverging",
+      "values": { "primary": { "value": 0.83, "ci": [0.79, 0.88], "n": 355 },
+                  "eval_network_per_horizon_error": [1.2, 1.9, 2.4], "horizon_names": ["h1", "h2", "h3"],
+                  "eval_network_per_horizon_weak": [false, false, true], "window_length": 24, "run_r0_primary": 0.86 },
+      "formats": { "primary": "ci", "eval_network_per_horizon_error": "list", "horizon_names": "list",
+                   "eval_network_per_horizon_weak": "list", "window_length": "param", "run_r0_primary": "metric" },
+      "refs": { "primary": "records/evaluation.json#metrics.models.network.mase",
+                "eval_network_per_horizon_error": "records/evaluation.json#metrics.models.network.per_horizon_error",
+                "horizon_names": "netspec.json#data_contract.sample.horizon",
+                "eval_network_per_horizon_weak": "records/evaluation.json#metrics.models.trivial.per_horizon_error",
+                "window_length": "netspec.json#data_contract.sample.length",
+                "run_r0_primary": "records/training.json#experiments.runs[id=R0].primary" },
+      "headline": "Rentals over the next {step.many}, from the last {window_length} {step.many}",
+      "lead": "A recurrent network reads a {window.one} of {feature.many} and forecasts ahead.",
+      "sections": [
+        { "id": "context",
+          "steps": [ { "id": "problem", "text": "Stations run empty." }, { "id": "data", "text": "Hourly logs." },
+                     { "id": "windows", "text": "Each answer reads the {window_length} previous {step.many}." },
+                     { "id": "cleaning", "text": "Gaps were filled." }, { "id": "split", "text": "Earlier weeks train, later weeks test." } ],
+          "facts": [ { "label": "window", "value": "window_length" }, { "label": "horizon", "value": "horizon_names", "format": "count" } ] },
+        { "id": "network", "lead": "A small recurrent network.",
+          "choices": [ { "title": "A gated recurrent layer", "text": "It keeps a running memory.", "focus": { "kind": "block", "ref": "B2" } } ] },
+        { "id": "experiments", "lead": "Two runs.", "caption": "Validation error.", "metric": { "name": "mase", "direction": "min" },
+          "runs": [ { "id": "R0", "value": "run_r0_primary", "label": "the spec as engineered", "selected": true, "reference": true } ] },
+        { "id": "results", "headline": "Better than yesterday's count, a little.",
+          "models": [ { "name": "network", "value": "primary", "selected": true } ],
+          "facts": [],
+          "breakdown": { "kind": "per_horizon", "metric": "per_horizon_error", "names": "horizon_names",
+                         "values": "eval_network_per_horizon_error", "weak": "eval_network_per_horizon_weak", "direction": "min",
+                         "caption": "Error per step ahead." },
+          "verdict": { "earned": true, "beaten_by_baseline": false, "strongest_baseline": "naive", "diff": null },
+          "limits": [ { "id": "split", "title": "One time split", "text": "Later weeks only." } ] },
+        { "id": "many", "monitor_note": null }
+      ],
+      "input_groups": [ { "id": "weather", "label": "weather", "text": "", "members": ["temp", "rain"] },
+                        { "id": "clock", "label": "clock", "text": "", "members": ["hour_sin", "hour_cos"] },
+                        { "id": "past", "label": "past", "text": "", "members": ["count"] } ],
+      "code_notes": {},
+      "report": { "status": "linked", "file": "report/report.pdf",
+                  "pdf_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+                  "aux_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+                  "roles_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                  "roles_source": "document-project", "briefs": null },
+      "bundle": { "manifest_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555", "slug": "bikeshare-count", "run": "R0" }
+    }
+  ]
+}

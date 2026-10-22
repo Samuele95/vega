@@ -1,0 +1,210 @@
+{
+ "schema": "dataset-shaper/recipe@1",
+ "input": {
+  "path": "dataset-shaper/fixtures/graph-level.csv",
+  "digest": "sha256:12e24f0892f0939b326761e75df993bb551215b713b10e1b713319c1219e4491",
+  "rows": 647,
+  "columns": 8,
+  "layers_read": []
+ },
+ "seed": 7,
+ "goal": "custom",
+ "target": "soluble",
+ "outputs": {
+  "dir": "shaped/",
+  "format": "parquet",
+  "files": [],
+  "recipe": "shaped/recipe.json",
+  "manifest": "shaped/manifest.json",
+  "lineage": "shaped/lineage.json",
+  "reproduce": "shaped/reproduce_graph-level.py"
+ },
+ "steps": [
+  {
+   "id": "S1",
+   "op": "retype",
+   "columns": [
+    "element"
+   ],
+   "params": {
+    "to": "nominal"
+   },
+   "source": "geometry:typing/element",
+   "rationale": "an element symbol is a category",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S2",
+   "op": "drop_identity",
+   "columns": [
+    "atom_key",
+    "bonded_to"
+   ],
+   "params": {},
+   "source": "geometry:typing/atom_key",
+   "rationale": "atom keys identify rows; the bonds they encode are read by S7 from the input",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "-2",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S3",
+   "op": "select_partition",
+   "columns": [
+    "soluble"
+   ],
+   "params": {
+    "label": "soluble",
+    "task": "binary"
+   },
+   "source": "geometry:partitions/soluble",
+   "rationale": "solubility is a property of the molecule, carried on each of its atoms",
+   "alternatives": [],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S4",
+   "op": "split",
+   "columns": [],
+   "params": {
+    "kind": "group",
+    "by": "molecule_id",
+    "test": 0.2,
+    "valid": 0.1
+   },
+   "source": "user:turn2 — a molecule is one sample; its atoms must not straddle parts",
+   "rationale": "a graph-level task: the molecule, not the atom, is what is held out",
+   "alternatives": [],
+   "consequences": {
+    "rows": "60 molecules -> 42 / 6 / 12",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": true
+  },
+  {
+   "id": "S5",
+   "op": "encode",
+   "columns": [
+    "element"
+   ],
+   "params": {
+    "strategy": "ordinal"
+   },
+   "source": "shaper:default",
+   "rationale": "five elements, embedded by the network",
+   "alternatives": [
+    {
+     "op": "encode",
+     "params": {
+      "strategy": "one-hot"
+     },
+     "when": "if the network does not embed"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S6",
+   "op": "scale",
+   "columns": [],
+   "params": {
+    "kind": "standard",
+    "columns": [
+     "charge",
+     "degree"
+    ]
+   },
+   "source": "shaper:default",
+   "rationale": "comparable scales",
+   "alternatives": [
+    {
+     "op": "scale",
+     "params": {
+      "kind": "none"
+     },
+     "when": "if the raw units matter"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "preprocessing": "none"
+    }
+   },
+   "reversible": false
+  },
+  {
+   "id": "S7",
+   "op": "graph_edges",
+   "columns": [
+    "atom_key",
+    "bonded_to"
+   ],
+   "params": {
+    "method": "key_pair",
+    "columns": [
+     "atom_key",
+     "bonded_to"
+    ],
+    "graph_id": "molecule_id",
+    "symmetric": true,
+    "self_loops": false,
+    "weight": null
+   },
+   "source": "analysis:F2/T1",
+   "rationale": "F2 — solubility follows the bonded structure: each atom is bonded to the atom its bonded_to names, inside its own molecule",
+   "alternatives": [
+    {
+     "op": "graph_edges",
+     "params": {
+      "method": "knn",
+      "k": 3,
+      "graph_id": "molecule_id"
+     },
+     "when": "if the bonds were missing and proximity had to stand in"
+    }
+   ],
+   "consequences": {
+    "rows": "none",
+    "columns": "none",
+    "downstream": {
+     "graph": "one graph per molecule; level graph",
+     "model_family": "gin with graph_pool"
+    }
+   },
+   "reversible": true
+  }
+ ]
+}

@@ -1,0 +1,1644 @@
+{
+ "schema": "vega/network-view@2",
+ "available": true,
+ "model_version": "sha256:2bd841b46b3c8a076876ac9cd5d1f79a6304c551053e9e2cc65018d6da7fb35a",
+ "spec_digest": "sha256:5fce4809bcc41a260742f01eee1f5cc5eba7535cf129a8ad3e2480d78347cc86",
+ "weights": "full",
+ "family": {
+  "name": "autoencoder",
+  "source": "catalog"
+ },
+ "task": {
+  "kind": "unsupervised",
+  "base": null,
+  "link": "reconstruction",
+  "outputs": {
+   "kind": "reconstruction",
+   "names": [
+    "x0",
+    "x1",
+    "x2",
+    "x3",
+    "x4",
+    "x5",
+    "x6",
+    "x7"
+   ]
+  },
+  "positive": null,
+  "threshold": null,
+  "threshold_scale": null,
+  "quantiles": null,
+  "decision_rule": "none",
+  "targets": [
+   "reconstruction_error",
+   "feature_error"
+  ],
+  "default_target": "reconstruction_error"
+ },
+ "sample": {
+  "shape": "row",
+  "length": null,
+  "stride": null,
+  "horizon": null,
+  "autoregressive": null,
+  "level": null,
+  "directed": null,
+  "self_loops": null,
+  "protocol": null,
+  "batching": null
+ },
+ "inputs": {
+  "numeric": [
+   "x0",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x5",
+   "x6",
+   "x7"
+  ],
+  "nominal": [],
+  "past_target": null,
+  "order": [
+   "x0",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x5",
+   "x6",
+   "x7"
+  ],
+  "width": 8,
+  "edges": null,
+  "axis_labels": {
+   "feature": [
+    "x0",
+    "x1",
+    "x2",
+    "x3",
+    "x4",
+    "x5",
+    "x6",
+    "x7"
+   ],
+   "step": null,
+   "token": null
+  }
+ },
+ "params": {
+  "total": 190,
+  "trainable": 190
+ },
+ "nodes": [
+  {
+   "id": "input.num",
+   "block": null,
+   "type": "input",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": null,
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "feature"
+   ],
+   "per": "sample",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "columns": [
+     "x0",
+     "x1",
+     "x2",
+     "x3",
+     "x4",
+     "x5",
+     "x6",
+     "x7"
+    ],
+    "stream": "numeric"
+   },
+   "formula": "x = the shaped inputs (numeric, nominal ids, edges)",
+   "code": null
+  },
+  {
+   "id": "B1",
+   "block": "B1",
+   "type": "sequential",
+   "view": "group",
+   "parent": null,
+   "children": [
+    "B1.0",
+    "B1.1"
+   ],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.0",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    4
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {},
+   "params": {
+    "count": 82,
+    "trainable": 82,
+    "children": [
+     "B1.0",
+     "B1.1"
+    ]
+   },
+   "formula": "f_n ∘ … ∘ f_1",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Sequential",
+    "anchor": "class Sequential("
+   }
+  },
+  {
+   "id": "B1.0",
+   "block": "B1",
+   "type": "dense",
+   "view": "units",
+   "parent": "B1",
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.0.inner.0",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 6,
+    "activation": "relu",
+    "bias": true
+   },
+   "params": {
+    "count": 54,
+    "trainable": 54,
+    "weight": "B1.0.weight",
+    "bias": "B1.0.bias",
+    "activation": "relu",
+    "row_norms": [
+     0.961809456,
+     0.980947077,
+     1.04606164,
+     1.09364939,
+     0.837385118,
+     1.13080072
+    ],
+    "col_norms": [
+     0.958399236,
+     1.18597341,
+     0.395739555,
+     0.613465846,
+     0.838048637,
+     1.23741424,
+     0.624601066,
+     0.822140038
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B1.1",
+   "block": "B1",
+   "type": "dense",
+   "view": "units",
+   "parent": "B1",
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.0.inner.1",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    4
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 4,
+    "activation": "relu",
+    "bias": true
+   },
+   "params": {
+    "count": 28,
+    "trainable": 28,
+    "weight": "B1.1.weight",
+    "bias": "B1.1.bias",
+    "activation": "relu",
+    "row_norms": [
+     0.962354302,
+     0.746972919,
+     1.16104603,
+     0.848110914
+    ],
+    "col_norms": [
+     0.797443271,
+     0.668151081,
+     0.937156439,
+     0.756986916,
+     0.362050027,
+     0.941648126
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B2",
+   "block": "B2",
+   "type": "dense",
+   "view": "units",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.1",
+   "in_shape": [
+    4
+   ],
+   "out_shape": [
+    2
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 2,
+    "activation": "none",
+    "bias": true
+   },
+   "params": {
+    "count": 10,
+    "trainable": 10,
+    "weight": "B2.weight",
+    "bias": "B2.bias",
+    "activation": "none",
+    "row_norms": [
+     1.25049567,
+     1.38771868
+    ],
+    "col_norms": [
+     0.889250755,
+     0.791455388,
+     1.1182071,
+     0.906612813
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B3",
+   "block": "B3",
+   "type": "decoder",
+   "view": "group",
+   "parent": null,
+   "children": [
+    "B3.l0",
+    "B3.l1"
+   ],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.2",
+   "in_shape": [
+    2
+   ],
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "widths": [
+     4,
+     6
+    ],
+    "activation": "relu"
+   },
+   "params": {
+    "count": 42,
+    "trainable": 42,
+    "children": [
+     "B3.l0",
+     "B3.l1"
+    ]
+   },
+   "formula": "x̂ = W_k·act(… act(W_1 z + b_1) …) + b_k",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Decoder",
+    "anchor": "class Decoder("
+   }
+  },
+  {
+   "id": "B3.l0",
+   "block": "B3",
+   "type": "dense",
+   "view": "units",
+   "parent": "B3",
+   "children": [],
+   "role": "decoder_layer",
+   "call": "tensor",
+   "path": "stages.2.net.0",
+   "in_shape": [
+    2
+   ],
+   "out_shape": [
+    4
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 4,
+    "activation": "relu",
+    "bias": true
+   },
+   "params": {
+    "count": 12,
+    "trainable": 12,
+    "weight": "B3.l0.weight",
+    "bias": "B3.l0.bias",
+    "activation": "relu",
+    "row_norms": [
+     0.379391402,
+     1.16383696,
+     0.914913118,
+     0.36074692
+    ],
+    "col_norms": [
+     1.03427088,
+     1.18150008
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B3.l1",
+   "block": "B3",
+   "type": "dense",
+   "view": "units",
+   "parent": "B3",
+   "children": [],
+   "role": "decoder_layer",
+   "call": "tensor",
+   "path": "stages.2.net.2",
+   "in_shape": [
+    4
+   ],
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 6,
+    "activation": "relu",
+    "bias": true
+   },
+   "params": {
+    "count": 30,
+    "trainable": 30,
+    "weight": "B3.l1.weight",
+    "bias": "B3.l1.bias",
+    "activation": "relu",
+    "row_norms": [
+     0.993764997,
+     1.36023605,
+     1.38443351,
+     0.506860793,
+     0.94316721,
+     0.538354516
+    ],
+    "col_norms": [
+     1.75196302,
+     1.12690806,
+     0.923281074,
+     0.999510109
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B4",
+   "block": "B4",
+   "type": "head",
+   "view": "units",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.3",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "output"
+   ],
+   "per": "sample",
+   "config": {
+    "out": 8,
+    "activation": "none",
+    "bias": true
+   },
+   "params": {
+    "count": 56,
+    "trainable": 56,
+    "weight": "B4.weight",
+    "bias": "B4.bias",
+    "activation": "none",
+    "row_norms": [
+     1.06130254,
+     0.859011292,
+     0.674645543,
+     1.27387428,
+     0.996166229,
+     1.10633945,
+     0.832906246,
+     0.888841271
+    ],
+    "col_norms": [
+     1.06221807,
+     0.79824096,
+     1.15283239,
+     1.34359419,
+     1.17471647,
+     1.1672827
+    ]
+   },
+   "formula": "z = W·x + b ; ordinal: z_j = w·x + θ_j with θ_0 ≥ θ_1 ≥ …",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Head",
+    "anchor": "class Head("
+   }
+  },
+  {
+   "id": "output",
+   "block": null,
+   "type": "output",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": [
+    8
+   ],
+   "out_shape": [
+    8
+   ],
+   "axes": [
+    "output"
+   ],
+   "per": "sample",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "link": "reconstruction",
+    "outputs": {
+     "kind": "reconstruction",
+     "names": [
+      "x0",
+      "x1",
+      "x2",
+      "x3",
+      "x4",
+      "x5",
+      "x6",
+      "x7"
+     ]
+    }
+   },
+   "formula": "ŷ = link(z)",
+   "code": null
+  }
+ ],
+ "edges": [
+  {
+   "from": "input.num",
+   "to": "B1.0",
+   "kind": "data"
+  },
+  {
+   "from": "B1.0",
+   "to": "B1.1",
+   "kind": "data"
+  },
+  {
+   "from": "B1.1",
+   "to": "B2",
+   "kind": "data"
+  },
+  {
+   "from": "B2",
+   "to": "B3.l0",
+   "kind": "data"
+  },
+  {
+   "from": "B3.l0",
+   "to": "B3.l1",
+   "kind": "data"
+  },
+  {
+   "from": "B3.l1",
+   "to": "B4",
+   "kind": "data"
+  },
+  {
+   "from": "B4",
+   "to": "output",
+   "kind": "readout"
+  }
+ ],
+ "chain": null,
+ "tensors": {
+  "B1.0.weight": {
+   "id": "B1.0.weight",
+   "node": "B1.0",
+   "role": "weight",
+   "shape": [
+    6,
+    8
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.505890012,
+    -0.331119627,
+    0.139278248,
+    -0.185292602,
+    0.185833395,
+    0.285432011,
+    -0.510365427,
+    0.359586358,
+    -0.210593596,
+    0.74037087,
+    0.257630438,
+    -0.190561548,
+    0.0712366924,
+    0.0760061741,
+    0.116502248,
+    0.492591977,
+    0.18838881,
+    0.58712405,
+    0.224230677,
+    -0.0628409609,
+    -0.538959563,
+    -0.55173409,
+    0.0724033043,
+    0.244297817,
+    0.510285556,
+    -0.216834888,
+    0.027497245,
+    -0.28743124,
+    -0.149317399,
+    -0.805906892,
+    0.261220247,
+    -0.255479574,
+    -0.0257016569,
+    0.157590404,
+    0.119885884,
+    -0.464651138,
+    0.536753356,
+    0.267750949,
+    0.176824421,
+    -0.233202934,
+    -0.567197084,
+    -0.576347888,
+    -0.0736871138,
+    0.0568059236,
+    -0.248675495,
+    0.646806538,
+    0.106469549,
+    0.353030026
+   ],
+   "summary": {
+    "n": 48,
+    "mean": 0.00562588417,
+    "std": 0.358121641,
+    "min": -0.805906892,
+    "max": 0.74037087,
+    "l2": 2.48144565,
+    "abs_q": [
+     0.246486656,
+     0.569942325,
+     0.775104961,
+     0.805906892
+    ],
+    "hist": {
+     "lo": -0.805906892,
+     "hi": 0.74037087,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      2,
+      2,
+      2,
+      1,
+      0,
+      1,
+      1,
+      3,
+      4,
+      1,
+      0,
+      2,
+      1,
+      2,
+      4,
+      4,
+      3,
+      2,
+      4,
+      1,
+      1,
+      0,
+      1,
+      2,
+      1,
+      0,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "B1.0.bias": {
+   "id": "B1.0.bias",
+   "node": "B1.0",
+   "role": "bias",
+   "shape": [
+    6
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0906569138,
+    -0.107047163,
+    0.0993879586,
+    0.045020245,
+    -0.126862973,
+    0.0723439679
+   ],
+   "summary": {
+    "n": 6,
+    "mean": 0.0122498249,
+    "std": 0.0931039511,
+    "min": -0.126862973,
+    "max": 0.0993879586,
+    "l2": 0.230022659,
+    "abs_q": [
+     0.0950224362,
+     0.116955068,
+     0.125872182,
+     0.126862973
+    ],
+    "hist": {
+     "lo": -0.126862973,
+     "hi": 0.0993879586,
+     "counts": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "B1.1.weight": {
+   "id": "B1.1.weight",
+   "node": "B1.1",
+   "role": "weight",
+   "shape": [
+    4,
+    6
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.437632143,
+    0.398693204,
+    0.429417461,
+    -0.575677574,
+    -0.101040103,
+    -0.22278811,
+    0.0221641101,
+    0.043376375,
+    0.45971939,
+    0.307064265,
+    -0.338416904,
+    0.368020982,
+    0.663863778,
+    0.125069305,
+    -0.614665627,
+    -0.263199568,
+    -0.0732839406,
+    -0.662730753,
+    -0.0564589277,
+    -0.519563019,
+    0.323584706,
+    0.279395789,
+    -0.0312182084,
+    -0.512264729
+   ],
+   "summary": {
+    "n": 24,
+    "mean": -0.00472108151,
+    "std": 0.384646998,
+    "min": -0.662730753,
+    "max": 0.663863778,
+    "l2": 1.88451968,
+    "abs_q": [
+     0.331000805,
+     0.602969211,
+     0.663603182,
+     0.663863778
+    ],
+    "hist": {
+     "lo": -0.662730753,
+     "hi": 0.663863778,
+     "counts": [
+      1,
+      1,
+      1,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      2,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B1.1.bias": {
+   "id": "B1.1.bias",
+   "node": "B1.1",
+   "role": "bias",
+   "shape": [
+    4
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0289210379,
+    -0.0637470931,
+    -0.0687745512,
+    0.111003332
+   ],
+   "summary": {
+    "n": 4,
+    "mean": 0.00185068138,
+    "std": 0.0740575735,
+    "min": -0.0687745512,
+    "max": 0.111003332,
+    "l2": 0.148161388,
+    "abs_q": [
+     0.0662608221,
+     0.0983346976,
+     0.109736468,
+     0.111003332
+    ],
+    "hist": {
+     "lo": -0.0687745512,
+     "hi": 0.111003332,
+     "counts": [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B2.weight": {
+   "id": "B2.weight",
+   "node": "B2",
+   "role": "weight",
+   "shape": [
+    2,
+    4
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.378574729,
+    -0.688405573,
+    0.395185351,
+    0.889014542,
+    0.804641604,
+    0.390511692,
+    1.04604769,
+    -0.177763492
+   ],
+   "summary": {
+    "n": 8,
+    "mean": 0.285082135,
+    "std": 0.595748259,
+    "min": -0.688405573,
+    "max": 1.04604769,
+    "l2": 1.86802101,
+    "abs_q": [
+     0.541795462,
+     0.936124486,
+     1.03505537,
+     1.04604769
+    ],
+    "hist": {
+     "lo": -0.688405573,
+     "hi": 1.04604769,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B2.bias": {
+   "id": "B2.bias",
+   "node": "B2",
+   "role": "bias",
+   "shape": [
+    2
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.217535585,
+    0.209846303
+   ],
+   "summary": {
+    "n": 2,
+    "mean": 0.213690944,
+    "std": 0.00384464115,
+    "min": 0.209846303,
+    "max": 0.217535585,
+    "l2": 0.302253539,
+    "abs_q": [
+     0.213690944,
+     0.216766657,
+     0.217458692,
+     0.217535585
+    ],
+    "hist": {
+     "lo": 0.209846303,
+     "hi": 0.217535585,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B3.l0.weight": {
+   "id": "B3.l0.weight",
+   "node": "B3.l0",
+   "role": "weight",
+   "shape": [
+    4,
+    2
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.24206014,
+    0.292138189,
+    -0.909920752,
+    -0.725645065,
+    0.400102645,
+    -0.822790325,
+    0.151938215,
+    0.327189714
+   ],
+   "summary": {
+    "n": 8,
+    "mean": -0.19113094,
+    "std": 0.521225773,
+    "min": -0.909920752,
+    "max": 0.400102645,
+    "l2": 1.57024162,
+    "abs_q": [
+     0.363646179,
+     0.848929453,
+     0.903821622,
+     0.909920752
+    ],
+    "hist": {
+     "lo": -0.909920752,
+     "hi": 0.400102645,
+     "counts": [
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "B3.l0.bias": {
+   "id": "B3.l0.bias",
+   "node": "B3.l0",
+   "role": "bias",
+   "shape": [
+    4
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0140062515,
+    0.0978299603,
+    0.195728451,
+    0.0195551571
+   ],
+   "summary": {
+    "n": 4,
+    "mean": 0.081779955,
+    "std": 0.0736665847,
+    "min": 0.0140062515,
+    "max": 0.195728451,
+    "l2": 0.220133839,
+    "abs_q": [
+     0.0586925587,
+     0.166358904,
+     0.192791496,
+     0.195728451
+    ],
+    "hist": {
+     "lo": 0.0140062515,
+     "hi": 0.195728451,
+     "counts": [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B3.l1.weight": {
+   "id": "B3.l1.weight",
+   "node": "B3.l1",
+   "role": "weight",
+   "shape": [
+    6,
+    4
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.511091948,
+    0.757103145,
+    -0.218564749,
+    -0.324620008,
+    -1.20672071,
+    0.226024866,
+    0.53840518,
+    0.230433717,
+    1.06361711,
+    0.778880775,
+    0.422728807,
+    -0.00446192408,
+    -0.42548421,
+    0.0696868077,
+    0.265860617,
+    -0.0182469785,
+    -0.137547106,
+    -0.177547202,
+    0.365368217,
+    -0.840016782,
+    -0.144038856,
+    0.050940834,
+    0.363210469,
+    0.366826326
+   ],
+   "summary": {
+    "n": 24,
+    "mean": 0.104705429,
+    "std": 0.496976161,
+    "min": -1.20672071,
+    "max": 1.06361711,
+    "l2": 2.48812475,
+    "abs_q": [
+     0.343915239,
+     0.82167598,
+     1.17380688,
+     1.20672071
+    ],
+    "hist": {
+     "lo": -1.20672071,
+     "hi": 1.06361711,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
+      1,
+      2,
+      2,
+      0,
+      0,
+      3,
+      0,
+      4,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B3.l1.bias": {
+   "id": "B3.l1.bias",
+   "node": "B3.l1",
+   "role": "bias",
+   "shape": [
+    6
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.0197554994,
+    -0.0554651171,
+    -0.114219718,
+    0.119851306,
+    0.0617045537,
+    0.0237116329
+   ],
+   "summary": {
+    "n": 6,
+    "mean": 0.00263785974,
+    "std": 0.0765996977,
+    "min": -0.114219718,
+    "max": 0.119851306,
+    "l2": 0.187741396,
+    "abs_q": [
+     0.0585848354,
+     0.117035512,
+     0.119569727,
+     0.119851306
+    ],
+    "hist": {
+     "lo": -0.114219718,
+     "hi": 0.119851306,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B4.weight": {
+   "id": "B4.weight",
+   "node": "B4",
+   "role": "weight",
+   "shape": [
+    8,
+    6
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.284196764,
+    -0.447998524,
+    0.490426719,
+    0.00833523273,
+    0.20622924,
+    0.74951601,
+    -0.61311543,
+    -0.303684324,
+    0.163728148,
+    0.268649638,
+    -0.412793726,
+    -0.0196848866,
+    -0.234281361,
+    -0.223934591,
+    0.170132548,
+    0.0934927538,
+    0.494428933,
+    0.260703325,
+    0.624095857,
+    -0.32267493,
+    0.179865986,
+    -0.571665823,
+    -0.672566891,
+    -0.563596666,
+    0.297084332,
+    0.086841628,
+    -0.665959299,
+    0.537850916,
+    0.397933662,
+    -0.0735523552,
+    -0.0988417342,
+    -0.00484258356,
+    -0.499479264,
+    0.959879279,
+    -0.192118064,
+    -0.0802282766,
+    -0.134140745,
+    -0.275049031,
+    -0.372985959,
+    0.135176018,
+    -0.507909298,
+    -0.429795563,
+    -0.33350119,
+    0.326770723,
+    -0.410244435,
+    -0.410531431,
+    0.130350202,
+    -0.467128336
+   ],
+   "summary": {
+    "n": 48,
+    "mean": -0.0634377152,
+    "std": 0.393941169,
+    "min": -0.672566891,
+    "max": 0.959879279,
+    "l2": 2.76446585,
+    "abs_q": [
+     0.313179627,
+     0.616409558,
+     0.861008543,
+     0.959879279
+    ],
+    "hist": {
+     "lo": -0.672566891,
+     "hi": 0.959879279,
+     "counts": [
+      2,
+      2,
+      1,
+      2,
+      3,
+      4,
+      2,
+      3,
+      2,
+      1,
+      1,
+      3,
+      1,
+      2,
+      1,
+      3,
+      3,
+      1,
+      2,
+      2,
+      1,
+      0,
+      2,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B4.bias": {
+   "id": "B4.bias",
+   "node": "B4",
+   "role": "bias",
+   "shape": [
+    8
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.033579886,
+    0.0883527026,
+    0.0403191559,
+    0.0021310898,
+    0.151861802,
+    -0.0429784022,
+    -0.0619919412,
+    -0.177188903
+   ],
+   "summary": {
+    "n": 8,
+    "mean": -0.00413429781,
+    "std": 0.0939250388,
+    "min": -0.177188903,
+    "max": 0.151861802,
+    "l2": 0.265917361,
+    "abs_q": [
+     0.0524851717,
+     0.159459932,
+     0.175416006,
+     0.177188903
+    ],
+    "hist": {
+     "lo": -0.177188903,
+     "hi": 0.151861802,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  }
+ },
+ "limits": {
+  "inline_tensor_max": 262144,
+  "inline_total_max": 1048576,
+  "json_list_max": 1024,
+  "vector_max": 4096,
+  "heat_max": 64,
+  "graph_nodes_max": 256,
+  "explain_float_budget": 262144,
+  "explain_exact_float_budget": 4194304,
+  "explain_rows_max": 4096,
+  "explain_edges_max": 65536,
+  "ig_steps_default": 32,
+  "ig_steps_max": 128,
+  "ig_batch_max": 65536
+ },
+ "inspection": {
+  "schema": "vega/inspection@1",
+  "readers": "sha256:a34c8711902127951b403455045d55f457346ac9c57fa6c9a191187d9b288ae0"
+ },
+ "network_digest": "sha256:400277253cc4902fc101315355528e525af4ffb730de9be1a5a139aa1e7de2e1"
+}

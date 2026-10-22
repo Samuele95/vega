@@ -1,0 +1,1244 @@
+{
+ "schema": "vega/network-view@2",
+ "available": true,
+ "model_version": "sha256:a3e1ee883a9f9823e03347972f3509d8dd4d100646ec5723ac12d4040b9c9911",
+ "spec_digest": "sha256:c2bc41d9584e92fc274a894fb32ecda10eb18e947c696d2d9e2b606f3cad7bb1",
+ "weights": "full",
+ "family": {
+  "name": "mlp-plain",
+  "source": "catalog"
+ },
+ "task": {
+  "kind": "regression",
+  "base": null,
+  "link": "identity",
+  "outputs": {
+   "kind": "value",
+   "names": [
+    "y"
+   ]
+  },
+  "positive": null,
+  "threshold": null,
+  "threshold_scale": null,
+  "quantiles": null,
+  "decision_rule": "none",
+  "targets": [
+   "value"
+  ],
+  "default_target": "value"
+ },
+ "sample": {
+  "shape": "row",
+  "length": null,
+  "stride": null,
+  "horizon": null,
+  "autoregressive": null,
+  "level": null,
+  "directed": null,
+  "self_loops": null,
+  "protocol": null,
+  "batching": null
+ },
+ "inputs": {
+  "numeric": [
+   "x0",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x5"
+  ],
+  "nominal": [],
+  "past_target": null,
+  "order": [
+   "x0",
+   "x1",
+   "x2",
+   "x3",
+   "x4",
+   "x5"
+  ],
+  "width": 6,
+  "edges": null,
+  "axis_labels": {
+   "feature": [
+    "x0",
+    "x1",
+    "x2",
+    "x3",
+    "x4",
+    "x5"
+   ],
+   "step": null,
+   "token": null
+  }
+ },
+ "params": {
+  "total": 77,
+  "trainable": 77
+ },
+ "nodes": [
+  {
+   "id": "input.num",
+   "block": null,
+   "type": "input",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": null,
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "feature"
+   ],
+   "per": "sample",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "columns": [
+     "x0",
+     "x1",
+     "x2",
+     "x3",
+     "x4",
+     "x5"
+    ],
+    "stream": "numeric"
+   },
+   "formula": "x = the shaped inputs (numeric, nominal ids, edges)",
+   "code": null
+  },
+  {
+   "id": "B1",
+   "block": "B1",
+   "type": "dense",
+   "view": "units",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.0",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    4
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 4,
+    "activation": "relu",
+    "bias": true
+   },
+   "params": {
+    "count": 28,
+    "trainable": 28,
+    "weight": "B1.weight",
+    "bias": "B1.bias",
+    "activation": "relu",
+    "row_norms": [
+     1.02855694,
+     0.797072053,
+     0.590825021,
+     1.06604898
+    ],
+    "col_norms": [
+     0.834161222,
+     0.679455221,
+     0.97518295,
+     0.567521989,
+     0.758722901,
+     0.415427685
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B2",
+   "block": "B2",
+   "type": "parallel",
+   "view": "group",
+   "parent": null,
+   "children": [
+    "B2.b0",
+    "B2.b1",
+    "B2.merge"
+   ],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.1",
+   "in_shape": [
+    4
+   ],
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "merge": "concat"
+   },
+   "params": {
+    "count": 36,
+    "trainable": 36,
+    "branches": [
+     "B2.b0",
+     "B2.b1"
+    ],
+    "merge": "concat"
+   },
+   "formula": "[f_1(x) ; … ; f_n(x)] | Σ_i f_i(x)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Parallel",
+    "anchor": "class Parallel("
+   }
+  },
+  {
+   "id": "B2.b0",
+   "block": "B2",
+   "type": "dense",
+   "view": "units",
+   "parent": "B2",
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.1.branches.0",
+   "in_shape": [
+    4
+   ],
+   "out_shape": [
+    3
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 3,
+    "activation": "tanh",
+    "bias": true
+   },
+   "params": {
+    "count": 15,
+    "trainable": 15,
+    "weight": "B2.b0.weight",
+    "bias": "B2.b0.bias",
+    "activation": "tanh",
+    "row_norms": [
+     1.13536668,
+     1.34073973,
+     0.915141344
+    ],
+    "col_norms": [
+     0.52343297,
+     1.21918178,
+     1.4079684,
+     0.42586726
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B2.b1",
+   "block": "B2",
+   "type": "sequential",
+   "view": "group",
+   "parent": "B2",
+   "children": [
+    "B2.b1.0",
+    "B2.b1.1"
+   ],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.1.branches.1",
+   "in_shape": [
+    4
+   ],
+   "out_shape": [
+    3
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {},
+   "params": {
+    "count": 21,
+    "trainable": 21,
+    "children": [
+     "B2.b1.0",
+     "B2.b1.1"
+    ]
+   },
+   "formula": "f_n ∘ … ∘ f_1",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Sequential",
+    "anchor": "class Sequential("
+   }
+  },
+  {
+   "id": "B2.b1.0",
+   "block": "B2",
+   "type": "dense",
+   "view": "units",
+   "parent": "B2.b1",
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.1.branches.1.inner.0",
+   "in_shape": [
+    4
+   ],
+   "out_shape": [
+    3
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "units": 3,
+    "activation": "relu",
+    "bias": true
+   },
+   "params": {
+    "count": 15,
+    "trainable": 15,
+    "weight": "B2.b1.0.weight",
+    "bias": "B2.b1.0.bias",
+    "activation": "relu",
+    "row_norms": [
+     0.604463041,
+     1.0137006,
+     1.15409946
+    ],
+    "col_norms": [
+     0.888384581,
+     0.83150059,
+     0.934889317,
+     0.608499527
+    ]
+   },
+   "formula": "z = W·x + b ; a = act(z)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Dense",
+    "anchor": "class Dense("
+   }
+  },
+  {
+   "id": "B2.b1.1",
+   "block": "B2",
+   "type": "layernorm",
+   "view": "affine",
+   "parent": "B2.b1",
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.1.branches.1.inner.1",
+   "in_shape": [
+    3
+   ],
+   "out_shape": [
+    3
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "eps": 1e-05
+   },
+   "params": {
+    "count": 6,
+    "trainable": 6,
+    "gamma": [
+     1.07470691,
+     0.894830227,
+     1.22645044
+    ],
+    "beta": [
+     0.00230375561,
+     -0.0324179009,
+     0.203699008
+    ],
+    "eps": 1e-05
+   },
+   "formula": "y = γ·(x − mean x)/√(var x + ε) + β",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Layernorm",
+    "anchor": "class Layernorm("
+   }
+  },
+  {
+   "id": "B2.merge",
+   "block": "B2",
+   "type": "parallel_merge",
+   "view": "merge",
+   "parent": "B2",
+   "children": [],
+   "role": null,
+   "call": "inner",
+   "path": "stages.1",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "merge": "concat"
+   },
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "merge": "concat"
+   },
+   "formula": "[b_1 ; … ; b_n] | Σ_i b_i",
+   "code": null
+  },
+  {
+   "id": "B3",
+   "block": "B3",
+   "type": "custom",
+   "view": "opaque",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.2",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    6
+   ],
+   "axes": [
+    "unit"
+   ],
+   "per": "sample",
+   "config": {
+    "code_ref": "custom/b3.py",
+    "out_shape": [
+     6
+    ]
+   },
+   "params": {
+    "count": 6,
+    "trainable": 6,
+    "class": "Gate",
+    "parameters": [
+     {
+      "name": "g",
+      "shape": [
+       6
+      ],
+      "l2": 1.5
+     }
+    ],
+    "declared_out_shape": [
+     6
+    ],
+    "verified": false
+   },
+   "formula": "declared by user code (opaque)",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Custom",
+    "anchor": "class Custom("
+   }
+  },
+  {
+   "id": "B4",
+   "block": "B4",
+   "type": "head",
+   "view": "units",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "tensor",
+   "path": "stages.3",
+   "in_shape": [
+    6
+   ],
+   "out_shape": [
+    1
+   ],
+   "axes": [
+    "output"
+   ],
+   "per": "sample",
+   "config": {
+    "out": 1,
+    "activation": "none",
+    "bias": true
+   },
+   "params": {
+    "count": 7,
+    "trainable": 7,
+    "weight": "B4.weight",
+    "bias": "B4.bias",
+    "activation": "none",
+    "row_norms": [
+     0.685387075
+    ],
+    "col_norms": [
+     0.444590122,
+     0.203014866,
+     0.036516238,
+     0.392035902,
+     0.138850853,
+     0.237854823
+    ]
+   },
+   "formula": "z = W·x + b ; ordinal: z_j = w·x + θ_j with θ_0 ≥ θ_1 ≥ …",
+   "code": {
+    "file": "model/blocks_core.py",
+    "class": "Head",
+    "anchor": "class Head("
+   }
+  },
+  {
+   "id": "output",
+   "block": null,
+   "type": "output",
+   "view": "io",
+   "parent": null,
+   "children": [],
+   "role": null,
+   "call": "io",
+   "path": "",
+   "in_shape": [
+    1
+   ],
+   "out_shape": [
+    1
+   ],
+   "axes": [
+    "output"
+   ],
+   "per": "sample",
+   "config": {},
+   "params": {
+    "count": 0,
+    "trainable": 0,
+    "link": "identity",
+    "outputs": {
+     "kind": "value",
+     "names": [
+      "y"
+     ]
+    }
+   },
+   "formula": "ŷ = link(z)",
+   "code": null
+  }
+ ],
+ "edges": [
+  {
+   "from": "input.num",
+   "to": "B1",
+   "kind": "data"
+  },
+  {
+   "from": "B1",
+   "to": "B2.b0",
+   "kind": "branch"
+  },
+  {
+   "from": "B1",
+   "to": "B2.b1.0",
+   "kind": "branch"
+  },
+  {
+   "from": "B2.b1.0",
+   "to": "B2.b1.1",
+   "kind": "data"
+  },
+  {
+   "from": "B2.b0",
+   "to": "B2.merge",
+   "kind": "merge"
+  },
+  {
+   "from": "B2.b1.1",
+   "to": "B2.merge",
+   "kind": "merge"
+  },
+  {
+   "from": "B2.merge",
+   "to": "B3",
+   "kind": "data"
+  },
+  {
+   "from": "B3",
+   "to": "B4",
+   "kind": "data"
+  },
+  {
+   "from": "B4",
+   "to": "output",
+   "kind": "readout"
+  }
+ ],
+ "chain": null,
+ "tensors": {
+  "B1.weight": {
+   "id": "B1.weight",
+   "node": "B1",
+   "role": "weight",
+   "shape": [
+    4,
+    6
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.242794931,
+    0.257516295,
+    0.424314559,
+    0.420872033,
+    0.742132545,
+    -0.157252908,
+    0.222159401,
+    -0.14950937,
+    -0.58169198,
+    -0.287349284,
+    0.0555880405,
+    -0.373618513,
+    -0.0781677142,
+    0.457340181,
+    0.232885927,
+    0.233658314,
+    0.140895635,
+    -0.0715560392,
+    -0.762502849,
+    0.404761255,
+    -0.615091383,
+    0.0882163495,
+    -0.0442507379,
+    0.0560412332
+   ],
+   "summary": {
+    "n": 24,
+    "mean": 0.0155248356,
+    "std": 0.363604832,
+    "min": -0.762502849,
+    "max": 0.742132545,
+    "l2": 1.78291555,
+    "abs_q": [
+     0.238226622,
+     0.605071563,
+     0.757817679,
+     0.762502849
+    ],
+    "hist": {
+     "lo": -0.762502849,
+     "hi": 0.742132545,
+     "counts": [
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1,
+      0,
+      2,
+      1,
+      1,
+      1,
+      3,
+      0,
+      0,
+      1,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B1.bias": {
+   "id": "B1.bias",
+   "node": "B1",
+   "role": "bias",
+   "shape": [
+    4
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0252336767,
+    -0.0333842561,
+    0.0900983512,
+    -0.128510132
+   ],
+   "summary": {
+    "n": 4,
+    "mean": -0.0116405901,
+    "std": 0.0803769256,
+    "min": -0.128510132,
+    "max": 0.0900983512,
+    "l2": 0.162430952,
+    "abs_q": [
+     0.0617413037,
+     0.116986598,
+     0.127357779,
+     0.128510132
+    ],
+    "hist": {
+     "lo": -0.128510132,
+     "hi": 0.0900983512,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B2.b0.weight": {
+   "id": "B2.b0.weight",
+   "node": "B2.b0",
+   "role": "weight",
+   "shape": [
+    3,
+    4
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.395952284,
+    -0.845973492,
+    0.593166173,
+    -0.254483879,
+    0.187026218,
+    0.754027605,
+    -1.08134127,
+    -0.157314092,
+    0.286749125,
+    0.449639052,
+    0.679139256,
+    0.30307287
+   ],
+   "summary": {
+    "n": 12,
+    "mean": 0.109138321,
+    "std": 0.561336958,
+    "min": -1.08134127,
+    "max": 0.754027605,
+    "l2": 1.98094024,
+    "abs_q": [
+     0.422795668,
+     0.836778903,
+     1.05545081,
+     1.08134127
+    ],
+    "hist": {
+     "lo": -1.08134127,
+     "hi": 0.754027605,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "B2.b0.bias": {
+   "id": "B2.b0.bias",
+   "node": "B2.b0",
+   "role": "bias",
+   "shape": [
+    3
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0514136031,
+    0.0106337965,
+    0.0265565701
+   ],
+   "summary": {
+    "n": 3,
+    "mean": 0.0295346566,
+    "std": 0.0167809397,
+    "min": 0.0106337965,
+    "max": 0.0514136031,
+    "l2": 0.0588361082,
+    "abs_q": [
+     0.0265565701,
+     0.0464421965,
+     0.0509164625,
+     0.0514136031
+    ],
+    "hist": {
+     "lo": 0.0106337965,
+     "hi": 0.0514136031,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B2.b1.0.weight": {
+   "id": "B2.b1.0.weight",
+   "node": "B2.b1.0",
+   "role": "weight",
+   "shape": [
+    3,
+    4
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0354903825,
+    0.495904982,
+    0.07966692,
+    0.334435999,
+    0.808069348,
+    0.585092306,
+    -0.172062427,
+    -0.0517132953,
+    0.367411852,
+    -0.321151763,
+    -0.915459335,
+    -0.505717278
+   ],
+   "summary": {
+    "n": 12,
+    "mean": 0.0616639744,
+    "std": 0.472518142,
+    "min": -0.915459335,
+    "max": 0.808069348,
+    "l2": 1.65073017,
+    "abs_q": [
+     0.350923926,
+     0.785771644,
+     0.903646436,
+     0.915459335
+    ],
+    "hist": {
+     "lo": -0.915459335,
+     "hi": 0.808069348,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B2.b1.0.bias": {
+   "id": "B2.b1.0.bias",
+   "node": "B2.b1.0",
+   "role": "bias",
+   "shape": [
+    3
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.0538656712,
+    -0.0211060569,
+    -0.0356913805
+   ],
+   "summary": {
+    "n": 3,
+    "mean": -0.000977255404,
+    "std": 0.0392342781,
+    "min": -0.0356913805,
+    "max": 0.0538656712,
+    "l2": 0.0679768402,
+    "abs_q": [
+     0.0356913805,
+     0.050230813,
+     0.0535021853,
+     0.0538656712
+    ],
+    "hist": {
+     "lo": -0.0356913805,
+     "hi": 0.0538656712,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B4.weight": {
+   "id": "B4.weight",
+   "node": "B4",
+   "role": "weight",
+   "shape": [
+    1,
+    6
+   ],
+   "axes": [
+    "out",
+    "in"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    -0.444590122,
+    -0.203014866,
+    -0.036516238,
+    -0.392035902,
+    -0.138850853,
+    0.237854823
+   ],
+   "summary": {
+    "n": 6,
+    "mean": -0.162858859,
+    "std": 0.227529274,
+    "min": -0.444590122,
+    "max": 0.237854823,
+    "l2": 0.685387096,
+    "abs_q": [
+     0.220434844,
+     0.418313012,
+     0.441962411,
+     0.444590122
+    ],
+    "hist": {
+     "lo": -0.444590122,
+     "hi": 0.237854823,
+     "counts": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "B4.bias": {
+   "id": "B4.bias",
+   "node": "B4",
+   "role": "bias",
+   "shape": [
+    1
+   ],
+   "axes": [
+    "out"
+   ],
+   "dtype": "float32",
+   "encoding": "json",
+   "data": [
+    0.01693823
+   ],
+   "summary": {
+    "n": 1,
+    "mean": 0.01693823,
+    "std": 0.0,
+    "min": 0.01693823,
+    "max": 0.01693823,
+    "l2": 0.01693823,
+    "abs_q": [
+     0.01693823,
+     0.01693823,
+     0.01693823,
+     0.01693823
+    ],
+    "hist": {
+     "lo": 0.01693823,
+     "hi": 0.01693823,
+     "counts": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  }
+ },
+ "limits": {
+  "inline_tensor_max": 262144,
+  "inline_total_max": 1048576,
+  "json_list_max": 1024,
+  "vector_max": 4096,
+  "heat_max": 64,
+  "graph_nodes_max": 256,
+  "explain_float_budget": 262144,
+  "explain_exact_float_budget": 4194304,
+  "explain_rows_max": 4096,
+  "explain_edges_max": 65536,
+  "ig_steps_default": 32,
+  "ig_steps_max": 128,
+  "ig_batch_max": 65536
+ },
+ "inspection": {
+  "schema": "vega/inspection@1",
+  "readers": "sha256:a34c8711902127951b403455045d55f457346ac9c57fa6c9a191187d9b288ae0"
+ },
+ "network_digest": "sha256:c4cfc5bb457a2168111ee342609fadc1ef81a04b6768c991c54968fa77a2519a"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "vega-show-page",
+  "private": true,
+  "type": "module",
+  "description": "Lets node import the page's ES modules for the unit tests under tests/; not served, not copied into a showcase.",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  }
+}

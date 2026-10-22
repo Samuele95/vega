@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<script src="../assets/vega-scramble.js"></script>
+<script src="../assets/vega-audio.js"></script>
+<script src="../assets/vega-loader.js"></script>
+<script src="../assets/vega-decode.js"></script>
+<script src="../assets/vega-fly.js"></script>
+<script src="../assets/vega-reel.js"></script>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vega — the reference star for neural network engineering and dataset analysis</title>
+<meta name="description" content="A framework that studies a raw dataset and turns it into a trained, evaluated, shipped neural network.">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/vega-favicon-32.png">
+<link rel="icon" type="image/svg+xml" href="../assets/brand/vega-favicon-32.svg">
+<link rel="apple-touch-icon" href="../assets/brand/vega-apple-touch-180.png">
+<style>
+html,body{margin:0;min-height:100%}
+html{--bg:#04080E;--bg2:#06171C;--fg:#E9F0F8;--mut:#A3B4C7;--dim:#8C9EB3;--acc:#9CC8FF;--cy:#6FE0DC;--line:rgba(156,200,255,.18);--glass:rgba(4,8,14,.94);color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:"Hanken Grotesk","Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;-webkit-font-smoothing:antialiased;transition:background .4s}
+a{color:var(--acc);text-decoration:none}a:hover{color:var(--fg)}
+:focus-visible{outline:1.5px solid var(--acc);outline-offset:5px;border-radius:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+@media (max-width:600px){footer[data-foot]{transform:translateY(calc(-100% - 66px))!important}}
+/* page-stop headlines centre in the space right of the expanded chapter rail (display-size labels reach its column otherwise) */
+@media (min-width:1200px){[data-panel-stop]{padding-left:calc(24px + 330px)!important;padding-right:calc(24px + 40px)!important}}
+</style>
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/vega-panel.css">
+</helmet>
+<div style="position:relative;overflow:hidden;color:var(--fg)">
+  <div data-stage="1" aria-hidden="true" style="position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(110% 80% at 50% 36%, var(--bg2) 0%, var(--bg) 62%)">
+    <x-import component-from-global-scope="vega-sky-lab" from="../assets/vega-sky-lab.js" interact="all" seed="17" hint-size="100%,100%" style="position:absolute;left:0;right:0;top:-6vh;bottom:-6vh;z-index:0"></x-import>
+    <x-import component-from-global-scope="vega-galaxy" from="../assets/vega-galaxy.js" hint-size="100%,100%" style="position:absolute;inset:0;z-index:0"></x-import>
+    <x-import component-from-global-scope="vega-constellation" from="../assets/vega-3d.js" role="presentation" hint-size="100%,100%" style="position:absolute;inset:0;z-index:1"></x-import>
+    <x-import component-from-global-scope="vega-readouts" from="../assets/vega-readouts.js"></x-import>
+  </div>
+  <canvas data-fx="1" aria-hidden="true" style="position:fixed;inset:0;width:100vw;height:100vh;z-index:3;pointer-events:none"></canvas>
+
+  <x-import component-from-global-scope="vega-hud" from="../assets/vega-hud.js" page="index"></x-import>
+  <x-import component-from-global-scope="vega-rail" from="../assets/vega-rail.js" label="Chapters"></x-import>
+  <x-import component-from-global-scope="vega-camera" from="../assets/vega-camera.js"></x-import>
+
+  <main style="position:relative;z-index:1;pointer-events:none">
+  <section data-stop="0" data-rail="Threshold" id="threshold" style="pointer-events:auto;position:relative;isolation:isolate;min-height:100vh;min-height:100svh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:110px 24px 120px">
+    <canvas ref="{{ canvasRef }}" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0"></canvas>
+    <h1 data-reel-fade="1" style="position:relative;z-index:1;margin:0;display:flex;flex-direction:column;align-items:center;gap:34px;font-weight:400">
+      <svg ref="{{ markRef }}" data-pulse-target="1" viewBox="0 0 64 64" width="116" height="116" aria-hidden="true" style="display:block;overflow:visible;color:var(--fg);filter:drop-shadow(0 0 14px rgba(156,200,255,.35))">
+        <polygon data-p="sv" fill="currentColor" points="32,5 33.5,32 32,59 30.5,32" style="transform-box:fill-box;transform-origin:center"></polygon>
+        <polygon data-p="sh" fill="currentColor" points="9,32 32,30.6 55,32 32,33.4" style="transform-box:fill-box;transform-origin:center"></polygon>
+        <g stroke="var(--acc)" stroke-width="1"><line data-p="dl" x1="27.8" y1="27.8" x2="18" y2="18" stroke-dasharray="14" stroke-dashoffset="0"></line><line data-p="dl" x1="36.2" y1="27.8" x2="46" y2="18" stroke-dasharray="14" stroke-dashoffset="0"></line><line data-p="dl" x1="36.2" y1="36.2" x2="46" y2="46" stroke-dasharray="14" stroke-dashoffset="0"></line><line data-p="dl" x1="27.8" y1="36.2" x2="18" y2="46" stroke-dasharray="14" stroke-dashoffset="0"></line></g>
+        <g fill="var(--acc)"><circle data-p="du" cx="18" cy="18" r="2" style="transform-box:fill-box;transform-origin:center"></circle><circle data-p="du" cx="46" cy="18" r="2" style="transform-box:fill-box;transform-origin:center"></circle><circle data-p="du" cx="46" cy="46" r="2" style="transform-box:fill-box;transform-origin:center"></circle><circle data-p="du" cx="18" cy="46" r="2" style="transform-box:fill-box;transform-origin:center"></circle></g>
+        <g fill="currentColor"><circle data-p="tu" cx="32" cy="5" r="2.8" style="transform-box:fill-box;transform-origin:center"></circle><circle data-p="tu" cx="55" cy="32" r="2.8" style="transform-box:fill-box;transform-origin:center"></circle><circle data-p="tu" cx="32" cy="59" r="2.8" style="transform-box:fill-box;transform-origin:center"></circle><circle data-p="tu" cx="9" cy="32" r="2.8" style="transform-box:fill-box;transform-origin:center"></circle></g>
+        <circle data-p="core" cx="32" cy="32" r="5.2" fill="currentColor" style="transform-box:fill-box;transform-origin:center"></circle>
+      </svg>
+      <svg viewBox="88 18 126 28" width="216" height="48" role="img" aria-label="Vega" style="display:block;color:var(--fg)">
+        <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="miter"><path data-w="1" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" d="M92,22 L101,42 L110,22"></path><path data-w="1" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" d="M140,22 H124.85 V41.15 H140 M124.85,32 H137"></path><path data-w="1" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" d="M172.66,25.57 A10,10 0 1 0 175,32 H166"></path><path data-w="1" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" d="M189,42 L199,22 L209,42"></path></g>
+        <circle data-wdot="1" cx="199" cy="35.5" r="1.7" fill="currentColor" style="transform-box:fill-box;transform-origin:center"></circle>
+      </svg>
+    </h1>
+    <div ref="{{ textRef }}" data-rail-clear="1" data-reel-fade="1" style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center">
+      <p style="margin:40px 0 0;max-width:22em;font-size:clamp(22px,3.1vw,31px);line-height:1.28;font-weight:300;letter-spacing:-.005em;text-wrap:balance;font-family:'Newsreader',Georgia,serif">The reference star for neural network engineering and dataset analysis.</p>
+      <p style="margin:20px 0 0;max-width:34em;font-size:16px;line-height:1.6;color:var(--mut);text-wrap:pretty">A raw dataset in; a trained, evaluated, shipped network out.</p>
+      <a href="chain.dc.html" style="margin-top:44px;display:inline-flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid rgba(156,200,255,.35);color:var(--fg);font:400 19px/1.2 'Newsreader',Georgia,serif;letter-spacing:.01em;transition:border-color .3s,gap .3s" style-hover="border-color:var(--acc);gap:18px;color:var(--fg)">Enter the constellation<span aria-hidden="true" style="color:var(--acc);font-size:16px">→</span></a>
+      
+    </div>
+  </section>
+  <sc-for list="{{ stops }}" as="s" hint-placeholder-count="6">
+    <section data-stop="{{ s.n }}" data-rail="{{ s.label }}" id="{{ s.id }}" data-panel-stop="1" style="position:relative;height:100vh;height:100svh;pointer-events:none;box-sizing:border-box;display:flex;justify-content:center;align-items:flex-start;padding:57vh 24px 0;padding-top:57svh">
+      <div class="vp">
+        <p class="vp-num">{{ s.num }}</p>
+        <h2 class="vp-h"><a href="{{ s.href }}"><span data-decode="1">{{ s.label }}</span><span class="vp-arr" aria-hidden="true">→</span></a></h2>
+        <sc-if value="{{ s.last }}" hint-placeholder-val="{{ false }}">
+          <button type="button" data-fly-cta="1" onClick="{{ takeControls }}" style="appearance:none;margin:34px 0 0;padding:10px 2px;border:0;border-bottom:1px solid rgba(156,200,255,.35);background:none;cursor:pointer;display:inline-flex;align-items:center;gap:12px;color:var(--fg);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em" style-hover="border-bottom-color:var(--acc)"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" style="overflow:visible"><path d="M6 .5 L11 11 L6 8.4 L1 11 Z" fill="none" stroke="var(--acc)" stroke-width="1.1" stroke-linejoin="round"></path></svg>TAKE THE CONTROLS<span style="color:var(--dim)">· F</span></button>
+        </sc-if>
+      </div>
+    </section>
+  </sc-for>
+  </main>
+
+  <footer data-foot="1" style="position:absolute;left:0;right:0;top:100vh;top:100svh;transform:translateY(calc(-100% - 40px));z-index:10;pointer-events:none;display:flex;justify-content:center">
+    <a href="https://samuele95.github.io/prometheus/code-forge.html" target="_blank" rel="noopener noreferrer" style="pointer-events:auto;display:flex;align-items:center;gap:14px;font:500 10px/1 'Hanken Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;letter-spacing:.34em;color:var(--dim);padding:8px" style-hover="color:var(--mut)">
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to left, var(--dim), transparent)"></span>
+      <span>built with <span style="color:var(--acc)">prometheus</span></span>
+      <span aria-hidden="true" style="width:36px;height:1px;background:linear-gradient(to right, var(--dim), transparent)"></span>
+    </a>
+  </footer>
+
+  <sc-if value="{{ indexOpen }}" hint-placeholder-val="{{ false }}">
+    <div role="dialog" aria-modal="true" aria-label="Index" style="position:fixed;inset:0;z-index:10;background:var(--glass);backdrop-filter:blur(6px);display:flex;flex-direction:column;padding:26px clamp(20px,4vw,48px);box-sizing:border-box;overflow:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;color:var(--dim)">INDEX</span>
+        <button type="button" ref="{{ closeRef }}" onClick="{{ closeIndex }}" style="appearance:none;background:none;border:0;cursor:pointer;color:var(--dim);font:500 11px/1 'Martian Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:.22em;padding:8px 4px" style-hover="color:var(--fg)">CLOSE · ESC</button>
+      </div>
+      <ol style="list-style:none;margin:auto;padding:40px 0;width:100%;max-width:560px;display:flex;flex-direction:column">
+        <sc-for list="{{ pages }}" as="p" hint-placeholder-count="7">
+          <li style="border-top:1px solid var(--line)">
+            <a href="{{ p.href }}" style="display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:18px 0;color:var(--fg)" style-hover="color:var(--acc)">
+              <span style="font:12px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;color:var(--dim)">{{ p.num }}</span>
+              <span style="font-size:clamp(19px,2.4vw,24px);font-weight:300;font-family:'Newsreader',Georgia,serif">{{ p.label }}</span>
+              <span style="font:11px 'Martian Mono',ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;color:var(--dim)">{{ p.note }}</span>
+            </a>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;ground&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;calm&quot;,&quot;standard&quot;,&quot;rich&quot;],&quot;default&quot;:&quot;standard&quot;,&quot;tsType&quot;:&quot;'calm'|'standard'|'rich'&quot;,&quot;section&quot;:&quot;Ground&quot;},&quot;spikes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Ground&quot;}}">
+class Component extends DCLogic {
+  state = { indexOpen: false };
+  canvasRef = { current: null }; markRef = { current: null }; textRef = { current: null }; closeRef = { current: null };
+  setCanvas = (el) => { this.canvasRef.current = el; };
+  setMark = (el) => { this.markRef.current = el; };
+  setText = (el) => { this.textRef.current = el; };
+  setClose = (el) => { this.closeRef.current = el; };
+
+  componentDidMount() {
+    this.onKey = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (window.VegaLoader && window.VegaLoader.active) return;
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'Escape' && this.state.indexOpen) { this.setState({ indexOpen: false }); return; }
+      if (e.key === 'i' || e.key === 'I') this.setState(s => ({ indexOpen: !s.indexOpen }));
+      else if ((e.key === 'Enter' && tag !== 'A' && tag !== 'BUTTON') || e.key === 'ArrowRight') { if (!this.state.indexOpen) { if (window.VegaFly) window.VegaFly.go('chain.dc.html'); else location.href = 'chain.dc.html'; } }
+    };
+    addEventListener('keydown', this.onKey);
+    this.onIndex = () => this.setState({ indexOpen: true });
+    addEventListener('vegaindex', this.onIndex);
+    this.tryGround(0);
+    this.tryScene(0);
+    // the hero intro plays once the visitor is through the ENTER gate (at once when the gate was skipped)
+    const L = window.VegaLoader;
+    if (L && L.active) {
+      const held = [document.querySelector('main'), document.querySelector('footer[data-foot]')].filter(Boolean);
+      held.forEach(e => { e.style.opacity = '0'; });
+      this.gateUp = true;
+      this.onEnter = () => { const lm = document.querySelector('.vl-mark'); if (lm) { const r = lm.getBoundingClientRect(); this.glide = { x: r.left + r.width / 2, y: r.top + r.height / 2, L: 27 / 64 * r.width, t: performance.now() }; } this.gateUp = false;
+        held.forEach(e => { e.style.opacity = ''; }); this.intro(); };
+      addEventListener('vegaenter', this.onEnter, { once: true });
+    }
+    else this.intro();
+    this.onPulse = () => { const g = document.querySelector('vega-galaxy'); if (g) g.pulseAt = performance.now(); const m = this.markRef.current; if (!m || !m.animate || matchMedia('(prefers-reduced-motion: reduce)').matches) return; m.animate([{ filter: 'drop-shadow(0 0 14px rgba(156,200,255,.35)) brightness(1)' }, { filter: 'drop-shadow(0 0 40px rgba(111,224,220,.9)) brightness(1.6)' }, { filter: 'drop-shadow(0 0 14px rgba(156,200,255,.35)) brightness(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }); };
+    addEventListener('vegapulse', this.onPulse);
+  }
+  intro() {
+    const m = this.markRef.current, tx = this.textRef.current;
+    let raf = 0, tx0 = 0, ty0 = 0, cx = 0, cy = 0;
+    const step = () => { cx += (tx0 - cx) * .08; cy += (ty0 - cy) * .08; m.style.transform = 'perspective(500px) rotateX(' + (-cy * 16).toFixed(2) + 'deg) rotateY(' + (cx * 16).toFixed(2) + 'deg)'; raf = Math.abs(tx0 - cx) + Math.abs(ty0 - cy) > .001 ? requestAnimationFrame(step) : 0; };
+    this.onTilt = (e) => { if (e.pointerType === 'touch') return; tx0 = e.clientX / innerWidth - .5; ty0 = e.clientY / innerHeight - .5; if (!raf) raf = requestAnimationFrame(step); };
+    const startTilt = () => { if (!this._tilting) { this._tilting = true; addEventListener('pointermove', this.onTilt); } };
+    if (!m || matchMedia('(prefers-reduced-motion: reduce)').matches || !m.animate) { startTilt(); return; }
+    let seen = false; try { seen = sessionStorage.getItem('vega-intro') === '1'; sessionStorage.setItem('vega-intro', '1'); } catch (e) {}
+    const f = seen ? 0.4 : 1, Q = (s) => [].slice.call(document.querySelectorAll(s)), one = (s) => document.querySelector(s), anims = [];
+    const an = (el, kf, o) => { if (!el) return; const a = el.animate(kf, Object.assign({ fill: 'both', easing: 'cubic-bezier(.2,.8,.2,1)' }, o, { duration: o.duration * f, delay: (o.delay || 0) * f })); anims.push(a); return a; };
+    const POP = [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.9)', opacity: 1, offset: 0.55 }, { transform: 'scale(1)', opacity: 1 }], G0 = 'drop-shadow(0 0 14px rgba(156,200,255,.35))';
+    const core = one('[data-p="core"]'), tips = Q('[data-p="tu"]'), du = Q('[data-p="du"]');
+    const t0 = seen ? 0 : 1050;
+    this.markInStart = performance.now() + t0 * f; this.markInDur = 1140 * f; // the WebGL mark replays this draw-in
+    an(core, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.7)', opacity: 1, offset: 0.6 }, { transform: 'scale(1)', opacity: 1 }], { duration: 380, delay: t0 });
+    an(one('[data-p="sv"]'), [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 420, delay: t0 + 170 });
+    an(one('[data-p="sh"]'), [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 420, delay: t0 + 260 });
+    tips.forEach((e, i) => an(e, POP, { duration: 320, delay: t0 + 420 + i * 60 }));
+    Q('[data-p="dl"]').forEach((e, i) => an(e, [{ strokeDashoffset: 14 }, { strokeDashoffset: 0 }], { duration: 240, delay: t0 + 680 + i * 55, easing: 'ease-out' }));
+    du.forEach((e, i) => an(e, POP, { duration: 300, delay: t0 + 840 + i * 55 }));
+    an(m, [{ filter: G0 }, { filter: 'drop-shadow(0 0 34px rgba(156,200,255,.95))' }, { filter: G0 }], { duration: 600, delay: t0 + 1060, fill: 'none' });
+    const tw = t0 + 900;
+    Q('[data-w]').forEach((pth, i) => an(pth, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 340, delay: tw + i * 110, easing: 'cubic-bezier(.45,0,.2,1)' }));
+    an(one('[data-wdot]'), POP, { duration: 360, delay: tw + 4 * 110 + 160 });
+    if (tx) [].slice.call(tx.children).forEach((el, i) => an(el, [{ opacity: 0, transform: 'translateY(16px)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0px)' }], { duration: 850, delay: tw + 380 + i * 130, fill: 'backwards' }));
+    const endAt = (tw + 380 + 3 * 130 + 850) * f;
+    const cv = one('[data-fx]'); let fxRaf = 0; const stopFx = () => { cancelAnimationFrame(fxRaf); if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); };
+    const pulse = () => { const s = one('vega-sky-lab'); if (!s || !s.waves) return; const r = s.getBoundingClientRect(), c = core.getBoundingClientRect(); s.waves.push({ x: c.left + c.width / 2 - r.left + 14, y: c.top + c.height / 2 - r.top + 14, t0: performance.now(), hit: new Set(), sent: 99 }); };
+    this.tPulse = setTimeout(pulse, (t0 + 40) * f + 20);
+    if (!seen && cv) {
+      const rc = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, mr = m.getBoundingClientRect(), U = (x, y) => [mr.left + x / 64 * mr.width, mr.top + y / 64 * mr.height];
+      const tg = [{ p: rc(core), at: t0, big: 1 }];
+      tips.forEach((el, i) => tg.push({ p: rc(el), at: t0 + 420 + i * 60 })); du.forEach((el, i) => tg.push({ p: rc(el), at: t0 + 840 + i * 55 }));
+      [[32, 14], [32, 50], [16, 32], [48, 32], [32, 22], [32, 42], [22, 32], [42, 32]].forEach((u, i) => tg.push({ p: U(u[0], u[1]), at: t0 + 200 + i * 35 }));
+      const sky = one('vega-sky-lab'), sr = sky && sky.getBoundingClientRect(), src = sky && sky.pts ? sky.pts.filter(s => s.m > 0.25) : [];
+      const mcx = mr.left + mr.width / 2, mcy = mr.top + mr.height / 2, D = Math.max(innerWidth, innerHeight), start = performance.now();
+      const parts = tg.map((t) => {
+        let p0 = null;
+        for (let k2 = 0; k2 < 12 && src.length; k2++) { const s = src[Math.floor(Math.random() * src.length)], q = [sr.left + s.x - 14, sr.top + s.y - 14]; if (Math.hypot(q[0] - mcx, q[1] - mcy) > D * 0.22 && q[0] > 0 && q[1] > 0 && q[0] < innerWidth && q[1] < innerHeight) { p0 = q; break; } }
+        if (!p0) { const a = Math.random() * 6.283, r = D * (0.3 + Math.random() * 0.25); p0 = [mcx + Math.cos(a) * r, mcy + Math.sin(a) * r]; }
+        const dur = 780 + Math.random() * 300; return { p0, p1: t.p, s: start + t.at - dur, dur, side: Math.random() < 0.5 ? -1 : 1, big: t.big };
+      });
+      const dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr);
+      const ctx = cv.getContext('2d');
+      const glow = (x, y, r, c, a) => { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, 'rgba(' + c + ',' + a + ')'); g.addColorStop(0.3, 'rgba(' + c + ',' + a * 0.3 + ')'); g.addColorStop(1, 'rgba(' + c + ',0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill(); };
+      const ez = (u) => u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+      const pos = (q, k2) => { const mx = (q.p0[0] + q.p1[0]) / 2, my = (q.p0[1] + q.p1[1]) / 2, dx = q.p1[0] - q.p0[0], dy = q.p1[1] - q.p0[1], c = [mx - dy * 0.22 * q.side, my + dx * 0.22 * q.side], w = 1 - k2; return [w * w * q.p0[0] + 2 * w * k2 * c[0] + k2 * k2 * q.p1[0], w * w * q.p0[1] + 2 * w * k2 * c[1] + k2 * k2 * q.p1[1]]; };
+      const HEAD = '156,200,255', DOT = '#FFFFFF', ARR = '111,224,220';
+      const loop = () => {
+        const now = performance.now(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, innerWidth, innerHeight); let live = 0;
+        parts.forEach(q => {
+          const u = (now - q.s) / q.dur;
+          if (u < -0.3) { live++; return; }
+          if (u < 0) { live++; glow(q.p0[0], q.p0[1], 10 + (u + 0.3) * 30, HEAD, (u + 0.3) / 0.3 * 0.85); return; }
+          if (u <= 1) { live++; const k2 = ez(u);
+            for (let j2 = 12; j2 >= 1; j2--) { const pp = pos(q, Math.max(0, k2 - j2 * 0.02)); ctx.fillStyle = 'rgba(' + HEAD + ',' + ((1 - j2 / 13) * 0.55).toFixed(3) + ')'; ctx.beginPath(); ctx.arc(pp[0], pp[1], 0.6 + (1 - j2 / 13) * 1.6, 0, 6.283); ctx.fill(); }
+            const pp = pos(q, k2); glow(pp[0], pp[1], q.big ? 22 : 14, HEAD, 0.85); ctx.fillStyle = DOT; ctx.beginPath(); ctx.arc(pp[0], pp[1], 1.8, 0, 6.283); ctx.fill(); return; }
+          if (u < 1.4) { live++; const fr = 1 - (u - 1) / 0.4; glow(q.p1[0], q.p1[1], (q.big ? 46 : 22) * (1.4 - fr * 0.4), ARR, fr * 0.8); }
+        });
+        if (live) fxRaf = requestAnimationFrame(loop); else stopFx();
+      };
+      fxRaf = requestAnimationFrame(loop);
+    }
+    const skip = (e) => { if (e && e.type === 'keydown' && (e.metaKey || e.ctrlKey || e.altKey)) return; anims.forEach(a => { try { a.finish(); } catch (x) {} }); stopFx(); done(); };
+    const done = () => { clearTimeout(this.tEnd); removeEventListener('pointerdown', skip, true); removeEventListener('keydown', skip, true); startTilt(); };
+    addEventListener('pointerdown', skip, true); addEventListener('keydown', skip, true);
+    this.tEnd = setTimeout(done, endAt + 50);
+    this.skipIntro = skip;
+  }
+
+  // the stage: a constellation with Vega at the core and one star per page in INDEX order (spec §3, index)
+  tryScene(n) {
+    const sc = document.querySelector('vega-constellation'), cam = document.querySelector('vega-camera');
+    const rd = document.querySelector('vega-readouts');
+    const ready = sc && cam && sc.setData && cam.configure && rd && rd.configure && document.querySelectorAll('[data-stop]').length === 7;
+    if (!ready) { if (n < 200) this.sceneRetry = setTimeout(() => this.tryScene(n + 1), 50); return; }
+    const R = 300, nodes = [{ x: 0, y: 0, z: 0, kind: 'core', size: 5.4, color: 'fg', glow: 'acc', pick: false }], edges = [], stars = [];
+    let seed = 17; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    for (let k = 0; k < 6; k++) {
+      const th = k / 6 * Math.PI * 2 + 0.35, r = R * (0.84 + 0.12 * (k % 2)), y = R * 0.3 * Math.sin(th * 2 + 0.7);
+      const i = nodes.length; stars.push(i);
+      nodes.push({ x: r * Math.sin(th), y, z: r * Math.cos(th), size: 3.4, color: 'fg', glow: 'acc', kind: 'planet', delay: 420 + k * 140 });
+      edges.push({ a: 0, b: i, alpha: 0.24, dash: [2, 5] });
+      // a small cluster around each page star, linked among itself (not to the star, so selecting it lights only its spoke)
+      for (let j = 0, m = 5 + (k % 3); j < m; j++) {
+        const u = rnd() * 6.283, v = rnd() * 2 - 1, d = R * (0.06 + rnd() * 0.08), w = Math.sqrt(1 - v * v);
+        nodes.push({ x: nodes[i].x + Math.cos(u) * w * d, y: y + v * d, z: nodes[i].z + Math.sin(u) * w * d, size: 1 + rnd() * 0.9, alpha: 0.75, color: rnd() < 0.3 ? 'acc' : 'mut', pick: false, delay: 700 + k * 140 + j * 60 });
+        if (j) edges.push({ a: nodes.length - 2, b: nodes.length - 1, alpha: 0.2, pulse: false });
+      }
+    }
+    const ring = stars.map(i => [nodes[i].x, nodes[i].y, nodes[i].z]);
+    sc.setData({ nodes, edges, guides: [{ pts: ring, close: true, alpha: 0.13, dash: [3, 7] }], radius: R, pulse: { tokens: 3, period: 1.6 }, autoRotate: false, zoom: 0.34, pitch: -0.16 });
+    // stops: the hero frames the core under the star mark; each page stop frames that page's star.
+    // The hero runs the scene without its nebula: the ground canvas already lights the mark there, and three
+    // full-screen fills per frame went over budget (p95 33 ms vs 16.7 ms measured).
+    const small = () => innerWidth <= 600, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    // the core lands on the far side of the star from the rail (smaller turn at 390, where the frame is narrow)
+    const off = () => small() ? -0.32 : -0.5;
+    const mark = () => { const m = this.markRef.current; if (!m) return [innerWidth / 2, innerHeight * 0.3]; const b = m.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; };
+    const sections = [...document.querySelectorAll('[data-stop]')].sort((a, b) => +a.dataset.stop - +b.dataset.stop);
+    // each page star's facing yaw, unwrapped so consecutive flights take the short way round
+    let prev = null; const base = stars.map(i => { let y = Math.atan2(nodes[i].x, nodes[i].z) + Math.PI; if (prev != null) { while (y - prev > Math.PI) y -= Math.PI * 2; while (y - prev < -Math.PI) y += Math.PI * 2; } return (prev = y); });
+    // the hero's yaw is free (it frames the core), so start it a short turn before the first page star's
+    const stops = [{ el: sections[0], focus: [0, 0, 0], get yaw() { return base[0] + off() + 0.7; }, pitch: -0.16, zoom: 0.34, opacity: 0.5, nebula: 0, select: -1, at: () => mark() }];
+    stars.forEach((i, k) => {
+      const nd = nodes[i], focus = [nd.x, nd.y, nd.z];
+      stops.push({ el: sections[k + 1], focus, select: i, opacity: 1, pitch: -Math.atan2(nd.y, Math.hypot(nd.x, nd.z)) - 0.2,
+        get yaw() { return base[k] + off(); }, get zoom() { return small() ? 0.62 : 0.7; },
+        // the star near centre, shifted as needed so the core stays inside the frame and clear of the rail
+        at(W, H, scene) {
+          const ps = cam.project(scene, focus, this.yaw, this.pitch, this.zoom), pc = cam.project(scene, [0, 0, 0], this.yaw, this.pitch, this.zoom);
+          const ins = small() ? 12 : 24, m = 56, rail = document.querySelector('vega-rail');
+          const rr = rail && !rail.classList.contains('vr-compact') ? rail.getBoundingClientRect().right + 24 : 0;
+          const minX = Math.max(rr, ins + m), maxX = W - ins - m, minY = ins + 72, maxY = H - ins - 72;
+          let ax = W * 0.5, ay = H * (small() ? 0.36 : 0.4); const cx = ax + pc[0] - ps[0], cy = ay + pc[1] - ps[1];
+          if (cx < minX) ax += minX - cx; else if (cx > maxX) ax -= cx - maxX;
+          if (cy < minY) ay += minY - cy; else if (cy > maxY) ay -= cy - maxY;
+          return [clamp(ax, ins + m, W - ins - m), clamp(ay, minY, maxY)];
+        } });
+    });
+    cam.configure({ scene: sc, sky: document.querySelector('vega-sky-lab'), stops });
+    // the galaxy (galaxy plan, G1): the hero sees the whole spiral from outside, tilted, with VEGA at its core behind
+    // the mark; the first page stop dives in until the galaxy is a band across the sky. Its core stays behind the
+    // constellation's core, and its yaw follows the camera's (parallax), so the VEGA system turns inside its galaxy.
+    if (window.VegaReel) window.VegaReel.on(cam); // film-like chapters: one gesture plays one flight
+    this.tryGalaxy = () => {
+      const gal = document.querySelector('vega-galaxy'); if (!gal || gal.failed) return; if (!('drive' in gal) && !gal.cv) { this.galRetry = setTimeout(this.tryGalaxy, 100); return; }
+      const ease = (t) => t * t * (3 - 2 * t);
+      // VEGA's mark becomes the star itself: the SVG hides and the galaxy draws the mark in light at its spot and size
+      // (same draw-in, same pulse), hands over to the pure star as the first shot leaves the hero, and on ENTER glides
+      // up from the loader's mark while the galaxy ignites. Without WebGL the SVG mark stays as it was.
+      const mEl = this.markRef.current; if (mEl && gal.ps) mEl.style.opacity = '0';
+      const rmq = matchMedia('(prefers-reduced-motion: reduce)');
+      this.onGalPtr = (e) => { if (e.pointerType === 'touch') return; this.gpx = e.clientX / innerWidth - 0.5; this.gpy = e.clientY / innerHeight - 0.5; };
+      addEventListener('pointermove', this.onGalPtr, { passive: true });
+      gal.drive = () => {
+        const now = performance.now(), { lin } = cam.progress(), a = ease(Math.min(1, lin)), b = Math.max(0, lin - 1) / 5, q = sc.P && sc.P[0];
+        const crane = window.VegaReel && window.VegaReel.playing && lin >= 0.5 ? 1 + 0.45 * Math.sin(Math.PI * (window.VegaReel.t || 0)) : 1;
+        const mr = mEl ? mEl.getBoundingClientRect() : null, heroL = mr ? 27 / 64 * mr.width : 0;
+        const k = mr ? 1 - ease(Math.min(1, Math.max(0, (lin - 0.04) / 0.55))) : 0;
+        let L = heroL, off = [0, 0], inP = rmq.matches ? 1 : (this.markInStart ? Math.min(1, Math.max(0, (now - this.markInStart) / this.markInDur)) : (this.gateUp ? 0 : 1));
+        if (this.glide) { const u = Math.min(1, (now - this.glide.t) / (rmq.matches ? 1 : 1100)), e = u * u * (3 - 2 * u);
+          if (mr) { off = [(this.glide.x - (mr.left + mr.width / 2)) * (1 - e), (this.glide.y - (mr.top + mr.height / 2)) * (1 - e)]; L = this.glide.L + (heroL - this.glide.L) * e; }
+          inP = 1; gal.exposure = 0.3 + 0.7 * ease(Math.min(1, (now - this.glide.t) / 1600)); if (u >= 1 && now - this.glide.t > 1600) this.glide = null; }
+        else if (this.gateUp) gal.exposure = 0.3; else gal.exposure = 1;
+        gal.mark = { L, k, in: inP };
+        gal.res = 1; // the mark is drawn crisp (one fixed size: a switch reallocates the canvas and the bloom mid-shot)
+        gal.flare = 0.12 + 0.3 * (1 - k);
+        gal.streak = window.VegaReel && window.VegaReel.playing ? Math.sin(Math.PI * (window.VegaReel.t || 0)) * 0.9 : 0;
+        const px = rmq.matches ? 0 : (this.gpx || 0), py = rmq.matches ? 0 : (this.gpy || 0);
+        return { dist: 2600 * Math.pow(230 / 2600, a) * (1 - 0.35 * b) * crane, yaw: (sc.yaw || 0) * 0.6 + 0.5 + px * 0.09, pitch: 0.62 - 0.46 * a - 0.04 * b - py * 0.05, anchor: q ? [q[0] + off[0], q[1] + off[1]] : null };
+      };
+    };
+    // the page stars are VEGA's planets: on WebGL the galaxy draws them as lit spheres where the constellation projects
+    // them, lit from the core's side (view space); without WebGL the constellation keeps drawing them itself
+    this.tryPlanets = () => { const gal = document.querySelector('vega-galaxy'); if (gal && !gal.failed && !gal.gl) { this.galRetry2 = setTimeout(this.tryPlanets, 100); return; } if (!gal || gal.failed || !gal.ps) return;
+      sc.externalBodies = true;
+      gal.bodies = () => { const P = sc.P; if (!P || !P[0]) return null; const a = +(sc.style.opacity || 1); if (a < 0.01) return null;
+        const r1 = sc.getBoundingClientRect(), r0 = gal.getBoundingClientRect(), ox = r1.left - r0.left, oy = r1.top - r0.top, c = P[0];
+        // a film's key light: VEGA's side, with the light brought round toward the lens so a framed planet shows a
+        // half / crescent instead of an eclipse (the stops look at each planet from outside the system)
+        const lt = (x, y, z) => { const h = Math.hypot(x, y) || 1; return [x / h, y / h, Math.max(z / h, 0.55)]; };
+        const list = stars.map((i, k) => { const q = P[i]; return { x: q[0] + ox, y: q[1] + oy, r: 3.4 * q[3] * 3.6 * (i === sc.sel ? 1.2 : 1), L: lt(c[5] - q[5], c[6] - q[6], -(c[2] - q[2])), z: q[2], i: k, a: a * q[4] }; });
+        list.coreZ = c[2]; return list; }; };
+    this.tryGalaxy(); this.tryPlanets();
+    // pinned readouts: each page star carries its INDEX number (spec §3, index), from the first page stop on
+    const ro = document.querySelector('vega-readouts');
+    if (ro && ro.configure) ro.configure({ scene: sc, items: stars.map((i, k) => ({ node: i, text: String(k + 1).padStart(2, '0'), stop: k + 1 })), showAt: (a) => a >= 1 });
+    // each panel's link dives into its own star
+    stars.forEach((i, k) => { const a = sections[k + 1].querySelector('.vp-h a'); if (a) a.setAttribute('data-fly-node', String(i)); });
+    // a click on a page star flies to its stop
+    this.onPick = (e) => { const k = stars.indexOf(e.detail.index); if (k >= 0) { const t = sections[k + 1].getBoundingClientRect().top + scrollY; scrollTo({ top: t, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } };
+    sc.addEventListener('pick', this.onPick);
+  }
+
+  tryGround(n) {
+    if (this.g || n > 60) return;
+    if (!this.canvasRef.current || !this.canvasRef.current.clientWidth) { this.retry = setTimeout(() => this.tryGround(n + 1), 50); return; }
+    try { this.ground(); } catch (e) { console.error('vega ground', e && e.message); }
+  }
+  componentDidUpdate() {
+    const open = this.state.indexOpen;
+    if (open && !this._wasOpen && this.closeRef.current) this.closeRef.current.focus();
+    if (!open && this._wasOpen) { const hud = document.querySelector('vega-hud'); if (hud && hud.focusIndex) hud.focusIndex(); }
+    this._wasOpen = open;
+    const key = (this.props.ground || '') + '|' + this.props.spikes;
+    if (this._gk !== undefined && this._gk !== key) this.g && this.g.rebuild();
+    this._gk = key;
+  }
+  componentWillUnmount() { if (this.onGalPtr) removeEventListener('pointermove', this.onGalPtr); clearTimeout(this.retry); clearTimeout(this.sceneRetry); const sc = document.querySelector('vega-constellation'); if (sc && this.onPick) sc.removeEventListener('pick', this.onPick); removeEventListener('keydown', this.onKey); this.onTilt && removeEventListener('pointermove', this.onTilt); clearTimeout(this.tEnd); clearTimeout(this.tPulse); removeEventListener('vegapulse', this.onPulse); removeEventListener('vegaindex', this.onIndex); this.onEnter && removeEventListener('vegaenter', this.onEnter); this.g && this.g.stop(); }
+
+  ground() {
+    const c = this.canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d'); if (!ctx) return;
+    const rm = matchMedia('(prefers-reduced-motion: reduce)');
+    const rng = (s) => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    let W = 0, H = 0, cols = [], edges = [], stars = [], pulses = [], cx = 0, cy = 0, box = null;
+    let raf = 0, last = 0, visible = true, px = 0, py = 0, tx = 0, ty = 0, T = 0;
+    const self = this;
+    const intensity = () => ({ calm: 0.6, standard: 1, rich: 1.4 })[self.props.ground] || 1;
+    const nPulses = () => ({ calm: 5, standard: 11, rich: 18 })[self.props.ground] || 11;
+    const spawn = (p) => {
+      const ci = Math.floor(Math.random() * Math.max(1, cols.length - 1));
+      const col = cols[ci]; const a = col[Math.floor(Math.random() * col.length)];
+      p.a = a; p.b = a.out[Math.floor(Math.random() * a.out.length)]; p.t = 0; p.v = 0.00018 + Math.random() * 0.00022; p.life = 2 + Math.floor(Math.random() * 4);
+      p.hue = Math.random() < 0.18 ? 'cy' : 'bw'; return p;
+    };
+    const build = () => {
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      W = c.clientWidth; H = c.clientHeight; c.width = W * dpr; c.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const r = rng(23); const L = W < 700 ? 5 : 9;
+      cols = [];
+      for (let i = 0; i < L; i++) {
+        const n = (W < 700 ? 4 : 6) + Math.floor(r() * 6); const col = [];
+        for (let j = 0; j < n; j++) col.push({ x: (i + 0.5) / L * W + (r() - 0.5) * (W / L) * 0.8, y: (j + r()) / n * H, s: 0.6 + r() * 1.2, b: 0.4 + r() * 0.6, tw: r() * 6.28, out: [] });
+        cols.push(col);
+      }
+      edges = [];
+      for (let i = 0; i < L - 1; i++) for (const a of cols[i]) {
+        const nx = cols[i + 1].slice().sort((p, q) => Math.abs(p.y - a.y) - Math.abs(q.y - a.y));
+        const k = 2 + (r() < 0.35 ? 1 : 0);
+        for (let m = 0; m < k && m < nx.length; m++) { a.out.push(nx[m]); edges.push([a, nx[m]]); }
+      }
+      stars = []; const ns = Math.round(W * H / 4200);
+      for (let i = 0; i < ns; i++) stars.push({ x: r() * W, y: r() * H, s: 0.25 + r() * 0.8, b: 0.15 + r() * 0.55, tw: r() * 6.28 });
+      pulses = []; for (let i = 0; i < nPulses(); i++) { const p = spawn({}); p.t = Math.random(); pulses.push(p); }
+      measure();
+    };
+    const measure = () => {
+      const cr = c.getBoundingClientRect();
+      const m = self.markRef.current && self.markRef.current.getBoundingClientRect();
+      if (m) { cx = m.left - cr.left + m.width / 2; cy = m.top - cr.top + m.height / 2; } else { cx = W / 2; cy = H * 0.36; }
+      const t = self.textRef.current && self.textRef.current.getBoundingClientRect();
+      box = t ? { l: t.left - cr.left - 30, r: t.right - cr.left + 30, t: cy - 90, b: t.bottom - cr.top + 20 } : null;
+    };
+    // quieter behind the text column so copy keeps its contrast on the brightest frame
+    const mask = (x, y) => {
+      if (!box) return 1;
+      const dx = Math.max(box.l - x, 0, x - box.r), dy = Math.max(box.t - y, 0, y - box.b);
+      const d = Math.hypot(dx, dy); return d <= 0 ? 0.12 : Math.min(1, 0.12 + d / 90);
+    };
+    const draw = (now) => {
+      const k = intensity();
+      px += (tx - px) * 0.04; py += (ty - py) * 0.04;
+      ctx.clearRect(0, 0, W, H);
+      const breath = 0.5 + 0.5 * Math.sin(now / 2800);
+      const R = Math.max(W, H) * 0.42;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+      g.addColorStop(0, `rgba(156,200,255,${0.11 * k * (0.78 + 0.22 * breath)})`); g.addColorStop(0.35, `rgba(60,150,170,${0.04 * k})`); g.addColorStop(1, 'rgba(10,40,50,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      const ink = '214,232,255';
+      for (const s of stars) {
+        const x = s.x + px * 0.35, y = s.y + py * 0.35;
+        const a = s.b * (0.6 + 0.4 * Math.sin(now / 1900 + s.tw)) * 0.75 * mask(x, y);
+        ctx.fillStyle = 'rgba(' + ink + ',' + a + ')'; ctx.fillRect(x, y, s.s, s.s);
+      }
+      ctx.lineWidth = 0.6;
+      for (const [a, b] of edges) {
+        const ax = a.x + px, ay = a.y + py, bx = b.x + px, by = b.y + py;
+        const m = Math.min(mask(ax, ay), mask(bx, by), mask((ax + bx) / 2, (ay + by) / 2));
+        ctx.strokeStyle = 'rgba(156,200,255,' + 0.07 * k * m + ')';
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+      }
+      for (const col of cols) for (const n of col) {
+        const x = n.x + px, y = n.y + py;
+        const a = n.b * (0.7 + 0.3 * Math.sin(now / 2300 + n.tw)) * 0.85 * mask(x, y);
+        ctx.fillStyle = 'rgba(' + ink + ',' + a + ')'; ctx.beginPath(); ctx.arc(x, y, n.s, 0, 6.283); ctx.fill();
+      }
+      if (self.props.spikes !== false) {
+        const sa = 0.2 * k * (0.85 + 0.15 * breath);
+        const col = '200,225,255';
+        const line = (x1, y1, x2, y2, a) => { const lg = ctx.createLinearGradient(x1, y1, x2, y2); lg.addColorStop(0, 'rgba(' + col + ',' + a + ')'); lg.addColorStop(1, 'rgba(' + col + ',0)'); ctx.strokeStyle = lg; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); };
+        line(cx - 70, cy, 0, cy, sa); line(cx + 70, cy, W, cy, sa); line(cx, cy - 70, cx, 0, sa); line(cx, cy + 70, cx, cy + 92, sa * 0.5);
+        for (let i = 0; i < 3; i++) {
+          const f = ((now / 9000) + i / 3) % 1; const e = f * f; const fade = Math.sin(f * Math.PI) * sa * 3.2;
+          for (const [dx, dy, len] of [[-1, 0, cx - 70], [1, 0, W - cx - 70], [0, -1, cy - 70]]) {
+            const x = cx + dx * (70 + e * len), y = cy + dy * (70 + e * len);
+            ctx.fillStyle = 'rgba(' + col + ',' + Math.min(0.9, fade) * mask(x, y) + ')'; ctx.beginPath(); ctx.arc(x, y, 1.3, 0, 6.283); ctx.fill();
+          }
+        }
+      }
+      for (const p of pulses) {
+        const ax = p.a.x + px, ay = p.a.y + py, bx = p.b.x + px, by = p.b.y + py;
+        const x = ax + (bx - ax) * p.t, y = ay + (by - ay) * p.t;
+        const t0 = Math.max(0, p.t - 0.22), x0 = ax + (bx - ax) * t0, y0 = ay + (by - ay) * t0;
+        const m = mask(x, y);
+        const rgb = p.hue === 'cy' ? '111,224,220' : '214,235,255';
+        const lg = ctx.createLinearGradient(x0, y0, x, y); lg.addColorStop(0, 'rgba(' + rgb + ',0)'); lg.addColorStop(1, 'rgba(' + rgb + ',' + 0.55 * m + ')');
+        ctx.strokeStyle = lg; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x, y); ctx.stroke();
+        ctx.fillStyle = 'rgba(' + rgb + ',' + 0.9 * m + ')'; ctx.beginPath(); ctx.arc(x, y, 1.4, 0, 6.283); ctx.fill();
+      }
+    };
+    const step = (now) => {
+      const dt = Math.min(64, last ? now - last : 16); last = now; T += dt;
+      for (const p of pulses) { p.t += p.v * dt; if (p.t >= 1) { if (p.b.out.length && --p.life > 0) { p.a = p.b; p.b = p.a.out[Math.floor(Math.random() * p.a.out.length)]; p.t = 0; } else spawn(p); } }
+      draw(T); raf = requestAnimationFrame(step);
+    };
+    const running = () => visible && !document.hidden && !rm.matches;
+    const sync = () => { cancelAnimationFrame(raf); raf = 0; last = 0; if (running()) raf = requestAnimationFrame(step); else draw(T || 4000); };
+    const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }); io.observe(c);
+    const ro = new ResizeObserver(() => { build(); draw(T || 4000); }); ro.observe(c);
+    const onVis = () => sync(); document.addEventListener('visibilitychange', onVis);
+    const onMove = (e) => { if (rm.matches) return; tx = (e.clientX / innerWidth - 0.5) * -14; ty = (e.clientY / innerHeight - 0.5) * -10; };
+    addEventListener('pointermove', onMove);
+    rm.addEventListener && rm.addEventListener('change', sync);
+    build(); sync();
+    this.g = {
+      once: () => { measure(); if (!raf) draw(T || 4000); },
+      rebuild: () => { build(); if (!raf) draw(T || 4000); },
+      stop: () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); document.removeEventListener('visibilitychange', onVis); removeEventListener('pointermove', onMove); }
+    };
+  }
+
+  renderVals() {
+    const pages = [
+      { num: '00', label: 'Threshold', href: 'index.dc.html', note: 'HERE' },
+      { num: '01', label: 'The chain', href: 'chain.dc.html', note: '' },
+      { num: '02', label: 'The data lane', href: 'data.dc.html', note: '' },
+      { num: '03', label: 'The rules', href: 'promise.dc.html', note: '' },
+      { num: '04', label: 'The proof', href: 'proof.dc.html', note: '' },
+      { num: '05', label: 'Coverage & the showcase', href: 'coverage.dc.html', note: '' },
+      { num: '06', label: 'Install', href: 'install.dc.html', note: '' },
+      { num: '07', label: 'Docs — vega-eval', href: '../docs/vega-eval.dc.html', note: 'DOCS' },
+      { num: '08', label: 'Docs — vega-show', href: '../docs/vega-show.dc.html', note: 'DOCS' }
+    ];
+    return {
+      stops: pages.slice(1, 7).map((p, i) => ({ n: i + 1, label: p.label, id: 'stop-' + p.num, num: p.num, href: p.href, last: i === 5 })),
+      takeControls: () => { const h = document.querySelector('vega-hud'); if (h && h.toggleFlight) h.toggleFlight(); }, /* the last chapter's invitation: FLY (G7) */
+      canvasRef: this.setCanvas, markRef: this.setMark, textRef: this.setText, closeRef: this.setClose,
+      indexOpen: this.state.indexOpen,
+      openIndex: () => this.setState({ indexOpen: true }),
+      closeIndex: () => this.setState({ indexOpen: false }),
+      pages
+    };
+  }
+}
+</script>
+</body>
+</html>
